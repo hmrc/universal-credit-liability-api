@@ -24,7 +24,7 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 
-class HealthEndpointIntegrationSpec
+class DocumentationEndpointsIntegrationSpec
     extends AnyWordSpec
     with Matchers
     with ScalaFutures
@@ -38,11 +38,23 @@ class HealthEndpointIntegrationSpec
     GuiceApplicationBuilder()
       .build()
 
-  "service health endpoint" should {
+  "/api/definition endpoint" should {
     "respond with 200 status" in {
       val response =
         wsClient
-          .url(s"$baseUrl/ping/ping")
+          .url(s"$baseUrl/api/definition")
+          .get()
+          .futureValue
+
+      response.status shouldBe 200
+    }
+  }
+
+  "/api/conf/1.0/application.yaml endpoint" should {
+    "respond with 200 status" in {
+      val response =
+        wsClient
+          .url(s"$baseUrl/api/conf/1.0/application.yaml")
           .get()
           .futureValue
 
