@@ -16,6 +16,7 @@ lazy val microservice = Project("universal-credit-liability-api", file("."))
   .settings(
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
   )
+  .settings(PlayKeys.playDefaultPort := 16107)
 
 lazy val it = project
   .enablePlugins(PlayScala)
