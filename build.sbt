@@ -11,7 +11,6 @@ lazy val microservice = Project("universal-credit-liability-api", file("."))
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s"
   )
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings*)
   .settings(
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
