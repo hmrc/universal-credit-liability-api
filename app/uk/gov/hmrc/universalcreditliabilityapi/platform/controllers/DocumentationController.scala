@@ -18,10 +18,10 @@ package uk.gov.hmrc.universalcreditliabilityapi.platform.controllers
 
 import controllers.Assets
 import play.api.libs.json.*
+import play.api.libs.json.JsValue.jsValueToJsLookup
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.universalcreditliabilityapi.config.AppConfig
-import uk.gov.hmrc.universalcreditliabilityapi.platform.models.*
 
 import javax.inject.{Inject, Singleton}
 import scala.io.Source
@@ -31,27 +31,44 @@ class DocumentationController @Inject() (assets: Assets, cc: ControllerComponent
     extends BackendController(cc) {
 
   def definition(): Action[AnyContent] = Action {
-    val apiBase  = Json.parse(Source.fromResource("api.definition/api-base.json").mkString(""))
-    val versions = Json
+    val definitionBase = Json.parse(Source.fromResource("api.definition/definition-base.json").mkString(""))
+    val versions       = Json
       .parse(Source.fromResource("api.definition/default-versions.json").mkString(""))
-      .validate[List[Version]]
-      .get
 
-    val updatedVersions = versions.map { versionObj =>
-      val version              = versionObj.version
-      val maybeConfigOverrides = appConfig.definitionOverrides.get(version)
-      val status               = maybeConfigOverrides.flatMap(_.status).getOrElse(versionObj.status)
-      val endpointsEnabled     = maybeConfigOverrides.map(_.endpointsEnabled).getOrElse(versionObj.endpointsEnabled)
+    val versionTransformer =
+      __.read[JsArray]
+        .map { case JsArray(array) =>
+          JsArray(array.map { obj =>
+            val version                 = (jsValueToJsLookup(obj) \ "version").get.as[String]
+            val defaultStatus           = (jsValueToJsLookup(obj) \ "status").get.as[String]
+            val defaultEndpointsEnabled = (jsValueToJsLookup(obj) \ "endpointsEnabled").get.asOpt[Boolean]
 
-      versionObj.copy(
-        status = status,
-        endpointsEnabled = endpointsEnabled
+            val maybeConfigOverrides = appConfig.definitionOverrides.get(version)
+            val status               = maybeConfigOverrides.flatMap(_.status).getOrElse(defaultStatus)
+            val endpointsEnabled     = maybeConfigOverrides.map(_.endpointsEnabled).getOrElse(defaultEndpointsEnabled)
+
+            obj.as[JsObject]
+              + ("status"           -> Json.toJson(status))
+              + ("endpointsEnabled" -> Json.toJson(endpointsEnabled))
+          })
+        }
+
+    val definitionTransformer = (__ \ "api").json
+      .update(
+        __.read[JsObject]
+          .map(
+            _ + ("versions" ->
+              versions
+                .transform(versionTransformer)
+                .getOrElse(throw new Exception("Unable to generate versions")))
+          )
       )
-    }
 
-    val api = apiBase.as[JsObject] + ("versions" -> Json.toJson(updatedVersions))
-
-    Ok(Json.obj("api" -> api))
+    Ok(
+      definitionBase
+        .transform(definitionTransformer)
+        .getOrElse(throw new Exception("Unable to generate definition.json"))
+    )
   }
 
   def specification(version: String, file: String): Action[AnyContent] =
