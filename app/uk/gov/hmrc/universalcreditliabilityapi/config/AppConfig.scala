@@ -22,5 +22,13 @@ import play.api.Configuration
 @Singleton
 class AppConfig @Inject() (config: Configuration) {
 
-  val appName: String = config.get[String]("appName")
+  val appName: String                              = config.get[String]("appName")
+  val definitionOverrides: Map[String, Override]   = Map(
+    "1.0" -> Override(Some("BETA"), Some(true))
+  )
+  val apiPlatformStatus: Option[String]            = config.getOptional[String]("apiPlatformStatus").orElse(Some("BETA"))
+  val apiPlatformEndpointsEnabled: Option[Boolean] =
+    config.getOptional[Boolean]("apiPlatformEndpointsEnabled").orElse(Some(true))
 }
+
+final case class Override(status: Option[String], endpointsEnabled: Option[Boolean], hide: Boolean = true)

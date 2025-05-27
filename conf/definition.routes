@@ -1,2 +1,2 @@
-GET        /api/definition                 uk.gov.hmrc.universalcreditliabilityapi.controllers.DocumentationController.definition()
-GET        /api/conf/:version/*file        uk.gov.hmrc.universalcreditliabilityapi.controllers.DocumentationController.specification(version, file)
+GET        /api/definition                 uk.gov.hmrc.universalcreditliabilityapi.platform.controllers.DocumentationController.definition()
+GET        /api/conf/:version/*file        uk.gov.hmrc.universalcreditliabilityapi.platform.controllers.DocumentationController.specification(version, file)
