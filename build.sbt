@@ -13,9 +13,16 @@ lazy val microservice = Project("universal-credit-liability-api", file("."))
   )
   .settings(CodeCoverageSettings.settings*)
   .settings(
-    Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
+    PlayKeys.playDefaultPort := 16107,
+    // uncomment this to use the custom formatter
+//    TwirlKeys.templateFormats += ("jso" -> "uk.gov.hmrc.universalcreditliabilityapi.twirl.JsoFormat"),
+    Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
+    Compile / TwirlKeys.compileTemplates / sourceDirectories := (Compile / unmanagedSourceDirectories).value,
+    Compile / unmanagedResourceDirectories += baseDirectory.value / "target" / "scala-3.3.5" / "twirl" / "main",
+//    Runtime / unmanagedResourceDirectories += baseDirectory.value / "target" / "scala-3.3.5" / "twirl" / "main",
+    TwirlKeys.templateImports += "uk.gov.hmrc.universalcreditliabilityapi.config.*",
+//    TwirlKeys.templateImports += "uk.gov.hmrc.universalcreditliabilityapi.twirl.*"
   )
-  .settings(PlayKeys.playDefaultPort := 16107)
 
 lazy val it = project
   .enablePlugins(PlayScala)
