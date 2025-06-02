@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.universalcreditliabilityapi.twirl
+package views
 
-import play.twirl.api.Format
-import play.twirl.api.BufferedContent
+import play.api.http.ContentTypeOf
+import play.api.mvc.Codec
 import play.twirl.api.utils.StringEscapeUtils
+import play.twirl.api.{BufferedContent, Format}
 
 class Jso(elements: Seq[Jso], text: String) extends BufferedContent[Jso](elements, text) {
-  val contentType = "application/json"
-
-  def this(text: String) = this(Nil, Formats.safe(text))
-
-  def this(elements: Seq[Jso]) = this(elements, "")
-
+  override val contentType = Jso.contentType
 }
 
 object Jso {
-  def apply(text: String) =
-    new Jso(text)
+  val contentType = "application/json"
+
+  implicit def contentTypeJso(implicit codec: Codec): ContentTypeOf[Jso] = ContentTypeOf[Jso](Some(Jso.contentType))
+
+  def apply(text: String) = new Jso(Nil, Formats.safe(text))
+
+  def apply(elements: Seq[Jso]) = new Jso(elements, "")
+
 }
 
 object Formats {
@@ -47,6 +49,6 @@ object JsoFormat extends Format[Jso] {
 
   override def empty: Jso = Jso("")
 
-  override def fill(elements: Seq[Jso]): Jso = new Jso(elements)
+  override def fill(elements: Seq[Jso]): Jso = Jso(elements)
 
 }

@@ -17,11 +17,10 @@
 package uk.gov.hmrc.universalcreditliabilityapi.platform.controllers
 
 import controllers.Assets
-import play.api.libs.json.{Json => PlayJson}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.universalcreditliabilityapi.config.AppConfig
-import uk.gov.hmrc.universalcreditliabilityapi.views.*
+import views.*
 
 import javax.inject.{Inject, Singleton}
 
@@ -34,10 +33,7 @@ class DocumentationController @Inject() (
 
   def definition(): Action[AnyContent] = Action {
     Ok(
-//      jso.definition(appConfig) // can't seem to get custom formatter working
-      PlayJson.parse(js.definition(appConfig).toString) // javascript formatter also escapes the same thing
-
-      // in both cases the template is not very well formatted due to lack of IDE support
+      jso.definition(appConfig)
     )
   }
 
