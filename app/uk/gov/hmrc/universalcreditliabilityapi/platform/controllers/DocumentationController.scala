@@ -20,7 +20,7 @@ import controllers.Assets
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.universalcreditliabilityapi.config.AppConfig
-import views.*
+import uk.gov.hmrc.universalcreditliabilityapi.views.*
 
 import javax.inject.{Inject, Singleton}
 

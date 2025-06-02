@@ -1,9 +1,14 @@
+import play.japi.twirl.compiler.TwirlCompiler
 import uk.gov.hmrc.DefaultBuildSettings
+
+import scala.collection.JavaConverters
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.3.5"
 
-libraryDependencies += guice
+lazy val configTest = settingKey[String]("example")
+
+configTest := TwirlKeys.templateImports.value.mkString("\n")
 
 lazy val microservice = Project("universal-credit-liability-api", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
@@ -16,8 +21,12 @@ lazy val microservice = Project("universal-credit-liability-api", file("."))
   .settings(CodeCoverageSettings.settings*)
   .settings(
     PlayKeys.playDefaultPort := 16107,
-    TwirlKeys.templateImports += "uk.gov.hmrc.universalcreditliabilityapi.config.*",
-    TwirlKeys.templateFormats += ("jso" -> "views.JsoFormat")
+    TwirlKeys.templateFormats += ("jso" -> "views.JsoFormat"),
+    // remove unwanted twirl imports by resetting it to the bare minimum required
+//    TwirlKeys.templateImports := JavaConverters.asScalaIterator(TwirlCompiler.DEFAULT_IMPORTS.iterator()).toSeq,
+// remove the normal formatters
+    //    TwirlKeys.templateImports -= "views.%format%._",
+    TwirlKeys.templateImports += "uk.gov.hmrc.universalcreditliabilityapi.config.*"
   )
 
 lazy val it = project
