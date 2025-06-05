@@ -1,1 +1,1 @@
-This is a placeholder overview.md for a new API Microservice repository
+This API provides the capability for DWP to send Universal Credit Liability notifications for a given individual on NPS (National Insurance & PAYE Service).

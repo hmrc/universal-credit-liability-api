@@ -1,16 +1,17 @@
 {
-  "scopes": [
-  ],
   "api": {
-    "name": "Hello World",
-    "description": "A 'hello world' example of an API on the HMRC API Developer Hub.",
-    "context": "discuss-with-the-api-platform-team",
-    "categories": ["OTHER"],
+    "name": "Universal Credit Liability",
+    "description": "This API provides the capability to receive UC business data from DWP's Universal Credits Full Service (UCFS) system.",
+    "context": "misc/universal-credit/liability",
+    "categories": [ "PRIVATE_GOVERNMENT" ],
     "versions": [
       {
         "version": "1.0",
         "status": "ALPHA",
-        "endpointsEnabled": false
+        "endpointsEnabled": false,
+        "access": {
+          "type": "PRIVATE"
+        }
       }
     ]
   }
