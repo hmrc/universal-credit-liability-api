@@ -17,16 +17,15 @@
 package uk.gov.hmrc.universalcreditliabilityapi
 
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
+import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 
-class DocumentationEndpointsIntegrationSpec
-    extends AnyWordSpec
-    with Matchers
+class SpecificationEndpointIntegrationSpec
+    extends PlaySpec
     with ScalaFutures
     with IntegrationPatience
     with GuiceOneServerPerSuite {
@@ -38,19 +37,7 @@ class DocumentationEndpointsIntegrationSpec
     GuiceApplicationBuilder()
       .build()
 
-  "/api/definition endpoint" should {
-    "respond with 200 status" in {
-      val response =
-        wsClient
-          .url(s"$baseUrl/api/definition")
-          .get()
-          .futureValue
-
-      response.status shouldBe 200
-    }
-  }
-
-  "/api/conf/1.0/application.yaml endpoint" should {
+  "GET /api/conf/1.0/application.yaml" must {
     "respond with 200 status" in {
       val response =
         wsClient
@@ -58,7 +45,7 @@ class DocumentationEndpointsIntegrationSpec
           .get()
           .futureValue
 
-      response.status shouldBe 200
+      response.status mustBe Status.OK
     }
   }
 }

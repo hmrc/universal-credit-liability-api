@@ -3,16 +3,8 @@
     "name": "Universal Credit Liability",
     "description": "This API provides the capability to receive UC business data from DWP's Universal Credits Full Service (UCFS) system.",
     "context": "misc/universal-credit/liability",
-    "categories": [ "PRIVATE_GOVERNMENT" ],
-    "versions": [
-      {
-        "version": "1.0",
-        "status": "ALPHA",
-        "endpointsEnabled": false,
-        "access": {
-          "type": "PRIVATE"
-        }
-      }
+    "categories": [
+      "PRIVATE_GOVERNMENT"
     ]
   }
 }
