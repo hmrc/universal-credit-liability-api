@@ -22,12 +22,10 @@ import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.universalcreditliabilityapi.connectors.HipConnector
 import uk.gov.hmrc.universalcreditliabilityapi.models.errors.Failure
-import uk.gov.hmrc.universalcreditliabilityapi.models.requests.UniversalCreditAction
-import uk.gov.hmrc.universalcreditliabilityapi.models.requests.UniversalCreditAction.{Insert, Terminate}
-import uk.gov.hmrc.universalcreditliabilityapi.services.SchemaValidationService
+import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorCodes.ForbiddenCode
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ForbiddenReason
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.OriginatorId
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, OriginatorId}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,32 +34,21 @@ import scala.concurrent.{ExecutionContext, Future}
 class UcLiabilityNotificationController @Inject() (
   cc: ControllerComponents,
   ucLiabilityService: SchemaValidationService,
+  mappingService: MappingService,
   hipConnector: HipConnector
 )(implicit val ec: ExecutionContext)
     extends BackendController(cc) {
 
   def submitLiabilityNotification(): Action[JsValue] = Action.async(parse.json) { implicit request =>
     (for {
-      _            <- validateOriginatorId(request)
-      creditAction <- ucLiabilityService.validateLiabilityNotificationRequest(request)
-    } yield creditAction match {
-      case Insert =>
-        val call = hipConnector.insertUcLiability(request)
-
-        call.map(result =>
-          Status(result.status)(result.body)
-            .withHeaders(result.headers.toSeq.map((k, v) => (k, v.mkString(" "))): _*)
-        )
-
-      case Terminate =>
-        val call = hipConnector.terminateUcLiability(request)
-
-        call.map(result =>
-          Status(result.status)(result.body)
-            .withHeaders(result.headers.toSeq.map((k, v) => (k, v.mkString(" "))): _*)
-        )
-
-    }).merge
+      originatorId                            <- validateOriginatorId(request)
+      validatedRequest                        <- ucLiabilityService.validateLiabilityNotificationRequest(request)
+      (correlationId, requestObject)           = validatedRequest
+      (nationalInsuranceNumber, mappedRequest) = mappingService.map(requestObject)
+    } yield hipConnector
+      .sendUcLiability(nationalInsuranceNumber, correlationId, originatorId, mappedRequest)
+      .map(result => Status(result.status)(result.body))).merge
+      .map(_.withHeaders("correlationId" -> request.headers.get(CorrelationId).getOrElse("")))
   }
 
   private def validateOriginatorId[T](request: Request[T]) =

@@ -34,23 +34,26 @@ class SchemaValidationService {
 
   def validateLiabilityNotificationRequest(
     request: Request[JsValue]
-  ): Either[Future[Result], UniversalCreditAction] = {
-    val correlationIdValidation = validateCorrelationId(request.headers.get(HeaderNames.CorrelationId))
-    val actionValidation        = determineActionType(request.body).flatMap {
-      case Insert    =>
-        validateJson[InsertUcLiabilityRequest](request).map(_.universalCreditAction)
-      case Terminate =>
-        validateJson[TerminateUcLiabilityRequest](request).map(_.universalCreditAction)
-    }
+  ): Either[Future[Result], (String, InsertUcLiabilityRequest | TerminateUcLiabilityRequest)] = {
+    val correlationIdValidation: EitherNec[Failures, String]                                                      = validateCorrelationId(
+      request.headers.get(HeaderNames.CorrelationId)
+    )
+    val actionValidation: Either[NonEmptyChain[Failures], InsertUcLiabilityRequest | TerminateUcLiabilityRequest] =
+      determineActionType(request.body).flatMap {
+        case Insert    =>
+          validateJson[InsertUcLiabilityRequest](request)
+        case Terminate =>
+          validateJson[TerminateUcLiabilityRequest](request)
+      }
 
     (correlationIdValidation, actionValidation)
-      .parMapN((_, action) => action)
+      .parMapN((correlationId, requestObject) => (correlationId, requestObject))
       .leftMap(mergeFailures)
   }
 
-  private def validateCorrelationId(correlationId: Option[String]): EitherNec[Failures, Unit] =
+  private def validateCorrelationId(correlationId: Option[String]): EitherNec[Failures, String] =
     correlationId match {
-      case Some(id) if CorrelationIdPattern.matches(id) => Right(())
+      case Some(id) if CorrelationIdPattern.matches(id) => Right(id)
       case _                                            =>
         Left(
           NonEmptyChain.one(

@@ -26,5 +26,5 @@ final case class UcLiabilityTerminationDetails(
 )
 
 object UcLiabilityTerminationDetails {
-  implicit val format: OFormat[UcLiabilityTerminationDetails] = Json.format[UcLiabilityTerminationDetails]
+  implicit val format: OWrites[UcLiabilityTerminationDetails] = Json.writes[UcLiabilityTerminationDetails]
 }

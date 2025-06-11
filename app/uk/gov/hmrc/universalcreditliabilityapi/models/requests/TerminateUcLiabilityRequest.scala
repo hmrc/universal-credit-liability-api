@@ -17,7 +17,7 @@
 package uk.gov.hmrc.universalcreditliabilityapi.models.requests
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsPath, Json, OWrites, Reads}
+import play.api.libs.json.{JsPath, Reads}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ValidationPatterns.{validDate, validNino}
 
 case class TerminateUcLiabilityRequest(
@@ -38,5 +38,4 @@ object TerminateUcLiabilityRequest {
       (JsPath \ "liabilityEndDate").read(validDate)
   )(TerminateUcLiabilityRequest.apply _)
 
-  implicit val writes: OWrites[TerminateUcLiabilityRequest] = Json.writes[TerminateUcLiabilityRequest]
 }

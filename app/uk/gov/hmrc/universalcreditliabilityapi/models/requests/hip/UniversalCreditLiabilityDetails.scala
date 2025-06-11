@@ -22,10 +22,9 @@ import uk.gov.hmrc.universalcreditliabilityapi.models.requests.UniversalCreditRe
 final case class UniversalCreditLiabilityDetails(
   universalCreditRecordType: UniversalCreditRecordType,
   dateOfBirth: String,
-  liabilityStartDate: String,
-  liabilityEndDate: Option[String]
+  liabilityStartDate: String
 )
 
 object UniversalCreditLiabilityDetails {
-  implicit val format: OFormat[UniversalCreditLiabilityDetails] = Json.format[UniversalCreditLiabilityDetails]
+  implicit val format: OWrites[UniversalCreditLiabilityDetails] = Json.writes[UniversalCreditLiabilityDetails]
 }

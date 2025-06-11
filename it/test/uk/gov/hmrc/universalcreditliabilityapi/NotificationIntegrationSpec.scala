@@ -29,14 +29,13 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
   private val wsClient = app.injector.instanceOf[WSClient]
   private val baseUrl  = s"http://localhost:$port"
+  private val nino = "AA000001"
 
   "POST /notification" must {
     "return 204 when HIP returns 204 for insert" in {
-      val nino = ":nino"
-
       stubHipInsert(nino)
 
-      val response = callPostNotification(false)
+      val response = callPostInsertion(nino)
 
       response.status mustBe Status.NO_CONTENT
 
@@ -44,11 +43,9 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     }
 
     "return 204 when HIP returns 204 for terminate" in {
-      val nino = ":nino"
-
       stubHipTermination(nino)
 
-      val response = callPostNotification(true)
+      val response = callPostTermination(nino)
 
       response.status mustBe Status.NO_CONTENT
 
@@ -80,16 +77,40 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
         )
     )
 
-  def callPostNotification(terminate: Boolean): WSResponse =
+  def callPostInsertion(nino: String): WSResponse =
     wsClient
       .url(s"$baseUrl/notification")
       .withHttpHeaders(
         "correlationId"        -> TestData.correlationId,
-        "gov-uk-originator-id" -> TestData.testOriginatorId,
-        // TODO remove temp workaround
-        "terminate"            -> terminate.toString
+        "gov-uk-originator-id" -> TestData.testOriginatorId
       )
-      .post(Json.parse("{}"))
+      .post(Json.parse(s"""
+          |{
+          |  "nationalInsuranceNumber": "$nino",
+          |  "universalCreditRecordType": "UC",
+          |  "universalCreditAction": "Insert",
+          |  "dateOfBirth": "2002-10-10",
+          |  "liabilityStartDate": "2025-08-19"
+          |}
+          |""".stripMargin))
+      .futureValue
+
+  def callPostTermination(nino: String): WSResponse =
+    wsClient
+      .url(s"$baseUrl/notification")
+      .withHttpHeaders(
+        "correlationId"        -> TestData.correlationId,
+        "gov-uk-originator-id" -> TestData.testOriginatorId
+      )
+      .post(Json.parse(s"""
+           |{
+           |  "nationalInsuranceNumber": "$nino",
+           |  "universalCreditRecordType": "UC",
+           |  "universalCreditAction": "Terminate",
+           |  "liabilityStartDate": "2025-08-19",
+           |  "liabilityEndDate": "2025-08-19"
+           |}
+           |""".stripMargin))
       .futureValue
 }
 
