@@ -18,7 +18,7 @@ package uk.gov.hmrc.universalcreditliabilityapi.controllers
 
 import jakarta.inject.Singleton
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents, Request}
+import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.universalcreditliabilityapi.connectors.HipConnector
 import uk.gov.hmrc.universalcreditliabilityapi.models.errors.Failure
@@ -30,23 +30,37 @@ import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.Forbid
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.OriginatorId
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UcLiabilityNotificationController @Inject() (
   cc: ControllerComponents,
   ucLiabilityService: SchemaValidationService,
   hipConnector: HipConnector
-) extends BackendController(cc) {
+)(implicit val ec: ExecutionContext)
+    extends BackendController(cc) {
 
-  def submitLiabilityNotification(): Action[JsValue] = Action(parse.json) { request =>
+  def submitLiabilityNotification(): Action[JsValue] = Action.async(parse.json) { implicit request =>
     (for {
       _            <- validateOriginatorId(request)
       creditAction <- ucLiabilityService.validateLiabilityNotificationRequest(request)
     } yield creditAction match {
-      case Insert    =>
-        hipConnector.insertUcLiability(request)
+      case Insert =>
+        val call = hipConnector.insertUcLiability(request)
+
+        call.map(result =>
+          Status(result.status)(result.body)
+            .withHeaders(result.headers.toSeq.map((k, v) => (k, v.mkString(" "))): _*)
+        )
+
       case Terminate =>
-        hipConnector.terminateUcLiability(request)
+        val call = hipConnector.terminateUcLiability(request)
+
+        call.map(result =>
+          Status(result.status)(result.body)
+            .withHeaders(result.headers.toSeq.map((k, v) => (k, v.mkString(" "))): _*)
+        )
+
     }).merge
   }
 
@@ -54,5 +68,9 @@ class UcLiabilityNotificationController @Inject() (
     request.headers
       .get(OriginatorId)
       .filter(_ => true) // TODO: Add business logic for originator id here
-      .toRight(Forbidden(Json.toJson(Failure(reason = ForbiddenReason, code = ForbiddenCode))))
+      .toRight(
+        Future.successful(
+          Results.Forbidden(Json.toJson(Failure(reason = ForbiddenReason, code = ForbiddenCode)))
+        )
+      )
 }

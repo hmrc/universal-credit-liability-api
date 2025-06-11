@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.universalcreditliabilityapi.models.requests.hip
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.*
 import uk.gov.hmrc.universalcreditliabilityapi.models.requests.UniversalCreditRecordType
 

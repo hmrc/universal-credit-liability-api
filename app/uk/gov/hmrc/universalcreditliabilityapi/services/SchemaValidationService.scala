@@ -22,17 +22,19 @@ import play.api.libs.json.*
 import play.api.mvc.Results.BadRequest
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.universalcreditliabilityapi.models.errors.{Failure, Failures}
-import uk.gov.hmrc.universalcreditliabilityapi.models.requests.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest, UniversalCreditAction}
 import uk.gov.hmrc.universalcreditliabilityapi.models.requests.UniversalCreditAction.{Insert, Terminate}
+import uk.gov.hmrc.universalcreditliabilityapi.models.requests.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest, UniversalCreditAction}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ValidationPatterns.CorrelationIdPattern
+
+import scala.concurrent.Future
 
 class SchemaValidationService {
 
   def validateLiabilityNotificationRequest(
     request: Request[JsValue]
-  ): Either[Result, UniversalCreditAction] = {
+  ): Either[Future[Result], UniversalCreditAction] = {
     val correlationIdValidation = validateCorrelationId(request.headers.get(HeaderNames.CorrelationId))
     val actionValidation        = determineActionType(request.body).flatMap {
       case Insert    =>
@@ -96,8 +98,8 @@ class SchemaValidationService {
         )
     }
 
-  private def mergeFailures(failures: NonEmptyChain[Failures]): Result = {
+  private def mergeFailures(failures: NonEmptyChain[Failures]): Future[Result] = {
     val allFailures: Seq[Failure] = failures.toList.flatMap(_.failures)
-    BadRequest(Json.toJson(Failures(allFailures)))
+    Future.successful(BadRequest(Json.toJson(Failures(allFailures))))
   }
 }
