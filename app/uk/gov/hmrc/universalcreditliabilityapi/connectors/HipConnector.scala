@@ -60,7 +60,7 @@ class HipConnector @Inject() (httpClientV2: HttpClientV2, appConfig: AppConfig)(
     val url = appConfig.hipBaseUrl
 
     httpClientV2
-      .post(url"$url/person/${apiInsertRequest.nationalInsuranceNumber}/liability/universal-credit/terminate")
+      .post(url"$url/person/${apiInsertRequest.nationalInsuranceNumber}/liability/universal-credit/termination")
       .setHeader(
         CorrelationId -> request.headers.get(CorrelationId).getOrElse(""),
         OriginatorId  -> request.headers.get(OriginatorId).getOrElse("")
