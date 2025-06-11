@@ -22,6 +22,7 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.universalcreditliabilityapi.actions.AuthAction
 import uk.gov.hmrc.universalcreditliabilityapi.config.AppConfig
 
 import java.net.URI
@@ -30,13 +31,14 @@ import scala.concurrent.ExecutionContext
 
 @Singleton()
 class NotificationController @Inject() (
+  authAction: AuthAction,
   cc: ControllerComponents,
   httpClientV2: HttpClientV2,
   appConfig: AppConfig,
   implicit val ec: ExecutionContext
 ) extends BackendController(cc) {
 
-  def postNotification(): Action[AnyContent] = Action.async { implicit request =>
+  def postNotification(): Action[AnyContent] = authAction.async { implicit request =>
     def call = httpClientV2
       .post(new URI(s"${appConfig.hipBaseUrl}/person/:nino/liability/universal-credit${
           if request.headers.get("terminate").contains("true") then "/termination" else ""
