@@ -17,11 +17,12 @@
 package uk.gov.hmrc.universalcreditliabilityapi.config
 
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AppConfig @Inject() (config: Configuration) {
+class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) {
 
   val appName: String = config.get[String]("appName")
 
@@ -32,6 +33,8 @@ class AppConfig @Inject() (config: Configuration) {
   val definitionOverrides: Map[String, Override] = Map(
     "1.0" -> Override(apiPlatformStatus, apiPlatformEndpointsEnabled)
   )
+
+  val hipBaseUrl: String = servicesConfig.baseUrl("hip")
 }
 
 final case class Override(status: Option[String], endpointsEnabled: Option[Boolean])
