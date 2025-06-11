@@ -17,9 +17,19 @@
 package uk.gov.hmrc.universalcreditliabilityapi.models.requests.hip
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.universalcreditliabilityapi.models.requests.TerminateUcLiabilityRequest
 
 final case class TerminateLiabilityRequest(ucLiabilityTerminationDetails: UcLiabilityTerminationDetails)
 
 object TerminateLiabilityRequest {
   implicit val format: OFormat[TerminateLiabilityRequest] = Json.format[TerminateLiabilityRequest]
+
+  def apply(apiRequest: TerminateUcLiabilityRequest): TerminateLiabilityRequest =
+    TerminateLiabilityRequest(
+      ucLiabilityTerminationDetails = UcLiabilityTerminationDetails(
+        universalCreditRecordType = apiRequest.universalCreditRecordType,
+        liabilityStartDate = apiRequest.liabilityStartDate,
+        liabilityEndDate = apiRequest.liabilityEndDate
+      )
+    )
 }
