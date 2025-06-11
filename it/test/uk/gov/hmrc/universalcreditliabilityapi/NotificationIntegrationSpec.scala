@@ -20,9 +20,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.{WSClient, WSResponse, writeableOf_JsValue}
 import uk.gov.hmrc.universalcreditliabilityapi.support.WireMockIntegrationSpec
-import play.api.libs.ws.writeableOf_JsValue
 
 import java.util.UUID
 
@@ -31,36 +30,70 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
   private val wsClient = app.injector.instanceOf[WSClient]
   private val baseUrl  = s"http://localhost:$port"
 
-  val correlationId: String = UUID.randomUUID().toString
-
   "POST /notification" must {
-    "return 204 when HIP returns 204" in {
+    "return 204 when HIP returns 204 for insert" in {
       val nino = ":nino"
 
       stubHipInsert(nino)
 
-      val response = callPostNotification()
+      val response = callPostNotification(false)
 
       response.status mustBe Status.NO_CONTENT
 
       verify(1, postRequestedFor(urlEqualTo(s"/person/$nino/liability/universal-credit")))
     }
+
+    "return 204 when HIP returns 204 for terminate" in {
+      val nino = ":nino"
+
+      stubHipTermination(nino)
+
+      val response = callPostNotification(true)
+
+      response.status mustBe Status.NO_CONTENT
+
+      verify(1, postRequestedFor(urlEqualTo(s"/person/$nino/liability/universal-credit/termination")))
+    }
   }
 
   def stubHipInsert(nino: String): StubMapping =
     stubFor(
-      post(urlEqualTo("/person/:nino/liability/universal-credit"))
+      post(urlEqualTo(s"/person/$nino/liability/universal-credit"))
         .willReturn(
           aResponse()
-            .withHeader("correlationId", correlationId)
+            .withHeader("content-type", "application/json")
+            .withHeader("correlationId", TestData.correlationId)
+            .withHeader("gov-uk-originator-id", TestData.testOriginatorId)
+            .withBody(Json.parse("{}").toString())
             .withStatus(204)
         )
     )
 
-  def callPostNotification(): WSResponse =
+  def stubHipTermination(nino: String): StubMapping =
+    stubFor(
+      post(urlEqualTo(s"/person/$nino/liability/universal-credit/termination"))
+        .willReturn(
+          aResponse()
+            .withHeader("correlationId", TestData.correlationId)
+            .withHeader("gov-uk-originator-id", TestData.testOriginatorId)
+            .withStatus(204)
+        )
+    )
+
+  def callPostNotification(terminate: Boolean): WSResponse =
     wsClient
       .url(s"$baseUrl/notification")
-      .withHttpHeaders("correlationId" -> correlationId)
+      .withHttpHeaders(
+        "correlationId"        -> TestData.correlationId,
+        "gov-uk-originator-id" -> TestData.testOriginatorId,
+        // TODO remove temp workaround
+        "terminate"            -> terminate.toString
+      )
       .post(Json.parse("{}"))
       .futureValue
+}
+
+object TestData {
+  val testOriginatorId      = ""
+  val correlationId: String = UUID.randomUUID().toString
 }

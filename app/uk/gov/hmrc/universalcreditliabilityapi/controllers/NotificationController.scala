@@ -27,7 +27,6 @@ import uk.gov.hmrc.universalcreditliabilityapi.config.AppConfig
 import java.net.URI
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 
 @Singleton()
 class NotificationController @Inject() (
@@ -39,13 +38,19 @@ class NotificationController @Inject() (
 
   def postNotification(): Action[AnyContent] = Action.async { implicit request =>
     def call = httpClientV2
-      .post(new URI(s"${appConfig.hipBaseUrl}/person/:nino/liability/universal-credit").toURL)
-      .setHeader(request.headers.headers*)
+      .post(new URI(s"${appConfig.hipBaseUrl}/person/:nino/liability/universal-credit${
+          if request.headers.get("terminate").contains("true") then "/termination" else ""
+        }").toURL)
+      .setHeader(
+        "correlationId"        -> request.headers.get("correlationId").getOrElse(""),
+        "gov-uk-originator-id" -> request.headers.get("gov-uk-originator-id").getOrElse("")
+      )
       .withBody[JsValue](request.body.asJson.get)
       .execute[HttpResponse]()
 
     call.map(result =>
-      Status(result.status)(result.body).withHeaders(result.headers.toSeq.map((k, v) => (k, v.mkString(" "))): _*)
+      Status(result.status)(result.body)
+        .withHeaders(result.headers.toSeq.map((k, v) => (k, v.mkString(" "))): _*)
     )
   }
 }
