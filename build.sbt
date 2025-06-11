@@ -1,3 +1,4 @@
+import sbt.Keys.dependencyOverrides
 import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
@@ -21,5 +22,10 @@ lazy val microservice = Project("universal-credit-liability-api", file("."))
 lazy val it = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test")
-  .settings(DefaultBuildSettings.itSettings())
-  .settings(libraryDependencies ++= AppDependencies.it)
+  .settings(
+    DefaultBuildSettings.itSettings(),
+    libraryDependencies ++= AppDependencies.it,
+    // dependencyOverrides for "com.github.tomakehurst" % "wiremock" % "3.0.1"
+    // Scala module 2.14.3 requires Jackson Databind version >= 2.14.0 and < 2.15.0
+    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.14.3"
+  )

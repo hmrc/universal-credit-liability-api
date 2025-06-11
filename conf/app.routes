@@ -1,5 +1,6 @@
 # microservice specific routes
 
 GET        /hello-world             uk.gov.hmrc.universalcreditliabilityapi.controllers.MicroserviceHelloWorldController.hello()
+POST       /notification            uk.gov.hmrc.universalcreditliabilityapi.controllers.NotificationController.postNotification()
 
-POST       /notification            uk.gov.hmrc.universalcreditliabilityapi.controllers.UcLiabilityNotificationController.submitLiabilityNotification()
+POST       /notifications            uk.gov.hmrc.universalcreditliabilityapi.controllers.UcLiabilityNotificationController.submitLiabilityNotification()

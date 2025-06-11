@@ -14,5 +14,7 @@ object AppDependencies {
     "uk.gov.hmrc" %% "bootstrap-test-play-30" % bootstrapVersion % Test
   )
 
-  val it: Seq[Nothing] = Seq.empty
+  val it: Seq[ModuleID] = Seq(
+    "com.github.tomakehurst" % "wiremock" % "3.0.1" % Test
+  )
 }
