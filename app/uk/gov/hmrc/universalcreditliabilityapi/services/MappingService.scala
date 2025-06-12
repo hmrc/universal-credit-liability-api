@@ -21,7 +21,7 @@ import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabili
 
 class MappingService {
 
-  def map(
+  def mapRequest(
     request: InsertUcLiabilityRequest | TerminateUcLiabilityRequest
   ): (String, InsertLiabilityRequest | TerminateLiabilityRequest) = request match {
     case insert: InsertUcLiabilityRequest       =>
