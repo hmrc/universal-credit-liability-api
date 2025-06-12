@@ -24,12 +24,12 @@ import play.api.libs.ws.{WSClient, WSResponse, writeableOf_JsValue}
 import uk.gov.hmrc.universalcreditliabilityapi.support.{MockAuthHelper, WireMockIntegrationSpec}
 
 import java.util.UUID
+import scala.util.Random
 
 class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
   private val wsClient = app.injector.instanceOf[WSClient]
   private val baseUrl  = s"http://localhost:$port"
-  private val nino     = "AA000001"
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -38,6 +38,8 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
   "POST /notification" must {
     "return 204 when HIP returns 204 for insert" in {
+      val nino = generateNino()
+
       stubHipInsert(nino)
 
       val response = callPostInsertion(nino)
@@ -49,6 +51,8 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     }
 
     "return 204 when HIP returns 204 for terminate" in {
+      val nino = generateNino()
+
       stubHipTermination(nino)
 
       val response = callPostTermination(nino)
@@ -59,6 +63,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     }
 
     "return 403 when originatorId header is missing from request" in {
+      val nino = generateNino()
 
       val response = callPostInsertionWithoutOriginatorId(nino)
 
@@ -68,6 +73,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     }
 
     "return 400 when invalid universal credit action is passed in the request" in {
+      val nino = generateNino()
 
       val response = callPostInsertionWithInvalidUniversalCreditAction(nino)
 
@@ -77,6 +83,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     }
 
     "return 400 when more than one request field is invalid" in {
+      val nino = generateNino()
 
       val response = callPostInsertionWithInvalidRequestBody(nino)
 
@@ -153,7 +160,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     wsClient
       .url(s"$baseUrl/notification")
       .withHttpHeaders(
-        "authorization"        -> "",
+        "authorization" -> "",
         "correlationId" -> TestData.correlationId
       )
       .post(Json.parse(s"""
@@ -203,6 +210,12 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
              |}
              |""".stripMargin))
       .futureValue
+
+  def generateNino(): String = {
+    val number = f"${Random.nextInt(100000)}%06d"
+    val nino   = s"AA$number"
+    nino
+  }
 }
 
 object TestData {
