@@ -16,6 +16,7 @@ object AppDependencies {
   )
 
   val it: Seq[ModuleID] = Seq(
-    "com.github.tomakehurst" % "wiremock" % "3.0.1" % Test
+    "com.github.tomakehurst" % "wiremock"                       % "3.0.1"  % Test,
+    "com.atlassian.oai"      % "swagger-request-validator-core" % "2.44.9" % Test
   )
 }
