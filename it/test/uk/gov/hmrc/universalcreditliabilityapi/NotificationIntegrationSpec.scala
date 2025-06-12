@@ -24,6 +24,7 @@ import play.api.libs.ws.{WSClient, WSResponse, writeableOf_JsValue}
 import uk.gov.hmrc.universalcreditliabilityapi.support.{MockAuthHelper, WireMockIntegrationSpec}
 
 import java.util.UUID
+import scala.util.Random
 
 class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
@@ -37,11 +38,11 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
   "POST /notification" must {
     "return 204 when HIP returns 204 for insert" in {
-      val nino = ":nino"
+      val nino = generateNino()
 
       stubHipInsert(nino)
 
-      val response = callPostNotification(false)
+      val response = callPostInsertion(nino)
 
       response.status mustBe Status.NO_CONTENT
 
@@ -50,15 +51,45 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     }
 
     "return 204 when HIP returns 204 for terminate" in {
-      val nino = ":nino"
+      val nino = generateNino()
 
       stubHipTermination(nino)
 
-      val response = callPostNotification(true)
+      val response = callPostTermination(nino)
 
       response.status mustBe Status.NO_CONTENT
 
       verify(1, postRequestedFor(urlEqualTo(s"/person/$nino/liability/universal-credit/termination")))
+    }
+
+    "return 403 when originatorId header is missing from request" in {
+      val nino = generateNino()
+
+      val response = callPostInsertionWithoutOriginatorId(nino)
+
+      response.status mustBe Status.FORBIDDEN
+
+      verify(0, postRequestedFor(urlEqualTo(s"/person/$nino/liability/universal-credit")))
+    }
+
+    "return 400 when invalid universal credit action is passed in the request" in {
+      val nino = generateNino()
+
+      val response = callPostInsertionWithInvalidUniversalCreditAction(nino)
+
+      response.status mustBe Status.BAD_REQUEST
+
+      verify(0, postRequestedFor(urlEqualTo(s"/person/$nino/liability/universal-credit/termination")))
+    }
+
+    "return 400 when more than one request field is invalid" in {
+      val nino = generateNino()
+
+      val response = callPostInsertionWithInvalidRequestBody(nino)
+
+      response.status mustBe Status.BAD_REQUEST
+
+      verify(0, postRequestedFor(urlEqualTo(s"/person/$nino/liability/universal-credit/termination")))
     }
   }
 
@@ -87,18 +118,104 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
         )
     )
 
-  def callPostNotification(terminate: Boolean): WSResponse =
+  def callPostInsertion(nino: String): WSResponse =
     wsClient
       .url(s"$baseUrl/notification")
       .withHttpHeaders(
         "authorization"        -> "",
         "correlationId"        -> TestData.correlationId,
-        "gov-uk-originator-id" -> TestData.testOriginatorId,
-        // TODO remove temp workaround
-        "terminate"            -> terminate.toString
+        "gov-uk-originator-id" -> TestData.testOriginatorId
       )
-      .post(Json.parse("{}"))
+      .post(Json.parse(s"""
+          |{
+          |  "nationalInsuranceNumber": "$nino",
+          |  "universalCreditRecordType": "UC",
+          |  "universalCreditAction": "Insert",
+          |  "dateOfBirth": "2002-10-10",
+          |  "liabilityStartDate": "2025-08-19"
+          |}
+          |""".stripMargin))
       .futureValue
+
+  def callPostTermination(nino: String): WSResponse =
+    wsClient
+      .url(s"$baseUrl/notification")
+      .withHttpHeaders(
+        "authorization"        -> "",
+        "correlationId"        -> TestData.correlationId,
+        "gov-uk-originator-id" -> TestData.testOriginatorId
+      )
+      .post(Json.parse(s"""
+           |{
+           |  "nationalInsuranceNumber": "$nino",
+           |  "universalCreditRecordType": "LCW/LCWRA",
+           |  "universalCreditAction": "Terminate",
+           |  "liabilityStartDate": "2025-08-19",
+           |  "liabilityEndDate": "2025-08-19"
+           |}
+           |""".stripMargin))
+      .futureValue
+
+  def callPostInsertionWithoutOriginatorId(nino: String): WSResponse =
+    wsClient
+      .url(s"$baseUrl/notification")
+      .withHttpHeaders(
+        "authorization" -> "",
+        "correlationId" -> TestData.correlationId
+      )
+      .post(Json.parse(s"""
+           |{
+           |  "nationalInsuranceNumber": "$nino",
+           |  "universalCreditRecordType": "UC",
+           |  "universalCreditAction": "Insert",
+           |  "dateOfBirth": "2002-10-10",
+           |  "liabilityStartDate": "2025-08-19"
+           |}
+           |""".stripMargin))
+      .futureValue
+
+  def callPostInsertionWithInvalidUniversalCreditAction(nino: String): WSResponse =
+    wsClient
+      .url(s"$baseUrl/notification")
+      .withHttpHeaders(
+        "authorization"        -> "",
+        "correlationId"        -> TestData.correlationId,
+        "gov-uk-originator-id" -> TestData.testOriginatorId
+      )
+      .post(Json.parse(s"""
+           |{
+           |  "nationalInsuranceNumber": "$nino",
+           |  "universalCreditRecordType": "UC",
+           |  "universalCreditAction": "Insrt",
+           |  "dateOfBirth": "2002-10-10",
+           |  "liabilityStartDate": "2025-08-19"
+           |}
+           |""".stripMargin))
+      .futureValue
+
+  def callPostInsertionWithInvalidRequestBody(nino: String): WSResponse =
+    wsClient
+      .url(s"$baseUrl/notification")
+      .withHttpHeaders(
+        "authorization"        -> "",
+        "gov-uk-originator-id" -> TestData.testOriginatorId
+      )
+      .post(Json.parse(s"""
+             |{
+             |  "nationalInsuranceNumber": "$nino",
+             |  "universalCreditRecordType": "UCW",
+             |  "universalCreditAction": "Insert",
+             |  "dateOfBirth": "2002-10-10",
+             |  "liabilityStartDate": "2025-14-19"
+             |}
+             |""".stripMargin))
+      .futureValue
+
+  def generateNino(): String = {
+    val number = f"${Random.nextInt(100000)}%06d"
+    val nino   = s"AA$number"
+    nino
+  }
 }
 
 object TestData {

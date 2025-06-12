@@ -22,7 +22,7 @@ import play.api.mvc.*
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import uk.gov.hmrc.universalcreditliabilityapi.models.response.Failure
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
