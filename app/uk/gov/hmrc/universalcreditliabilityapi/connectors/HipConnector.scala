@@ -62,5 +62,4 @@ class HipConnector @Inject() (httpClientV2: HttpClientV2, appConfig: AppConfig)(
       .withBody(requestBody)
       .execute[HttpResponse]()
   }
-
 }

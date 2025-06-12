@@ -64,5 +64,4 @@ object ApplicationConstants {
     def invalidInput(field: String): String =
       s"Constraint Violation - Invalid/Missing input parameter: $field"
   }
-
 }

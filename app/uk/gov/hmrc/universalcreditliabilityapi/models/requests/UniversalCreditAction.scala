@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.universalcreditliabilityapi.models.requests
 
-import play.api.libs.json.{JsError, JsString, JsSuccess, Reads, Writes}
+import play.api.libs.json.{JsError, JsString, JsSuccess, Reads}
 
 enum UniversalCreditAction {
   case Insert
@@ -24,11 +24,6 @@ enum UniversalCreditAction {
 }
 
 object UniversalCreditAction {
-
-  implicit val writes: Writes[UniversalCreditAction] = Writes {
-    case Insert    => JsString("Insert")
-    case Terminate => JsString("Terminate")
-  }
 
   implicit val reads: Reads[UniversalCreditAction] = Reads {
     case JsString("Insert")    => JsSuccess(Insert)

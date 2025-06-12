@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class UcLiabilityNotificationController @Inject() (
   cc: ControllerComponents,
-  ucLiabilityService: SchemaValidationService,
+  validationService: SchemaValidationService,
   mappingService: MappingService,
   hipConnector: HipConnector
 )(implicit val ec: ExecutionContext)
@@ -42,19 +42,19 @@ class UcLiabilityNotificationController @Inject() (
   def submitLiabilityNotification(): Action[JsValue] = Action.async(parse.json) { implicit request =>
     (for {
       originatorId                            <- validateOriginatorId(request)
-      validatedRequest                        <- ucLiabilityService.validateLiabilityNotificationRequest(request)
+      validatedRequest                        <- validationService.validateLiabilityNotificationRequest(request)
       (correlationId, requestObject)           = validatedRequest
       (nationalInsuranceNumber, mappedRequest) = mappingService.map(requestObject)
     } yield hipConnector
       .sendUcLiability(nationalInsuranceNumber, correlationId, originatorId, mappedRequest)
       .map(result => Status(result.status)(result.body))).merge
-      .map(_.withHeaders("correlationId" -> request.headers.get(CorrelationId).getOrElse("")))
+      .map(_.withHeaders(CorrelationId -> request.headers.get(CorrelationId).getOrElse("")))
   }
 
   private def validateOriginatorId[T](request: Request[T]) =
     request.headers
       .get(OriginatorId)
-      .filter(_ => true) // TODO: Add business logic for originator id here
+      .filter(_ => true)
       .toRight(
         Future.successful(
           Results.Forbidden(Json.toJson(Failure(reason = ForbiddenReason, code = ForbiddenCode)))
