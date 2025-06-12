@@ -20,6 +20,7 @@ import jakarta.inject.Singleton
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.universalcreditliabilityapi.actions.AuthAction
 import uk.gov.hmrc.universalcreditliabilityapi.connectors.HipConnector
 import uk.gov.hmrc.universalcreditliabilityapi.models.errors.Failure
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
@@ -32,6 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UcLiabilityNotificationController @Inject() (
+  authAction: AuthAction,
   cc: ControllerComponents,
   validationService: SchemaValidationService,
   mappingService: MappingService,
@@ -39,7 +41,7 @@ class UcLiabilityNotificationController @Inject() (
 )(implicit val ec: ExecutionContext)
     extends BackendController(cc) {
 
-  def submitLiabilityNotification(): Action[JsValue] = Action.async(parse.json) { implicit request =>
+  def submitLiabilityNotification(): Action[JsValue] = authAction.async(parse.json) { implicit request =>
     (for {
       originatorId                            <- validateOriginatorId(request)
       validatedRequest                        <- validationService.validateLiabilityNotificationRequest(request)
