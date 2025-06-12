@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.universalcreditliabilityapi.models.errors
+package uk.gov.hmrc.universalcreditliabilityapi.models.hip.response
 
 import play.api.libs.json.{Json, OWrites}
 
-final case class Failures(failures: Seq[Failure])
+final case class Failure(reason: String, code: String)
 
-object Failures {
-  implicit val writes: OWrites[Failures] = Json.writes[Failures]
+object Failure {
+  implicit val writes: OWrites[Failure] = Json.writes[Failure]
 }

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.universalcreditliabilityapi.models.requests
+package uk.gov.hmrc.universalcreditliabilityapi.models.common
 
-import play.api.libs.json.{JsError, JsString, JsSuccess, Reads, Writes}
+import play.api.libs.json.*
 
 enum UniversalCreditRecordType(val code: String) {
   case UC extends UniversalCreditRecordType("UC")

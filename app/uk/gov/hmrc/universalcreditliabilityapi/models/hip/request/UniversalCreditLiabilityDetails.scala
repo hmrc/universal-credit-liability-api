@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.universalcreditliabilityapi.models.requests.hip
+package uk.gov.hmrc.universalcreditliabilityapi.models.hip.request
 
 import play.api.libs.json.*
-import uk.gov.hmrc.universalcreditliabilityapi.models.requests.UniversalCreditRecordType
+import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType
 
 final case class UniversalCreditLiabilityDetails(
   universalCreditRecordType: UniversalCreditRecordType,

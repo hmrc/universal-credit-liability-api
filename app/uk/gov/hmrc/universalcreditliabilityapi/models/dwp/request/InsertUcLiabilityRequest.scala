@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.universalcreditliabilityapi.models.requests
+package uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Reads}
+import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ValidationPatterns.{validDate, validNino}
 
-case class TerminateUcLiabilityRequest(
+final case class InsertUcLiabilityRequest(
   universalCreditAction: UniversalCreditAction,
   nationalInsuranceNumber: String,
   universalCreditRecordType: UniversalCreditRecordType,
   liabilityStartDate: String,
-  liabilityEndDate: String
+  dateOfBirth: String
 )
 
-object TerminateUcLiabilityRequest {
+object InsertUcLiabilityRequest {
 
-  implicit val reads: Reads[TerminateUcLiabilityRequest] = (
+  implicit val reads: Reads[InsertUcLiabilityRequest] = (
     (JsPath \ "universalCreditAction").read[UniversalCreditAction] and
       (JsPath \ "nationalInsuranceNumber").read(validNino) and
       (JsPath \ "universalCreditRecordType").read[UniversalCreditRecordType] and
       (JsPath \ "liabilityStartDate").read(validDate) and
-      (JsPath \ "liabilityEndDate").read(validDate)
-  )(TerminateUcLiabilityRequest.apply _)
+      (JsPath \ "dateOfBirth").read(validDate)
+  )(InsertUcLiabilityRequest.apply _)
 
 }

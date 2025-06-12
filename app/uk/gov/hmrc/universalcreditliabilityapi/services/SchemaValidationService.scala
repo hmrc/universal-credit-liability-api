@@ -21,9 +21,9 @@ import cats.syntax.all.*
 import play.api.libs.json.*
 import play.api.mvc.Results.BadRequest
 import play.api.mvc.{Request, Result}
-import uk.gov.hmrc.universalcreditliabilityapi.models.errors.{Failure, Failures}
-import uk.gov.hmrc.universalcreditliabilityapi.models.requests.UniversalCreditAction.{Insert, Terminate}
-import uk.gov.hmrc.universalcreditliabilityapi.models.requests.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest, UniversalCreditAction}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest, UniversalCreditAction}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCreditAction.{Insert, Terminate}
+import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.{Failure, Failures}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ValidationPatterns.CorrelationIdPattern

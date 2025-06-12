@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.universalcreditliabilityapi.connectors
 
-import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.universalcreditliabilityapi.config.AppConfig
-import uk.gov.hmrc.universalcreditliabilityapi.models.requests.hip.{InsertLiabilityRequest, TerminateLiabilityRequest}
+import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, TerminateLiabilityRequest}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, OriginatorId}
 
 import javax.inject.Inject
@@ -45,13 +44,6 @@ class HipConnector @Inject() (httpClientV2: HttpClientV2, appConfig: AppConfig)(
           Json.toJson(terminate)
         )
     }
-
-    Logger(this.getClass).logger.warn(s"""
-         |url=${url.toString},
-         |correlationId=$correlationId,
-         |originatorId=$originatorId,
-         |requestBody=${Json.stringify(requestBody)},
-         |""".stripMargin)
 
     httpClientV2
       .post(url)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.universalcreditliabilityapi.models.response
+package uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response
 
 import play.api.libs.json.{Json, OWrites}
 

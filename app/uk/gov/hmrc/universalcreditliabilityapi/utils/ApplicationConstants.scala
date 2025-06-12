@@ -17,7 +17,7 @@
 package uk.gov.hmrc.universalcreditliabilityapi.utils
 
 import play.api.libs.json.Reads
-import uk.gov.hmrc.universalcreditliabilityapi.models.errors.Failure
+import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failure
 
 import scala.util.matching.Regex
 

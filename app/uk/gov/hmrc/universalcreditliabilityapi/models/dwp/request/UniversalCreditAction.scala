@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.universalcreditliabilityapi.models.requests
+package uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request
 
 import play.api.libs.json.{JsError, JsString, JsSuccess, Reads}
 

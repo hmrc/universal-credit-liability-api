@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.universalcreditliabilityapi.models.requests.hip
+package uk.gov.hmrc.universalcreditliabilityapi.models.hip.request
 
-import play.api.libs.json.*
-import uk.gov.hmrc.universalcreditliabilityapi.models.requests.UniversalCreditRecordType
+import play.api.libs.json.{JsValue, Json, OWrites}
 
-final case class UcLiabilityTerminationDetails(
-  universalCreditRecordType: UniversalCreditRecordType,
-  liabilityStartDate: String,
-  liabilityEndDate: String
-)
+final case class InsertLiabilityRequest(universalCreditLiabilityDetails: UniversalCreditLiabilityDetails)
 
-object UcLiabilityTerminationDetails {
-  implicit val format: OWrites[UcLiabilityTerminationDetails] = Json.writes[UcLiabilityTerminationDetails]
+object InsertLiabilityRequest {
+  implicit val format: OWrites[InsertLiabilityRequest] = Json.writes[InsertLiabilityRequest]
 }

@@ -22,7 +22,7 @@ import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.universalcreditliabilityapi.actions.AuthAction
 import uk.gov.hmrc.universalcreditliabilityapi.connectors.HipConnector
-import uk.gov.hmrc.universalcreditliabilityapi.models.errors.Failure
+import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failure
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorCodes.ForbiddenCode
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ForbiddenReason
