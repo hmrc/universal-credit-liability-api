@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  version: 0.0.1
+  version: "1.0"
   title: Universal Credit Liability
   description: |-
     # Usage Terms
@@ -350,7 +350,7 @@ components:
         message:
           type: string
           enum:
-            - "Unprocessable Entity"
+            - "Unprocessable entity"
         errors:
           items:
             $ref: '#/components/schemas/errors_422'
@@ -367,7 +367,7 @@ components:
         - message
       properties:
         code:
-          oneOf:
+          anyOf:
             - $ref: '#/components/schemas/ExistingErrorCodes'
             - $ref: '#/components/schemas/FutureExtensions'
         message:

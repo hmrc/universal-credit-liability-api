@@ -18,6 +18,8 @@ package uk.gov.hmrc.universalcreditliabilityapi.services
 
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, TerminateLiabilityRequest, UcLiabilityTerminationDetails, UniversalCreditLiabilityDetails}
+import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.{Failures => HipFailures}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.{Failure => DwpFailure, Failures => DwpFailures}
 
 class MappingService {
 
@@ -47,4 +49,11 @@ class MappingService {
         )
       )
   }
+
+  def map422ResponseErrors(response: HipFailures): DwpFailures =
+    DwpFailures(
+      code = "UNPROCESSABLE_ENTITY",
+      message = "Unprocessable entity",
+      errors = response.failures.map(f => DwpFailure(code = f.code, message = f.reason))
+    )
 }

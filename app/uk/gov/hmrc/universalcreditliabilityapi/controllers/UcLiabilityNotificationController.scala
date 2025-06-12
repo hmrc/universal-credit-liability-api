@@ -17,12 +17,14 @@
 package uk.gov.hmrc.universalcreditliabilityapi.controllers
 
 import jakarta.inject.Singleton
-import play.api.libs.json.{JsValue, Json}
+import play.api.Logger
+import play.api.libs.json.{JsSuccess, JsValue, Json}
 import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.universalcreditliabilityapi.actions.AuthAction
 import uk.gov.hmrc.universalcreditliabilityapi.connectors.HipConnector
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure
+import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failures as HipFailures
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorCodes.ForbiddenCode
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ForbiddenReason
@@ -41,6 +43,8 @@ class UcLiabilityNotificationController @Inject() (
 )(implicit val ec: ExecutionContext)
     extends BackendController(cc) {
 
+  private def logger = Logger(this.getClass).logger
+
   def submitLiabilityNotification(): Action[JsValue] = authAction.async(parse.json) { implicit request =>
     (for {
       originatorId                            <- validateOriginatorId(request)
@@ -49,7 +53,33 @@ class UcLiabilityNotificationController @Inject() (
       (nationalInsuranceNumber, mappedRequest) = mappingService.mapRequest(requestObject)
     } yield hipConnector
       .sendUcLiability(nationalInsuranceNumber, correlationId, originatorId, mappedRequest)
-      .map(result => Status(result.status)(result.body))).merge
+      .map { result =>
+        result.status match {
+          case NO_CONTENT           => NoContent
+          case BAD_REQUEST          =>
+            logger.warn("400 returned by HIP")
+            InternalServerError
+          case FORBIDDEN            =>
+            Forbidden(
+              Json.toJson(Failure(code = "403.2", message = "Forbidden"))
+            )
+          case NOT_FOUND            => NotFound
+          case UNPROCESSABLE_ENTITY =>
+            Json.parse(result.body).validate[HipFailures] match {
+              case JsSuccess(hipResponse, _) =>
+                UnprocessableEntity(
+                  Json.toJson(mappingService.map422ResponseErrors(hipResponse))
+                )
+              case _                         =>
+                logger.warn("Unreadable 422 returned by HIP")
+                InternalServerError
+            }
+
+          case SERVICE_UNAVAILABLE =>
+            ServiceUnavailable(Json.toJson(Failure(code = "SERVER_ERROR", message = "Service unavailable.")))
+          case _                   => InternalServerError
+        }
+      }).merge
       .map(_.withHeaders(CorrelationId -> request.headers.get(CorrelationId).getOrElse("")))
   }
 
