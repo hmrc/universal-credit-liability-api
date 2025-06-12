@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse, writeableOf_JsValue}
-import uk.gov.hmrc.universalcreditliabilityapi.support.WireMockIntegrationSpec
+import uk.gov.hmrc.universalcreditliabilityapi.support.{MockAuthHelper, WireMockIntegrationSpec}
 
 import java.util.UUID
 
@@ -30,6 +30,11 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
   private val wsClient = app.injector.instanceOf[WSClient]
   private val baseUrl  = s"http://localhost:$port"
   private val nino = "AA000001"
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    MockAuthHelper.mockAuthOk()
+  }
 
   "POST /notification" must {
     "return 204 when HIP returns 204 for insert" in {
@@ -40,6 +45,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       response.status mustBe Status.NO_CONTENT
 
       verify(1, postRequestedFor(urlEqualTo(s"/person/$nino/liability/universal-credit")))
+      MockAuthHelper.verifyAuthWasCalled()
     }
 
     "return 204 when HIP returns 204 for terminate" in {
@@ -72,6 +78,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
         .willReturn(
           aResponse()
             .withHeader("correlationId", TestData.correlationId)
+            .withHeader("correlationId", TestData.correlationId)
             .withHeader("gov-uk-originator-id", TestData.testOriginatorId)
             .withStatus(204)
         )
@@ -81,6 +88,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     wsClient
       .url(s"$baseUrl/notification")
       .withHttpHeaders(
+        "authorization"        -> "",
         "correlationId"        -> TestData.correlationId,
         "gov-uk-originator-id" -> TestData.testOriginatorId
       )
@@ -99,6 +107,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     wsClient
       .url(s"$baseUrl/notification")
       .withHttpHeaders(
+        "authorization"        -> "",
         "correlationId"        -> TestData.correlationId,
         "gov-uk-originator-id" -> TestData.testOriginatorId
       )
