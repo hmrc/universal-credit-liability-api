@@ -29,7 +29,9 @@ import scala.util.Random
 class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
   private given WSClient       = app.injector.instanceOf[WSClient]
-  private val openApiValidator = OpenApiValidator.fromResource("public/api/conf/1.0/application.yaml")
+  private val openApiValidator = OpenApiValidator
+    .fromResource("public/api/conf/1.0/application.yaml")
+    .forPath(method = "POST", context = "/misc/universal-credit/liability", path = "/notification")
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -165,9 +167,8 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     headers: Map[String, String] = TestData.validHeaders,
     validateRequestAgainstOwnSchema: Boolean = true
   ): WSResponse = {
-    val validator = openApiValidator.forPath("POST", "/misc/universal-credit/liability", "/notification")
 
-    val request = validator
+    val request = openApiValidator
       .newRequestBuilder()
       .withHttpHeaders(headers.toSeq: _*)
       .addHttpHeaders("content-type" -> "application/json")
@@ -178,13 +179,13 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       })
 
     if (validateRequestAgainstOwnSchema) {
-      val requestValidationErrors = validator.validateRequest(request)
+      val requestValidationErrors = openApiValidator.validateRequest(request)
       requestValidationErrors mustBe List.empty
     }
 
     val response = request.execute().futureValue
 
-    val responseValidationErrors = validator.validateResponse(response)
+    val responseValidationErrors = openApiValidator.validateResponse(response)
     responseValidationErrors mustBe List.empty
 
     response
