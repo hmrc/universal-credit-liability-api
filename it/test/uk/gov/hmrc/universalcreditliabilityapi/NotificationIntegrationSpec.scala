@@ -134,6 +134,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     wsClient
       .url(s"$baseUrl/notification")
       .withHttpHeaders(
+        "authorization"        -> "",
         "correlationId"        -> TestData.correlationId,
         "gov-uk-originator-id" -> TestData.testOriginatorId
       )
@@ -152,6 +153,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     wsClient
       .url(s"$baseUrl/notification")
       .withHttpHeaders(
+        "authorization"        -> "",
         "correlationId" -> TestData.correlationId
       )
       .post(Json.parse(s"""
@@ -169,6 +171,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     wsClient
       .url(s"$baseUrl/notification")
       .withHttpHeaders(
+        "authorization"        -> "",
         "correlationId"        -> TestData.correlationId,
         "gov-uk-originator-id" -> TestData.testOriginatorId
       )
@@ -187,6 +190,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     wsClient
       .url(s"$baseUrl/notification")
       .withHttpHeaders(
+        "authorization"        -> "",
         "gov-uk-originator-id" -> TestData.testOriginatorId
       )
       .post(Json.parse(s"""
