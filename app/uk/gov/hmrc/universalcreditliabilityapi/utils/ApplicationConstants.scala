@@ -17,7 +17,7 @@
 package uk.gov.hmrc.universalcreditliabilityapi.utils
 
 import play.api.libs.json.Reads
-import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failure
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure
 
 import scala.util.matching.Regex
 
@@ -56,7 +56,7 @@ object ApplicationConstants {
 
   def invalidInputFailure(field: String): Failure =
     Failure(
-      reason = ErrorMessages.invalidInput(field),
+      message = ErrorMessages.invalidInput(field),
       code = ErrorCodes.InvalidInput
     )
 

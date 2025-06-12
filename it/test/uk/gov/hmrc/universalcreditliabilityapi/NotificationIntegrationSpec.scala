@@ -21,15 +21,17 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse, writeableOf_String}
-import uk.gov.hmrc.universalcreditliabilityapi.support.{MockAuthHelper, WireMockIntegrationSpec}
+import uk.gov.hmrc.universalcreditliabilityapi.support.{MockAuthHelper, OpenApiValidator, WireMockIntegrationSpec}
 
 import java.util.UUID
 import scala.util.Random
 
 class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
-  private val wsClient = app.injector.instanceOf[WSClient]
-  private val baseUrl  = s"http://localhost:$port"
+  private given WSClient       = app.injector.instanceOf[WSClient]
+  private val openApiValidator = OpenApiValidator
+    .fromResource("public/api/conf/1.0/application.yaml")
+    .forPath(method = "POST", context = "/misc/universal-credit/liability", path = "/notification")
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -54,7 +56,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
       stubHipInsert(nino)
 
-      val response = callPostInsertion(requestBody)
+      val response = callPostNotification(requestBody)
 
       response.status mustBe Status.NO_CONTENT
 
@@ -68,7 +70,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
       stubHipTermination(nino)
 
-      val response = callPostTermination(requestBody)
+      val response = callPostNotification(requestBody)
 
       response.status mustBe Status.NO_CONTENT
 
@@ -80,7 +82,11 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
       val requestBody = TestData.validInsertionRequest(nino)
 
-      val response = callPostInsertion(requestBody, headers = TestData.validHeaders.removed("gov-uk-originator-id"))
+      val response = callPostNotification(
+        requestBody,
+        headers = TestData.validHeaders.removed("gov-uk-originator-id"),
+        validateRequestAgainstOwnSchema = false
+      )
 
       response.status mustBe Status.FORBIDDEN
 
@@ -100,7 +106,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
                                       |}
                                       |""".stripMargin)
 
-      val response = callPostInsertion(requestBody)
+      val response = callPostNotification(requestBody, validateRequestAgainstOwnSchema = false)
 
       response.status mustBe Status.BAD_REQUEST
 
@@ -120,7 +126,11 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
                                       |}
                                       |""".stripMargin)
 
-      val response = callPostInsertion(requestBody, headers = TestData.validHeaders.removed("correlationId"))
+      val response = callPostNotification(
+        requestBody,
+        headers = TestData.validHeaders.removed("correlationId"),
+        validateRequestAgainstOwnSchema = false
+      )
 
       response.status mustBe Status.BAD_REQUEST
 
@@ -147,37 +157,44 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
           aResponse()
             .withHeader("content-type", "application/json")
             .withHeader("correlationId", TestData.correlationId)
-            .withBody(body)
-            .withStatus(status)
+            .withHeader("gov-uk-originator-id", TestData.testOriginatorId)
+            .withStatus(204)
         )
     )
 
-  def callPostInsertion(body: String | JsValue, headers: Map[String, String] = TestData.validHeaders): WSResponse =
-    wsClient
-      .url(s"$baseUrl/notification")
-      .withHttpHeaders(headers.toSeq: _*)
-      .addHttpHeaders("content-type" -> "application/json")
-      .post(body match {
-        case j: JsValue => Json.stringify(j)
-        case s: String  => s
-      })
-      .futureValue
+  def callPostNotification(
+    body: String | JsValue,
+    headers: Map[String, String] = TestData.validHeaders,
+    validateRequestAgainstOwnSchema: Boolean = true
+  ): WSResponse = {
 
-  def callPostTermination(body: String | JsValue, headers: Map[String, String] = TestData.validHeaders): WSResponse =
-    wsClient
-      .url(s"$baseUrl/notification")
+    val request = openApiValidator
+      .newRequestBuilder()
       .withHttpHeaders(headers.toSeq: _*)
       .addHttpHeaders("content-type" -> "application/json")
-      .post(body match {
+      .withMethod("POST")
+      .withBody(body match {
         case j: JsValue => Json.stringify(j)
         case s: String  => s
       })
-      .futureValue
+
+    if (validateRequestAgainstOwnSchema) {
+      val requestValidationErrors = openApiValidator.validateRequest(request)
+      requestValidationErrors mustBe List.empty
+    }
+
+    val response = request.execute().futureValue
+
+    val responseValidationErrors = openApiValidator.validateResponse(response)
+    responseValidationErrors mustBe List.empty
+
+    response
+  }
 
 }
 
 object TestData {
-  val testOriginatorId                  = ""
+  val testOriginatorId                  = "testId"
   val correlationId: String             = UUID.randomUUID().toString
   val validHeaders: Map[String, String] = Map(
     "authorization"        -> "",

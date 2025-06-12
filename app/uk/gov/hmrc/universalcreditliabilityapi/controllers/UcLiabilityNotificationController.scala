@@ -22,7 +22,7 @@ import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.universalcreditliabilityapi.actions.AuthAction
 import uk.gov.hmrc.universalcreditliabilityapi.connectors.HipConnector
-import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failure
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorCodes.ForbiddenCode
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ForbiddenReason
@@ -46,7 +46,7 @@ class UcLiabilityNotificationController @Inject() (
       originatorId                            <- validateOriginatorId(request)
       validatedRequest                        <- validationService.validateLiabilityNotificationRequest(request)
       (correlationId, requestObject)           = validatedRequest
-      (nationalInsuranceNumber, mappedRequest) = mappingService.map(requestObject)
+      (nationalInsuranceNumber, mappedRequest) = mappingService.mapRequest(requestObject)
     } yield hipConnector
       .sendUcLiability(nationalInsuranceNumber, correlationId, originatorId, mappedRequest)
       .map(result => Status(result.status)(result.body))).merge
@@ -59,7 +59,7 @@ class UcLiabilityNotificationController @Inject() (
       .filter(_ => true)
       .toRight(
         Future.successful(
-          Results.Forbidden(Json.toJson(Failure(reason = ForbiddenReason, code = ForbiddenCode)))
+          Results.Forbidden(Json.toJson(Failure(message = ForbiddenReason, code = ForbiddenCode)))
         )
       )
 }

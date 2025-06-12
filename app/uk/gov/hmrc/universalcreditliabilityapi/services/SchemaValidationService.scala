@@ -23,7 +23,7 @@ import play.api.mvc.Results.BadRequest
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest, UniversalCreditAction}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCreditAction.{Insert, Terminate}
-import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.{Failure, Failures}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.{Failure, Failures}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ValidationPatterns.CorrelationIdPattern
@@ -35,10 +35,11 @@ class SchemaValidationService {
   def validateLiabilityNotificationRequest(
     request: Request[JsValue]
   ): Either[Future[Result], (String, InsertUcLiabilityRequest | TerminateUcLiabilityRequest)] = {
-    val correlationIdValidation: EitherNec[Failures, String]                                                      = validateCorrelationId(
-      request.headers.get(HeaderNames.CorrelationId)
-    )
-    val actionValidation: Either[NonEmptyChain[Failures], InsertUcLiabilityRequest | TerminateUcLiabilityRequest] =
+    val correlationIdValidation: EitherNec[Failure, String]                                                      =
+      validateCorrelationId(
+        request.headers.get(HeaderNames.CorrelationId)
+      )
+    val actionValidation: Either[NonEmptyChain[Failure], InsertUcLiabilityRequest | TerminateUcLiabilityRequest] =
       determineActionType(request.body).flatMap {
         case Insert    =>
           validateJson[InsertUcLiabilityRequest](request)
@@ -48,40 +49,32 @@ class SchemaValidationService {
 
     (correlationIdValidation, actionValidation)
       .parMapN((correlationId, requestObject) => (correlationId, requestObject))
-      .leftMap(mergeFailures)
+      .leftMap(mergeBadRequestFailures)
   }
 
-  private def validateCorrelationId(correlationId: Option[String]): EitherNec[Failures, String] =
+  private def validateCorrelationId(correlationId: Option[String]): EitherNec[Failure, String] =
     correlationId match {
       case Some(id) if CorrelationIdPattern.matches(id) => Right(id)
       case _                                            =>
         Left(
           NonEmptyChain.one(
-            Failures(
-              failures = Seq(
-                ApplicationConstants.invalidInputFailure(HeaderNames.CorrelationId)
-              )
-            )
+            ApplicationConstants.invalidInputFailure(HeaderNames.CorrelationId)
           )
         )
     }
 
-  private def determineActionType(json: JsValue): Either[NonEmptyChain[Failures], UniversalCreditAction] =
+  private def determineActionType(json: JsValue): Either[NonEmptyChain[Failure], UniversalCreditAction] =
     (json \ "universalCreditAction").validate[UniversalCreditAction] match {
       case JsSuccess(value, _) => Right(value)
       case JsError(errors)     =>
         Left(
           NonEmptyChain.one(
-            Failures(
-              failures = Seq(
-                ApplicationConstants.invalidInputFailure("universalCreditAction")
-              )
-            )
+            ApplicationConstants.invalidInputFailure("universalCreditAction")
           )
         )
     }
 
-  private def validateJson[T](request: Request[JsValue])(implicit reads: Reads[T]): EitherNec[Failures, T] =
+  private def validateJson[T](request: Request[JsValue])(implicit reads: Reads[T]): EitherNec[Failure, T] =
     request.body.validate[T] match {
       case JsSuccess(validatedRequest, _) =>
         Right(validatedRequest)
@@ -95,14 +88,14 @@ class SchemaValidationService {
         }.toSeq
 
         Left(
-          NonEmptyChain.one(
-            Failures(failures)
-          )
+          NonEmptyChain.fromSeq(failures).get
         )
     }
 
-  private def mergeFailures(failures: NonEmptyChain[Failures]): Future[Result] = {
-    val allFailures: Seq[Failure] = failures.toList.flatMap(_.failures)
-    Future.successful(BadRequest(Json.toJson(Failures(allFailures))))
+  private def mergeBadRequestFailures(failures: NonEmptyChain[Failure]): Future[Result] = {
+    val allFailures: Seq[Failure] = failures.toList
+    Future.successful(
+      BadRequest(Json.toJson(Failures(code = "BAD_REQUEST", message = "Bad request", errors = allFailures)))
+    )
   }
 }

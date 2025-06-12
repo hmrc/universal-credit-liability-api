@@ -25,7 +25,9 @@ lazy val it = project
   .settings(
     DefaultBuildSettings.itSettings(),
     libraryDependencies ++= AppDependencies.it,
-    // dependencyOverrides for "com.github.tomakehurst" % "wiremock" % "3.0.1"
+    // dependencyOverrides for:
+    // "swagger-request-validator-core" % "2.44.8"
+    // "com.github.tomakehurst" % "wiremock" % "3.0.1"
     // Scala module 2.14.3 requires Jackson Databind version >= 2.14.0 and < 2.15.0
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.14.3"
   )
