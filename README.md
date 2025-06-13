@@ -1,7 +1,10 @@
 
 # universal-credit-liability-api
 
-This is a placeholder README.md for a new repository
+
+## Overview
+
+This API provides the capability for DWP to send Universal Credit Liability notifications for a given individual on NPS (National Insurance & PAYE Service).
 
 
 ## Scalafmt
