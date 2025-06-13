@@ -17,6 +17,7 @@
 package uk.gov.hmrc.universalcreditliabilityapi
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
@@ -529,6 +530,22 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     }
   }
 
+  "return 500 when HIP if an exception is raised" in {
+    val nino        = TestData.generateNino()
+    val requestBody = TestData.validTerminateRequest(nino)
+
+    stubHipFailure()
+
+    verify(lessThan(1), postRequestedFor(anyUrl()))
+
+    val response = callPostNotification(requestBody)
+
+    response.status mustBe Status.INTERNAL_SERVER_ERROR
+
+    // one for auth, and connection failure would have triggered multiple retries
+    verify(moreThan(2), postRequestedFor(anyUrl()))
+  }
+
   def stubHipInsert(
     nino: String,
     status: Int = 204,
@@ -575,6 +592,18 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
           .withHeader("correlationId", TestData.correlationId)
           .withStatus(status)
           .withBody(responseBody)
+      )
+    )
+  }
+
+  def stubHipFailure(): StubMapping = {
+
+    val mappingBuilder = post(anyUrl())
+
+    stubFor(
+      mappingBuilder.willReturn(
+        aResponse()
+          .withFault(Fault.MALFORMED_RESPONSE_CHUNK)
       )
     )
   }
