@@ -426,7 +426,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       response.body[JsValue] mustBe Json.parse("""
           |{
           |   "code": "SERVER_ERROR",
-          |   "message": "Service unavailable."
+          |   "message": "The 'misc/universal-credit/liability' API is currently unavailable"
           |}
           |""".stripMargin)
 
@@ -446,7 +446,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       response.body[JsValue] mustBe Json.parse("""
                                                  |{
                                                  |   "code": "SERVER_ERROR",
-                                                 |   "message": "Service unavailable."
+                                                 |   "message": "The 'misc/universal-credit/liability' API is currently unavailable"
                                                  |}
                                                  |""".stripMargin)
 
