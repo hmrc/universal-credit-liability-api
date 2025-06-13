@@ -23,7 +23,7 @@ import play.api.mvc.Results.BadRequest
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest, UniversalCreditAction}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCreditAction.{Insert, Terminate}
-import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.{Failure, Failures}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ValidationPatterns.CorrelationIdPattern
@@ -95,7 +95,7 @@ class SchemaValidationService {
   private def mergeBadRequestFailures(failures: NonEmptyChain[Failure]): Future[Result] = {
     val allFailures: Seq[Failure] = failures.toList
     Future.successful(
-      BadRequest(Json.toJson(Failures(code = "BAD_REQUEST", message = "Bad request", errors = allFailures)))
+      BadRequest(Json.toJson(allFailures.head))
     )
   }
 }
