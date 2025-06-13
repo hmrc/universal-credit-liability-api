@@ -269,14 +269,8 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       response.status mustBe Status.UNPROCESSABLE_ENTITY
       response.body[JsValue] mustBe Json.parse("""
                                                  |{
-                                                 |  "code": "UNPROCESSABLE_ENTITY",
-                                                 |  "message": "Unprocessable entity",
-                                                 |  "errors": [
-                                                 |    {
-                                                 |      "code": "65536",
-                                                 |      "message": "Start date before 29/04/2013"
-                                                 |    }
-                                                 |  ]
+                                                 |  "code": "65536",
+                                                 |  "message": "Start date before 29/04/2013"
                                                  |}
                                                  |""".stripMargin)
 
@@ -306,14 +300,8 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       response.status mustBe Status.UNPROCESSABLE_ENTITY
       response.body[JsValue] mustBe Json.parse("""
                                                  |{
-                                                 |  "code": "UNPROCESSABLE_ENTITY",
-                                                 |  "message": "Unprocessable entity",
-                                                 |  "errors": [
-                                                 |    {
-                                                 |      "code": "65536",
-                                                 |      "message": "Start date before 29/04/2013"
-                                                 |    }
-                                                 |  ]
+                                                 |  "code": "65536",
+                                                 |  "message": "Start date before 29/04/2013"
                                                  |}
                                                  |""".stripMargin)
 
@@ -351,6 +339,44 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       val hipResponseBody = "{}"
 
       stubHipTermination(nino, status = 422, responseBody = hipResponseBody)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.INTERNAL_SERVER_ERROR
+
+      verify(1, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 500 when HIP returns 422 with no specified cause for insert" in {
+      val nino            = TestData.generateNino()
+      val requestBody     = TestData.validInsertionRequest(nino)
+      val hipResponseBody = """
+                              |{
+                              |  "failures": []
+                              |}
+                              |""".stripMargin
+
+      stubHipInsert(nino, status = 422, body = hipResponseBody)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.INTERNAL_SERVER_ERROR
+
+      verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 500 when HIP returns 422 with no specified cause for terminate" in {
+      val nino            = TestData.generateNino()
+      val requestBody     = TestData.validTerminateRequest(nino)
+      val hipResponseBody = """
+                              |{
+                              |  "failures": []
+                              |}
+                              |""".stripMargin
+
+      stubHipTermination(nino, status = 422, body = hipResponseBody)
 
       val response = callPostNotification(requestBody)
 
