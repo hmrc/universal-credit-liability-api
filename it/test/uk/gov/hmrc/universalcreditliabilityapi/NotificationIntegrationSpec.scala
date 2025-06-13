@@ -357,7 +357,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
                               |}
                               |""".stripMargin
 
-      stubHipInsert(nino, status = 422, body = hipResponseBody)
+      stubHipInsert(nino, status = 422, responseBody = hipResponseBody)
 
       val response = callPostNotification(requestBody)
 
@@ -376,7 +376,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
                               |}
                               |""".stripMargin
 
-      stubHipTermination(nino, status = 422, body = hipResponseBody)
+      stubHipTermination(nino, status = 422, responseBody = hipResponseBody)
 
       val response = callPostNotification(requestBody)
 
@@ -487,6 +487,44 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       verify(
         1,
         postRequestedFor(urlEqualTo(hipInsertionUrl(nino)))
+          .withRequestBody(equalToJson(hipRequestBody))
+      )
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "verify correct request body is sent to HIP for terminate" in {
+      val nino = TestData.generateNino()
+
+      val requestBody = Json.parse(s"""
+           |{
+           |  "nationalInsuranceNumber": "$nino",
+           |  "universalCreditRecordType": "UC",
+           |  "universalCreditAction": "Terminate",
+           |  "liabilityStartDate": "2025-08-19",
+           |  "liabilityEndDate": "2025-08-20"
+           |}
+           |""".stripMargin)
+
+      val hipRequestBody =
+        s"""
+           |{
+           |  "ucLiabilityTerminationDetails": {
+           |    "universalCreditRecordType": "UC",
+           |    "liabilityStartDate": "2025-08-19",
+           |    "liabilityEndDate": "2025-08-20"
+           |  }
+           |}
+           |""".stripMargin
+
+      stubHipTermination(nino, expectedRequestBody = Some(hipRequestBody))
+
+      val response = callPostNotification(requestBody, validateRequestAgainstOwnSchema = false)
+
+      response.status mustBe Status.NO_CONTENT
+
+      verify(
+        1,
+        postRequestedFor(urlEqualTo(hipTerminationUrl(nino)))
           .withRequestBody(equalToJson(hipRequestBody))
       )
       MockAuthHelper.verifyAuthWasCalled()
