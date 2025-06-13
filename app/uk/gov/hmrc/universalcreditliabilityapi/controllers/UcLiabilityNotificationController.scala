@@ -67,9 +67,11 @@ class UcLiabilityNotificationController @Inject() (
           case UNPROCESSABLE_ENTITY =>
             Json.parse(result.body).validate[HipFailures] match {
               case JsSuccess(hipResponse, _) =>
-                UnprocessableEntity(
-                  Json.toJson(mappingService.map422ResponseErrors(hipResponse))
-                )
+                val maybeResponse = mappingService.map422ResponseErrors(hipResponse)
+                maybeResponse.map(response => UnprocessableEntity(Json.toJson(response))).getOrElse {
+                  logger.warn("422 with no reasons returned by HIP")
+                  InternalServerError
+                }
               case _                         =>
                 logger.warn("Unreadable 422 returned by HIP")
                 InternalServerError
