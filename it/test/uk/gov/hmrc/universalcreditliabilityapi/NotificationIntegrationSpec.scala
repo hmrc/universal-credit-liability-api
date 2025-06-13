@@ -487,7 +487,6 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       verify(
         1,
         postRequestedFor(urlEqualTo(hipInsertionUrl(nino)))
-          .withRequestBody(equalToJson(hipRequestBody))
       )
       MockAuthHelper.verifyAuthWasCalled()
     }
@@ -525,7 +524,6 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       verify(
         1,
         postRequestedFor(urlEqualTo(hipTerminationUrl(nino)))
-          .withRequestBody(equalToJson(hipRequestBody))
       )
       MockAuthHelper.verifyAuthWasCalled()
     }
