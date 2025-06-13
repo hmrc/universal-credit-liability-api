@@ -28,7 +28,7 @@ import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failures as H
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorCodes.ForbiddenCode
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ForbiddenReason
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, OriginatorId}
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.OriginatorId
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -82,7 +82,6 @@ class UcLiabilityNotificationController @Inject() (
           case _                   => InternalServerError
         }
       }).merge
-      .map(_.withHeaders(CorrelationId -> request.headers.get(CorrelationId).getOrElse("")))
   }
 
   private def validateOriginatorId[T](request: Request[T]) =
