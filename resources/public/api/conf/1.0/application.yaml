@@ -63,15 +63,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorResponse_400'
               examples:
-                400_Response:
+                400.1_Response:
                   value:
-                    code: "BAD_REQUEST"
-                    message: "Bad request"
-                    errors:
-                      - code: '01'
-                        message: "Constraint Violation - Invalid/Missing input parameter: <parameter>"
-                      - code: '02'
-                        message: HTTP message not readable
+                    code: '400.1'
+                    message: "Constraint Violation - Invalid/Missing input parameter: <parameter>"
+                400.2_Response:
+                  value:
+                    code: '400.2'
+                    message: "HTTP message not readable"
           description: Bad Request
           headers:
             correlationId:
@@ -111,116 +110,68 @@ paths:
               examples:
                 422_ConflictingLiability:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "55038"
-                        message: 'A conflicting or identical Liability is already recorded'
+                    code: "55038"
+                    message: 'A conflicting or identical Liability is already recorded'
                 422_StartDateBefore16thBirthday:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "65026"
-                        message: 'Start date must not be before 16th birthday'
+                    code: "65026"
+                    message: 'Start date must not be before 16th birthday'
                 422_StartDateAfterStatePensionAge:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "55029"
-                        message: 'Start Date later than SPA'
+                    code: "55029"
+                    message: 'Start Date later than SPA'
                 422_StartDateAfterDeath:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "64996"
-                        message: 'Start Date is not before date of death'
+                    code: "64996"
+                    message: 'Start Date is not before date of death'
                 422_StartAndEndDateAfterDeath:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "55006"
-                        message: 'Start Date and End Date must be earlier than Date of Death'
+                    code: "55006"
+                    message: 'Start Date and End Date must be earlier than Date of Death'
                 422_EndDateAfterStatePensionAge:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "55008"
-                        message: 'End Date must be earlier than State Pension Age'
+                    code: "55008"
+                    message: 'End Date must be earlier than State Pension Age'
                 422_EndDateAfterDeath:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "55027"
-                        message: 'End Date later than Date of Death'
+                    code: "55027"
+                    message: 'End Date later than Date of Death'
                 422_NotWithinUCPeriod:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "64997"
-                        message: 'LCW/LCWRA not within a period of UC'
+                    code: "64997"
+                    message: 'LCW/LCWRA not within a period of UC'
                 422_LCWLCWRAOverride:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "64998"
-                        message: 'LCW/LCWRA Override not within a period of LCW/LCWRA'
+                    code: "64998"
+                    message: 'LCW/LCWRA Override not within a period of LCW/LCWRA'
                 422_NoMatchingLiability:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "55039"
-                        message: 'NO corresponding liability found'
+                    code: "55039"
+                    message: 'NO corresponding liability found'
                 422_StartDateBefore29042013:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "65536"
-                        message: 'Start date before 29/04/2013'
+                    code: "65536"
+                    message: 'Start date before 29/04/2013'
                 422_EndDateBeforeStartDate:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "65537"
-                        message: 'End date before start date'
+                    code: "65537"
+                    message: 'End date before start date'
                 422_PseudoAccount:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "65541"
-                        message: 'The NINO input matches a Pseudo Account'
+                    code: "65541"
+                    message: 'The NINO input matches a Pseudo Account'
                 422_NonLiveAccount:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "65542"
-                        message: 'The NINO input matches a non-live account (including redundant, amalgamated and administrative account types)'
+                    code: "65542"
+                    message: 'The NINO input matches a non-live account (including redundant, amalgamated and administrative account types)'
                 422_AccountTransferredIsleOfMan:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "65543"
-                        message: 'The NINO input matches an account that has been transferred to the Isle of Man'
+                    code: "65543"
+                    message: 'The NINO input matches an account that has been transferred to the Isle of Man'
                 422_StartDateAfterDeath2:
                   value:
-                    code: "UNPROCESSABLE_ENTITY"
-                    message: "Unprocessable entity"
-                    errors:
-                      - code: "99999"
-                        message: 'Start Date after Death'
+                    code: "99999"
+                    message: 'Start Date after Death'
         '500':
           $ref: '#/components/responses/internalServerErrorResponse'
 components:
@@ -329,28 +280,6 @@ components:
           $ref: '#/components/schemas/liabilityEndDate'
       description: Request body for this API.
     errorResponse_400:
-      description: Array of Error Response Failure Object in Error Response.
-      title: Error Response
-      properties:
-        code:
-          type: string
-          enum:
-            - "BAD_REQUEST"
-        message:
-          type: string
-          enum:
-            - "Bad request"
-        errors:
-          items:
-            $ref: '#/components/schemas/errors_400'
-          type: array
-          minItems: 1
-      type: object
-      required:
-        - code
-        - message
-        - errors
-    errors_400:
       type: object
       required:
         - code
@@ -388,28 +317,6 @@ components:
           enum:
             - Forbidden
     errorResponse_422:
-      description: Error Response Payload for this API
-      title: Error Response
-      type: object
-      properties:
-        code:
-          type: string
-          enum:
-            - "UNPROCESSABLE_ENTITY"
-        message:
-          type: string
-          enum:
-            - "Unprocessable entity"
-        errors:
-          items:
-            $ref: '#/components/schemas/errors_422'
-          type: array
-          minItems: 1
-      required:
-        - code
-        - message
-        - errors
-    errors_422:
       type: object
       required:
         - code
