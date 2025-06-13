@@ -20,9 +20,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
-import play.api.libs.ws.{WSClient, WSResponse, writeableOf_String}
+import play.api.libs.ws.{WSClient, WSResponse, readableAsJson, writeableOf_String}
 import uk.gov.hmrc.universalcreditliabilityapi.support.{MockAuthHelper, OpenApiValidator, WireMockIntegrationSpec}
-import play.api.libs.ws.readableAsJson
+
 import java.util.UUID
 import scala.util.Random
 
@@ -172,11 +172,11 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       stubHipInsert(
         nino,
         status = 403,
-        body = """|{
-                                                   |  "code": "any code",
-                                                   |  "reason": "any insert forbidden reason"
-                                                   |}
-                                                   |""".stripMargin
+        responseBody = """|{
+                          |  "code": "any code",
+                          |  "reason": "any insert forbidden reason"
+                          |}
+                          |""".stripMargin
       )
 
       val response = callPostNotification(requestBody)
@@ -199,11 +199,11 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       stubHipTermination(
         nino,
         status = 403,
-        body = """|{
-                                                   |  "code": "any code",
-                                                   |  "reason": "any terminate forbidden reason"
-                                                   |}
-                                                   |""".stripMargin
+        responseBody = """|{
+                          |  "code": "any code",
+                          |  "reason": "any terminate forbidden reason"
+                          |}
+                          |""".stripMargin
       )
 
       val response = callPostNotification(requestBody)
@@ -262,7 +262,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
           |}
           |""".stripMargin
 
-      stubHipInsert(nino, status = 422, body = hipResponseBody)
+      stubHipInsert(nino, status = 422, responseBody = hipResponseBody)
 
       val response = callPostNotification(requestBody)
 
@@ -299,7 +299,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
           |}
           |""".stripMargin
 
-      stubHipTermination(nino, status = 422, body = hipResponseBody)
+      stubHipTermination(nino, status = 422, responseBody = hipResponseBody)
 
       val response = callPostNotification(requestBody)
 
@@ -324,7 +324,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     "return 500 when HIP returns invalid 422 for insert" in {
       val nino            = TestData.generateNino()
       val requestBody     = TestData.validInsertionRequest(nino)
-      val hipResponseBody =  """
+      val hipResponseBody = """
                                |{
                                |  "failures2": [
                                |    {
@@ -335,7 +335,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
                                |}
                                |""".stripMargin
 
-      stubHipInsert(nino, status = 422, body = hipResponseBody)
+      stubHipInsert(nino, status = 422, responseBody = hipResponseBody)
 
       val response = callPostNotification(requestBody)
 
@@ -350,7 +350,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       val requestBody     = TestData.validTerminateRequest(nino)
       val hipResponseBody = "{}"
 
-      stubHipTermination(nino, status = 422, body = hipResponseBody)
+      stubHipTermination(nino, status = 422, responseBody = hipResponseBody)
 
       val response = callPostNotification(requestBody)
 
@@ -375,7 +375,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     }
 
     "return 500 when HIP returns 500 for terminate" in {
-      val nino = TestData.generateNino()
+      val nino        = TestData.generateNino()
       val requestBody = TestData.validTerminateRequest(nino)
 
       stubHipTermination(nino, status = 500)
@@ -428,31 +428,94 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       MockAuthHelper.verifyAuthWasCalled()
     }
 
+    "verify that liabilityEndDate is not sent to HIP if it sent as part of the insert request" in {
+      val nino = TestData.generateNino()
+
+      val requestBody = Json.parse(s"""
+           |{
+           |  "nationalInsuranceNumber": "$nino",
+           |  "universalCreditRecordType": "UC",
+           |  "universalCreditAction": "Insert",
+           |  "dateOfBirth": "2002-10-10",
+           |  "liabilityEndDate": "2015-08-19",
+           |  "liabilityStartDate": "2025-08-19"
+           |}
+           |""".stripMargin)
+
+      val hipRequestBody = s"""
+                              |{
+                              |  "universalCreditLiabilityDetails": {
+                              |    "universalCreditRecordType": "UC",
+                              |    "dateOfBirth": "2002-10-10",
+                              |    "liabilityStartDate": "2025-08-19"
+                              |  }
+                              |}
+                              |""".stripMargin
+
+      stubHipInsert(nino, expectedRequestBody = Some(hipRequestBody))
+
+      val response = callPostNotification(requestBody, validateRequestAgainstOwnSchema = false)
+
+      response.status mustBe Status.NO_CONTENT
+
+      verify(
+        1,
+        postRequestedFor(urlEqualTo(hipInsertionUrl(nino)))
+          .withRequestBody(equalToJson(hipRequestBody))
+      )
+      MockAuthHelper.verifyAuthWasCalled()
+    }
   }
 
-  def stubHipInsert(nino: String, status: Int = 204, body: String = ""): StubMapping =
-    stubFor(
-      post(urlEqualTo(s"/person/$nino/liability/universal-credit"))
-        .willReturn(
-          aResponse()
-            .withHeader("content-type", "application/json")
-            .withHeader("correlationId", TestData.correlationId)
-            .withBody(body)
-            .withStatus(status)
-        )
-    )
+  def stubHipInsert(
+    nino: String,
+    status: Int = 204,
+    responseBody: String = "",
+    expectedRequestBody: Option[String] = None
+  ): StubMapping = {
 
-  def stubHipTermination(nino: String, status: Int = 204, body: String = ""): StubMapping =
+    val mappingBuilder = post(urlEqualTo(s"/person/$nino/liability/universal-credit"))
+
+    val mappingWithBody = expectedRequestBody match {
+      case Some(body) => mappingBuilder.withRequestBody(equalToJson(body))
+      case None       => mappingBuilder
+    }
+
     stubFor(
-      post(urlEqualTo(s"/person/$nino/liability/universal-credit/termination"))
-        .willReturn(
-          aResponse()
-            .withHeader("content-type", "application/json")
-            .withHeader("correlationId", TestData.correlationId)
-            .withStatus(status)
-            .withBody(body)
-        )
+      mappingWithBody.willReturn(
+        aResponse()
+          .withHeader("content-type", "application/json")
+          .withHeader("correlationId", TestData.correlationId)
+          .withStatus(status)
+          .withBody(responseBody)
+      )
     )
+  }
+
+  def stubHipTermination(
+    nino: String,
+    status: Int = 204,
+    responseBody: String = "",
+    expectedRequestBody: Option[String] = None
+  ): StubMapping = {
+
+    val mappingBuilder = post(urlEqualTo(s"/person/$nino/liability/universal-credit/termination"))
+
+    val mappingWithBody = expectedRequestBody match {
+      case Some(body) => mappingBuilder.withRequestBody(equalToJson(body))
+      case None       => mappingBuilder
+    }
+
+    stubFor(
+      mappingWithBody.willReturn(
+        aResponse()
+          .withHeader("content-type", "application/json")
+          .withHeader("correlationId", TestData.correlationId)
+          .withStatus(status)
+          .withBody(responseBody)
+      )
+    )
+  }
 
   def callPostNotification(
     body: String | JsValue,
