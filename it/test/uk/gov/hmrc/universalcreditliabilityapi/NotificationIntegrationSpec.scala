@@ -22,7 +22,7 @@ import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse, writeableOf_String}
 import uk.gov.hmrc.universalcreditliabilityapi.support.{MockAuthHelper, OpenApiValidator, WireMockIntegrationSpec}
-
+import play.api.libs.ws.readableAsJson
 import java.util.UUID
 import scala.util.Random
 
@@ -136,6 +136,298 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
       verify(0, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
     }
+
+    "return 500 when HIP returns 400 for insert" in {
+      val nino        = TestData.generateNino()
+      val requestBody = TestData.validInsertionRequest(nino)
+
+      stubHipInsert(nino, status = 400)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.INTERNAL_SERVER_ERROR
+
+      verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 500 when HIP returns 400 for terminate" in {
+      val nino        = TestData.generateNino()
+      val requestBody = TestData.validTerminateRequest(nino)
+
+      stubHipTermination(nino, status = 400)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.INTERNAL_SERVER_ERROR
+
+      verify(1, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 403 when HIP returns 403 with code=403.2 and message=Forbidden for insert" in {
+      val nino        = TestData.generateNino()
+      val requestBody = TestData.validInsertionRequest(nino)
+
+      stubHipInsert(
+        nino,
+        status = 403,
+        body = """|{
+                                                   |  "code": "any code",
+                                                   |  "reason": "any insert forbidden reason"
+                                                   |}
+                                                   |""".stripMargin
+      )
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.FORBIDDEN
+      response.body[JsValue] mustBe Json.parse("""|{
+                                                  |  "code": "403.2",
+                                                  |  "message": "Forbidden"
+                                                  |}
+                                                  |""".stripMargin)
+
+      verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 403 when HIP returns 403 with code=403.2 and message=Forbidden for terminate" in {
+      val nino        = TestData.generateNino()
+      val requestBody = TestData.validTerminateRequest(nino)
+
+      stubHipTermination(
+        nino,
+        status = 403,
+        body = """|{
+                                                   |  "code": "any code",
+                                                   |  "reason": "any terminate forbidden reason"
+                                                   |}
+                                                   |""".stripMargin
+      )
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.FORBIDDEN
+      response.body[JsValue] mustBe Json.parse("""|{
+                                                  |  "code": "403.2",
+                                                  |  "message": "Forbidden"
+                                                  |}
+                                                  |""".stripMargin)
+
+      verify(1, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 404 when HIP returns 404 for insert" in {
+      val nino        = TestData.generateNino()
+      val requestBody = TestData.validInsertionRequest(nino)
+
+      stubHipInsert(nino, status = 404)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.NOT_FOUND
+
+      verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 404 when HIP returns 404 for terminate" in {
+      val nino        = TestData.generateNino()
+      val requestBody = TestData.validTerminateRequest(nino)
+
+      stubHipTermination(nino, status = 404)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.NOT_FOUND
+
+      verify(1, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 422 when HIP returns valid 422 for insert" in {
+      val nino            = TestData.generateNino()
+      val requestBody     = TestData.validInsertionRequest(nino)
+      val hipResponseBody =
+        """
+          |{
+          |  "failures": [
+          |    {
+          |      "reason": "Start date before 29/04/2013",
+          |      "code": "65536"
+          |    }
+          |  ]
+          |}
+          |""".stripMargin
+
+      stubHipInsert(nino, status = 422, body = hipResponseBody)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.UNPROCESSABLE_ENTITY
+      response.body[JsValue] mustBe Json.parse("""
+                                                 |{
+                                                 |  "code": "UNPROCESSABLE_ENTITY",
+                                                 |  "message": "Unprocessable entity",
+                                                 |  "errors": [
+                                                 |    {
+                                                 |      "code": "65536",
+                                                 |      "message": "Start date before 29/04/2013"
+                                                 |    }
+                                                 |  ]
+                                                 |}
+                                                 |""".stripMargin)
+
+      verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 422 when HIP returns valid 422 for terminate" in {
+      val nino            = TestData.generateNino()
+      val requestBody     = TestData.validTerminateRequest(nino)
+      val hipResponseBody =
+        """
+          |{
+          |  "failures": [
+          |    {
+          |      "reason": "Start date before 29/04/2013",
+          |      "code": "65536"
+          |    }
+          |  ]
+          |}
+          |""".stripMargin
+
+      stubHipTermination(nino, status = 422, body = hipResponseBody)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.UNPROCESSABLE_ENTITY
+      response.body[JsValue] mustBe Json.parse("""
+                                                 |{
+                                                 |  "code": "UNPROCESSABLE_ENTITY",
+                                                 |  "message": "Unprocessable entity",
+                                                 |  "errors": [
+                                                 |    {
+                                                 |      "code": "65536",
+                                                 |      "message": "Start date before 29/04/2013"
+                                                 |    }
+                                                 |  ]
+                                                 |}
+                                                 |""".stripMargin)
+
+      verify(1, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 500 when HIP returns invalid 422 for insert" in {
+      val nino            = TestData.generateNino()
+      val requestBody     = TestData.validInsertionRequest(nino)
+      val hipResponseBody =  """
+                               |{
+                               |  "failures2": [
+                               |    {
+                               |      "reasons": "Start date before 29/04/2013",
+                               |      "codes": "65536"
+                               |    }
+                               |  ]
+                               |}
+                               |""".stripMargin
+
+      stubHipInsert(nino, status = 422, body = hipResponseBody)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.INTERNAL_SERVER_ERROR
+
+      verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 500 when HIP returns invalid 422 for terminate" in {
+      val nino            = TestData.generateNino()
+      val requestBody     = TestData.validTerminateRequest(nino)
+      val hipResponseBody = "{}"
+
+      stubHipTermination(nino, status = 422, body = hipResponseBody)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.INTERNAL_SERVER_ERROR
+
+      verify(1, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 500 when HIP returns 500 for insert" in {
+      val nino        = TestData.generateNino()
+      val requestBody = TestData.validInsertionRequest(nino)
+
+      stubHipInsert(nino, status = 500)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.INTERNAL_SERVER_ERROR
+
+      verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 500 when HIP returns 500 for terminate" in {
+      val nino = TestData.generateNino()
+      val requestBody = TestData.validTerminateRequest(nino)
+
+      stubHipTermination(nino, status = 500)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.INTERNAL_SERVER_ERROR
+
+      verify(1, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 503 when HIP returns 503 with a body matching the API platform's shutter response for insert" in {
+      val nino        = TestData.generateNino()
+      val requestBody = TestData.validInsertionRequest(nino)
+
+      stubHipInsert(nino, status = 503)
+
+      val response = callPostNotification(requestBody, validateResponseAgainstOwnSchema = false)
+
+      response.status mustBe Status.SERVICE_UNAVAILABLE
+      response.body[JsValue] mustBe Json.parse("""
+          |{
+          |   "code": "SERVER_ERROR",
+          |   "message": "Service unavailable."
+          |}
+          |""".stripMargin)
+
+      verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 503 when HIP returns 503 with a body matching the API platform's shutter response for terminate" in {
+      val nino        = TestData.generateNino()
+      val requestBody = TestData.validTerminateRequest(nino)
+
+      stubHipTermination(nino, status = 503)
+
+      val response = callPostNotification(requestBody, validateResponseAgainstOwnSchema = false)
+
+      response.status mustBe Status.SERVICE_UNAVAILABLE
+      response.body[JsValue] mustBe Json.parse("""
+                                                 |{
+                                                 |   "code": "SERVER_ERROR",
+                                                 |   "message": "Service unavailable."
+                                                 |}
+                                                 |""".stripMargin)
+
+      verify(1, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
   }
 
   def stubHipInsert(nino: String, status: Int = 204, body: String = ""): StubMapping =
@@ -157,15 +449,16 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
           aResponse()
             .withHeader("content-type", "application/json")
             .withHeader("correlationId", TestData.correlationId)
-            .withHeader("gov-uk-originator-id", TestData.testOriginatorId)
-            .withStatus(204)
+            .withStatus(status)
+            .withBody(body)
         )
     )
 
   def callPostNotification(
     body: String | JsValue,
     headers: Map[String, String] = TestData.validHeaders,
-    validateRequestAgainstOwnSchema: Boolean = true
+    validateRequestAgainstOwnSchema: Boolean = true,
+    validateResponseAgainstOwnSchema: Boolean = true
   ): WSResponse = {
 
     val request = openApiValidator
@@ -185,8 +478,10 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
     val response = request.execute().futureValue
 
-    val responseValidationErrors = openApiValidator.validateResponse(response)
-    responseValidationErrors mustBe List.empty
+    if (validateResponseAgainstOwnSchema) {
+      val responseValidationErrors = openApiValidator.validateResponse(response)
+      responseValidationErrors mustBe List.empty
+    }
 
     response
   }
@@ -214,7 +509,7 @@ object TestData {
        |  "universalCreditRecordType": "LCW/LCWRA",
        |  "universalCreditAction": "Insert",
        |  "dateOfBirth": "2002-10-10",
-       |  "liabilityEndDate": "2025-08-19"
+       |  "liabilityStartDate": "2025-08-19"
        |}
        |""".stripMargin)
 
