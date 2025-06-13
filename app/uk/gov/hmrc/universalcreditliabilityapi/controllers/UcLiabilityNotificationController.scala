@@ -78,7 +78,14 @@ class UcLiabilityNotificationController @Inject() (
             }
 
           case SERVICE_UNAVAILABLE =>
-            ServiceUnavailable(Json.toJson(Failure(code = "SERVER_ERROR", message = "Service unavailable.")))
+            ServiceUnavailable(
+              Json.toJson(
+                Failure(
+                  code = "SERVER_ERROR",
+                  message = "The 'misc/universal-credit/liability' API is currently unavailable"
+                )
+              )
+            )
           case _                   => InternalServerError
         }
       }).merge
