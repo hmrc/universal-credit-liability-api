@@ -21,8 +21,8 @@ import cats.syntax.all.*
 import play.api.libs.json.*
 import play.api.mvc.Results.BadRequest
 import play.api.mvc.{Request, Result}
-import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest, UniversalCreditAction}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCreditAction.{Insert, Terminate}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest, UniversalCreditAction}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames
@@ -74,23 +74,38 @@ class SchemaValidationService {
         )
     }
 
-  private def validateJson[T](request: Request[JsValue])(implicit reads: Reads[T]): EitherNec[Failure, T] =
+  private def validateJson[T](request: Request[JsValue])(implicit reads: Reads[T]): EitherNec[Failure, T] = {
+    val fieldOrder = List(
+      "nationalInsuranceNumber",
+      "universalCreditRecordType",
+      "dateOfBirth",
+      "liabilityStartDate",
+      "liabilityEndDate"
+    )
+
     request.body.validate[T] match {
       case JsSuccess(validatedRequest, _) =>
         Right(validatedRequest)
 
       case JsError(errors) =>
-        val failures = errors.flatMap { case (path, validationErrors) =>
+        val unorderedFailures = errors.flatMap { case (path, validationErrors) =>
           val field = path.toString().stripPrefix("/")
-          validationErrors.map { err =>
-            ApplicationConstants.invalidInputFailure(field)
-          }
+          validationErrors.map(_ => field -> ApplicationConstants.invalidInputFailure(field))
         }.toSeq
 
+        val orderedFailures = unorderedFailures
+          .sortBy { case (field, _) =>
+            fieldOrder.indexOf(field) match {
+              case idx => idx
+            }
+          }
+          .map(_._2)
+
         Left(
-          NonEmptyChain.fromSeq(failures).get
+          NonEmptyChain.fromSeq(orderedFailures).get
         )
     }
+  }
 
   private def mergeBadRequestFailures(failures: NonEmptyChain[Failure]): Future[Result] = {
     val allFailures: Seq[Failure] = failures.toList

@@ -114,7 +114,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       verify(0, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
     }
 
-    "return 400 when more than one request field is invalid" in {
+    "return 400 with one correctly ordered error code when more than one request field is invalid" in {
       val nino = TestData.generateNino()
 
       val requestBody = Json.parse(s"""
@@ -134,6 +134,8 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       )
 
       response.status mustBe Status.BAD_REQUEST
+      (response.body \ "message")
+        .as[String] mustBe "Constraint Violation - Invalid/Missing input parameter: correlationId"
 
       verify(0, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
     }
