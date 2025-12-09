@@ -1,6 +1,4 @@
-
 # universal-credit-liability-api
-
 
 ## Overview
 

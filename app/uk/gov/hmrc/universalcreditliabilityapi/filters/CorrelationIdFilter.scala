@@ -19,9 +19,9 @@ package uk.gov.hmrc.universalcreditliabilityapi.filters
 import jakarta.inject.Inject
 import org.apache.pekko.stream.Materializer
 import play.api.mvc.*
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.CorrelationId
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.CorrelationId
 
 class CorrelationIdFilter @Inject() (implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
 
