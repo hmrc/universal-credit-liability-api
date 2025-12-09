@@ -2,7 +2,8 @@ import sbt.Keys.dependencyOverrides
 import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "3.3.5"
+ThisBuild / scalaVersion := "3.3.7"
+ThisBuild / semanticdbEnabled := true
 
 lazy val microservice = Project("universal-credit-liability-api", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
@@ -12,7 +13,7 @@ lazy val microservice = Project("universal-credit-liability-api", file("."))
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s"
   )
-  .settings(CodeCoverageSettings.settings*)
+  .settings(CodeCoverageSettings.settings *)
   .settings(
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
   )
@@ -31,3 +32,7 @@ lazy val it = project
     // Scala module 2.14.3 requires Jackson Databind version >= 2.14.0 and < 2.15.0
     dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.14.3"
   )
+
+addCommandAlias("runPrePullRequestChecks", "; scalafmtCheckAll; scalafmtSbtCheck; scalafixAll --check")
+addCommandAlias("checkCodeCoverage", "; clean; coverage; test; it/test; coverageReport")
+addCommandAlias("lintCode", "; scalafmtAll; scalafmtSbt; scalafixAll")

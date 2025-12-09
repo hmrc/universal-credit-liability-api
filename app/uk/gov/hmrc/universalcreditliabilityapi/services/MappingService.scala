@@ -17,9 +17,9 @@
 package uk.gov.hmrc.universalcreditliabilityapi.services
 
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure as DwpFailure
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, TerminateLiabilityRequest, UcLiabilityTerminationDetails, UniversalCreditLiabilityDetails}
-import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.{Failures => HipFailures}
-import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.{Failure => DwpFailure}
+import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failures as HipFailures
 
 class MappingService {
 
