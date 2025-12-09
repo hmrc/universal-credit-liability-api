@@ -30,7 +30,7 @@ lazy val it = project
     // "swagger-request-validator-core" % "2.44.8"
     // "com.github.tomakehurst" % "wiremock" % "3.0.1"
     // Scala module 2.15.3 requires Jackson Databind version >= 2.15.0 and < 2.16.0
-    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.25.0"
+    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.15.0"
   )
 
 addCommandAlias("runPrePullRequestChecks", "; scalafmtCheckAll; scalafmtSbtCheck; scalafixAll --check")
