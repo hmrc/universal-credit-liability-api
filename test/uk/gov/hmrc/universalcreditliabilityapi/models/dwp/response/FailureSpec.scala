@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.universalcreditliabilityapi.model.dwp.response
+package uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -29,19 +29,18 @@ class FailureSpec extends AnyWordSpec with Matchers {
       val failureModel = Failure("12345", "Something went wrong")
 
       val failureJson: JsValue = Json.parse(
-        """{
-          | "code": "12345",
-          | "message": "Something went wrong"
-          |}""".stripMargin
+        """|{
+           |  "code": "12345",
+           |  "message": "Something went wrong"
+           |}""".stripMargin
       )
 
       Json.toJson(failureModel) mustBe failureJson
     }
 
     "contain the keys 'code' and 'message' when serialised" in {
-      val failureModel = Failure("12345", "Something went wrong")
-
-      val failureJsonKeys = Json.toJson(failureModel).as[JsObject].keys
+      val failureModel: Failure                   = Failure("12345", "Something went wrong")
+      val failureJsonKeys: collection.Set[String] = Json.toJson(failureModel).as[JsObject].keys
 
       failureJsonKeys mustBe Set("code", "message")
     }
