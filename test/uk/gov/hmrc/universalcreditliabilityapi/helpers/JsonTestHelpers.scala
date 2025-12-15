@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request
+package uk.gov.hmrc.universalcreditliabilityapi.helpers
 
-import play.api.libs.json.{JsError, JsString, JsSuccess, Reads}
+import play.api.libs.json.JsError
+import play.api.libs.json.JsResult
 
-enum UniversalCreditAction {
-  case Insert
-  case Terminate
-}
+object JsonTestHelpers {
 
-object UniversalCreditAction {
+  def extractJsErrorMessage(jsResult: JsResult[_]): Option[String] =
+    jsResult match {
+      case JsError(errors) => errors.headOption.flatMap(_._2.headOption.map(_.message))
+      case _               => None
+    }
 
-  implicit val reads: Reads[UniversalCreditAction] = Reads {
-    case JsString("Insert")    => JsSuccess(Insert)
-    case JsString("Terminate") => JsSuccess(Terminate)
-    case _                     => JsError("Unknown Universal Credit Action")
-  }
 }
