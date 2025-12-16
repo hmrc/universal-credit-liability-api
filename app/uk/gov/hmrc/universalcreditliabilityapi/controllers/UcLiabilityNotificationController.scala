@@ -53,8 +53,8 @@ class UcLiabilityNotificationController @Inject() (
       (nationalInsuranceNumber, mappedRequest) = mappingService.mapRequest(requestObject)
     } yield hipConnector
       .sendUcLiability(nationalInsuranceNumber, correlationId, originatorId, mappedRequest)
-      .map { result =>
-        result.status match {
+      .map { hipHttpResponse =>
+        hipHttpResponse.status match {
           case NO_CONTENT           => NoContent
           case BAD_REQUEST          =>
             logger.warn("400 returned by HIP")
@@ -65,7 +65,7 @@ class UcLiabilityNotificationController @Inject() (
             )
           case NOT_FOUND            => NotFound
           case UNPROCESSABLE_ENTITY =>
-            Json.parse(result.body).validate[HipFailures] match {
+            Json.parse(hipHttpResponse.body).validate[HipFailures] match {
               case JsSuccess(hipResponse, _) =>
                 val maybeResponse = mappingService.map422ResponseErrors(hipResponse)
                 maybeResponse.map(response => UnprocessableEntity(Json.toJson(response))).getOrElse {
