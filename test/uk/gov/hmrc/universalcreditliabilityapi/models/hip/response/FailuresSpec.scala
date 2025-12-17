@@ -35,14 +35,16 @@ class FailuresSpec extends AnyWordSpec with Matchers {
       )
 
       val failureJson: Failures = failureModel.as[Failures]
-      failureJson mustBe Failures(Seq(
-        Failure("12345", "Something went wrong"),
-        Failure("54321", "Something went wrong")
-      ))
+      failureJson mustBe Failures(
+        Seq(
+          Failure("12345", "Something went wrong"),
+          Failure("54321", "Something went wrong")
+        )
+      )
     }
 
     "fail to deserialise when failures is empty" in {
-      val failureModel = Json.parse(
+      val failureModel          = Json.parse(
         """{
           |"failures":[]
           |}""".stripMargin
