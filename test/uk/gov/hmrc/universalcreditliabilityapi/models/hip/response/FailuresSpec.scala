@@ -19,6 +19,7 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.response
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsResultException, Json}
+import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failures
 
 class FailuresSpec extends AnyWordSpec with Matchers {
 
