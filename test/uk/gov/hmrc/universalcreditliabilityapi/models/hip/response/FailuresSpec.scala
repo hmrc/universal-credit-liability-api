@@ -43,7 +43,7 @@ class FailuresSpec extends AnyWordSpec with Matchers {
       )
     }
 
-    "fail to deserialise when failures is empty" in {
+    "successfully deserialise when failures is empty" in {
       val failureModel          = Json.parse(
         """{
           |"failures":[]
