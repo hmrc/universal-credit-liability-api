@@ -24,14 +24,12 @@ import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabili
 
 class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
 
-
   "UniversalCreditLiabilityDetails" must {
 
     "successfully serialise" when {
 
       "given valid JSON with 'LCW/LCWRA' record type" in {
-        val json: JsValue = Json.parse(
-          """
+        val json: JsValue = Json.parse("""
             |{
             |    "universalCreditRecordType": "LCW/LCWRA",
             |    "dateOfBirth": "2002-10-10",
@@ -49,8 +47,7 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
       }
 
       "given valid JSON with valid leap year dates" in {
-        val json: JsValue = Json.parse(
-          """
+        val json: JsValue = Json.parse("""
             |{
             |    "universalCreditRecordType": "LCW/LCWRA",
             |    "dateOfBirth": "2002-02-29",
@@ -61,7 +58,8 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
         val testInsertLiabilityRequest = UniversalCreditLiabilityDetails(
           universalCreditRecordType = LCW_LCWRA,
           dateOfBirth = "2002-02-29",
-          liabilityStartDate = "2024-02-29")
+          liabilityStartDate = "2024-02-29"
+        )
 
         val requestInsert = InsertLiabilityRequest(testInsertLiabilityRequest)
 
@@ -114,4 +112,3 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
     }
   }
 }
-

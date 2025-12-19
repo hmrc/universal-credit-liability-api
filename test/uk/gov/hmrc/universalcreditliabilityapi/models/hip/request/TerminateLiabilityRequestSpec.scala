@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package uk.gov.hmrc.universalcreditliabilityapi.models.hip.request
 
 import org.scalatest.matchers.must.Matchers
@@ -23,7 +22,6 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.LCW_LCWRA
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{TerminateLiabilityRequest, UcLiabilityTerminationDetails}
 
-
 class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
 
   "TerminateLiabilityRequest" must {
@@ -31,8 +29,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
     "successfully serialise" when {
 
       "given valid JSON with 'LCW/LCWRA' record type" in {
-        val json: JsValue = Json.parse(
-          """
+        val json: JsValue = Json.parse("""
             |{
             |  "ucLiabilityTerminationDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
@@ -55,8 +52,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
       }
 
       "given valid JSON with valid leap year date" in {
-        val json: JsValue = Json.parse(
-          """
+        val json: JsValue = Json.parse("""
             |{
             |  "ucLiabilityTerminationDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
@@ -69,7 +65,8 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
         val testTerminateLiabilityRequest = UcLiabilityTerminationDetails(
           universalCreditRecordType = LCW_LCWRA,
           liabilityStartDate = "2002-02-29",
-          liabilityEndDate = "2024-02-29")
+          liabilityEndDate = "2024-02-29"
+        )
 
         val requestTerminate = TerminateLiabilityRequest(testTerminateLiabilityRequest)
 
@@ -93,7 +90,8 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
         val testTerminateLiabilityRequest = UcLiabilityTerminationDetails(
           universalCreditRecordType = LCW_LCWRA,
           liabilityStartDate = "1900-01-01",
-          liabilityEndDate = "2099-12-31")
+          liabilityEndDate = "2099-12-31"
+        )
 
         val request = TerminateLiabilityRequest(testTerminateLiabilityRequest)
 
@@ -116,7 +114,8 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
         val testTerminateLiabilityRequest = UcLiabilityTerminationDetails(
           universalCreditRecordType = LCW_LCWRA,
           liabilityStartDate = "2002-10-10",
-          liabilityEndDate = "2020-01-01")
+          liabilityEndDate = "2020-01-01"
+        )
 
         val request = TerminateLiabilityRequest(testTerminateLiabilityRequest)
 
@@ -125,5 +124,3 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
     }
   }
 }
-
-

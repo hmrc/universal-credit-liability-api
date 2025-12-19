@@ -19,19 +19,17 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.request
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.{LCW_LCWRA}
+import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.LCW_LCWRA
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, UniversalCreditLiabilityDetails}
 
 class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
-
 
   "InsertLiabilityRequest" must {
 
     "successfully serialise" when {
 
       "given valid JSON with 'LCW/LCWRA' record type" in {
-        val json: JsValue = Json.parse(
-          """
+        val json: JsValue = Json.parse("""
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
@@ -54,8 +52,7 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
       }
 
       "given valid JSON with valid leap year dates" in {
-        val json: JsValue = Json.parse(
-          """
+        val json: JsValue = Json.parse("""
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
@@ -68,7 +65,8 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
         val testInsertLiabilityRequest = UniversalCreditLiabilityDetails(
           universalCreditRecordType = LCW_LCWRA,
           dateOfBirth = "2002-02-29",
-          liabilityStartDate = "2024-02-29")
+          liabilityStartDate = "2024-02-29"
+        )
 
         val requestInsert = InsertLiabilityRequest(testInsertLiabilityRequest)
 
@@ -126,5 +124,3 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
     }
   }
 }
-
-
