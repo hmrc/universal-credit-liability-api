@@ -18,7 +18,7 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.request
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsValue, Json, JsError}
+import play.api.libs.json.{JsError, JsValue, Json}
 import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.{LCW_LCWRA, UC}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, UniversalCreditLiabilityDetails}
 
@@ -31,8 +31,7 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
     "successfully serialise" when {
 
       "given valid JSON with 'LCW/LCWRA' record type" in {
-        val json: JsValue = Json.parse(
-          """
+        val json: JsValue = Json.parse("""
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
@@ -54,8 +53,7 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
       }
 
       "given valid JSON with valid leap year dates" in {
-        val json: JsValue = Json.parse(
-          """
+        val json: JsValue = Json.parse("""
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",

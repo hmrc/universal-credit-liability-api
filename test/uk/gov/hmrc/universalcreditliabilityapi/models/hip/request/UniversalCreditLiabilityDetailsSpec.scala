@@ -20,7 +20,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsError, JsValue, Json}
 import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.{LCW_LCWRA, UC}
-import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{UniversalCreditLiabilityDetails}
+import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.UniversalCreditLiabilityDetails
 
 import java.time.LocalDate
 
@@ -31,8 +31,7 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
     "successfully serialise" when {
 
       "given valid JSON with 'LCW/LCWRA' record type" in {
-        val json: JsValue = Json.parse(
-          """
+        val json: JsValue = Json.parse("""
             |{
             |    "universalCreditRecordType": "LCW/LCWRA",
             |    "dateOfBirth": "2002-10-10",
@@ -50,8 +49,7 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
       }
 
       "given valid JSON with valid leap year dates" in {
-        val json: JsValue = Json.parse(
-          """
+        val json: JsValue = Json.parse("""
             |{
             |    "universalCreditRecordType": "LCW/LCWRA",
             |    "dateOfBirth": "2004-02-29",
