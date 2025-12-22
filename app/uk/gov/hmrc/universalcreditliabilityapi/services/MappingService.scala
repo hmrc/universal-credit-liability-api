@@ -21,6 +21,8 @@ import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure as Dw
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, TerminateLiabilityRequest, UcLiabilityTerminationDetails, UniversalCreditLiabilityDetails}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failures as HipFailures
 
+import java.time.LocalDate
+
 class MappingService {
 
   def mapRequest(
@@ -32,8 +34,8 @@ class MappingService {
         InsertLiabilityRequest(
           UniversalCreditLiabilityDetails(
             universalCreditRecordType = insert.universalCreditRecordType,
-            dateOfBirth = insert.dateOfBirth,
-            liabilityStartDate = insert.liabilityStartDate
+            dateOfBirth = LocalDate.parse(insert.dateOfBirth),
+            liabilityStartDate = LocalDate.parse(insert.liabilityStartDate)
           )
         )
       )
@@ -43,8 +45,8 @@ class MappingService {
         TerminateLiabilityRequest(
           UcLiabilityTerminationDetails(
             universalCreditRecordType = terminate.universalCreditRecordType,
-            liabilityStartDate = terminate.liabilityStartDate,
-            liabilityEndDate = terminate.liabilityEndDate
+            liabilityStartDate = LocalDate.parse(terminate.liabilityStartDate),
+            liabilityEndDate = LocalDate.parse(terminate.liabilityEndDate)
           )
         )
       )

@@ -19,12 +19,14 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.request
 import play.api.libs.json.*
 import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType
 
+import java.time.LocalDate
+
 final case class UcLiabilityTerminationDetails(
   universalCreditRecordType: UniversalCreditRecordType,
-  liabilityStartDate: String,
-  liabilityEndDate: String
+  liabilityStartDate: LocalDate,
+  liabilityEndDate: LocalDate
 )
 
 object UcLiabilityTerminationDetails {
-  implicit val format: OWrites[UcLiabilityTerminationDetails] = Json.writes[UcLiabilityTerminationDetails]
+  implicit val format: OFormat[UcLiabilityTerminationDetails] = Json.format
 }

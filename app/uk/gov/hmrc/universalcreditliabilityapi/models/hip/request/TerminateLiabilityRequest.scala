@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.universalcreditliabilityapi.models.hip.request
 
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OFormat, OWrites}
 
 final case class TerminateLiabilityRequest(ucLiabilityTerminationDetails: UcLiabilityTerminationDetails)
 
 object TerminateLiabilityRequest {
-  implicit val format: OWrites[TerminateLiabilityRequest] = Json.writes[TerminateLiabilityRequest]
+  implicit val format: OFormat[TerminateLiabilityRequest] = Json.format
 }
