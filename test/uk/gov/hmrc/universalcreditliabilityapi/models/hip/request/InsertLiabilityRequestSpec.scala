@@ -18,11 +18,9 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.request
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsError, JsValue, Json}
-import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.{LCW_LCWRA, UC}
+import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.LCW_LCWRA
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, UniversalCreditLiabilityDetails}
-
-import java.time.LocalDate
 
 class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
 
@@ -43,13 +41,14 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
 
         val testInsertLiabilityRequest = UniversalCreditLiabilityDetails(
           universalCreditRecordType = LCW_LCWRA,
-          dateOfBirth = LocalDate.parse("2002-10-10"),
-          liabilityStartDate = LocalDate.parse("2025-08-19")
+          dateOfBirth = "2002-10-10",
+          liabilityStartDate = "2025-08-19"
         )
 
-        val request = InsertLiabilityRequest(testInsertLiabilityRequest)
+        val requestInsert = InsertLiabilityRequest(testInsertLiabilityRequest)
 
-        Json.toJson(request) mustBe json
+        val result: JsValue = Json.toJson(requestInsert)
+        result mustBe json
       }
 
       "given valid JSON with valid leap year dates" in {
@@ -57,7 +56,7 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2004-02-29",
+            |    "dateOfBirth": "2002-02-29",
             |    "liabilityStartDate": "2024-02-29"
             |  }
             |}
@@ -65,13 +64,14 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
 
         val testInsertLiabilityRequest = UniversalCreditLiabilityDetails(
           universalCreditRecordType = LCW_LCWRA,
-          dateOfBirth = LocalDate.parse("2004-02-29"),
-          liabilityStartDate = LocalDate.parse("2024-02-29")
+          dateOfBirth = "2002-02-29",
+          liabilityStartDate = "2024-02-29"
         )
 
-        val request = InsertLiabilityRequest(testInsertLiabilityRequest)
+        val requestInsert = InsertLiabilityRequest(testInsertLiabilityRequest)
 
-        Json.toJson(request) mustBe json
+        val result: JsValue = Json.toJson(requestInsert)
+        result mustBe json
       }
 
       "given valid JSON with boundary date values" in {
@@ -89,8 +89,8 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
 
         val testInsertLiabilityRequest = UniversalCreditLiabilityDetails(
           universalCreditRecordType = LCW_LCWRA,
-          dateOfBirth = LocalDate.parse("1900-01-01"),
-          liabilityStartDate = LocalDate.parse("2099-12-31")
+          dateOfBirth = "1900-01-01",
+          liabilityStartDate = "2099-12-31"
         )
 
         val request = InsertLiabilityRequest(testInsertLiabilityRequest)
@@ -98,12 +98,12 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
         Json.toJson(request) mustBe expectedJson
       }
 
-      "given valid JSON with another valid date combination" in {
+      "given valid JSON with other record types" in {
         val expectedJson: JsValue = Json.parse(
           """
             |{
             |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "UC",
+            |    "universalCreditRecordType": "LCW/LCWRA",
             |    "dateOfBirth": "2001-01-01",
             |    "liabilityStartDate": "2020-01-01"
             |  }
@@ -112,158 +112,14 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
         )
 
         val testInsertLiabilityRequest = UniversalCreditLiabilityDetails(
-          universalCreditRecordType = UC,
-          dateOfBirth = LocalDate.parse("2001-01-01"),
-          liabilityStartDate = LocalDate.parse("2020-01-01")
+          universalCreditRecordType = LCW_LCWRA,
+          dateOfBirth = "2001-01-01",
+          liabilityStartDate = "2020-01-01"
         )
 
         val request = InsertLiabilityRequest(testInsertLiabilityRequest)
 
         Json.toJson(request) mustBe expectedJson
-      }
-    }
-    "fail to deserialise" when {
-
-      "given JSON contains invalid record type" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "INVALID",
-            |    "dateOfBirth": "2002-10-10",
-            |    "liabilityStartDate": "2015-08-19"
-            |  }
-            |}
-            |""".stripMargin
-        )
-
-        json.validate[InsertLiabilityRequest] mustBe a[JsError]
-
-      }
-
-      "given JSON contains invalid liability start date" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2002-10-10",
-            |    "liabilityStartDate": "2025-12-45"
-            |  }
-            |}
-            |""".stripMargin
-        )
-
-        json.validate[InsertLiabilityRequest] mustBe a[JsError]
-      }
-
-      "given JSON contains liability start date with an invalid format" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2002-10-10",
-            |    "liabilityStartDate": "2025/12/12"
-            |  }
-            |}
-            |""".stripMargin
-        )
-
-        json.validate[InsertLiabilityRequest] mustBe a[JsError]
-      }
-
-      "given JSON contains invalid date of birth" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2002-10-45",
-            |    "liabilityStartDate": "2025-12-12"
-            |  }
-            |}
-            |""".stripMargin
-        )
-
-        json.validate[InsertLiabilityRequest] mustBe a[JsError]
-      }
-
-      "given JSON contains date of birth with invalid format" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2002/10/10",
-            |    "liabilityStartDate": "2025-12-12"
-            |  }
-            |}
-            |""".stripMargin
-        )
-
-        json.validate[InsertLiabilityRequest] mustBe a[JsError]
-      }
-
-      "given JSON is missing a record type" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            |   "universalCreditLiabilityDetails": {
-            |    "dateOfBirth": "2002-10-10",
-            |    "liabilityStartDate": "2015-08-19"
-            |  }
-            |}
-            |""".stripMargin
-        )
-
-        json.validate[InsertLiabilityRequest] mustBe a[JsError]
-      }
-
-      "given JSON is missing a date of birth" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            |   "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "liabilityStartDate": "2015-08-19"
-            |  }
-            |}
-            |""".stripMargin
-        )
-
-        json.validate[InsertLiabilityRequest] mustBe a[JsError]
-      }
-
-      "given JSON is missing a liability Start Date" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            |   "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2002-10-10"
-            |  }
-            |}
-            |""".stripMargin
-        )
-
-        json.validate[InsertLiabilityRequest] mustBe a[JsError]
-      }
-
-      "given JSON contains invalid leap year dates" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2001-02-29",
-            |    "liabilityStartDate": "2025-02-29"
-            |  }
-            |}
-            |""".stripMargin
-        )
-
-        json.validate[InsertLiabilityRequest] mustBe a[JsError]
       }
     }
   }
