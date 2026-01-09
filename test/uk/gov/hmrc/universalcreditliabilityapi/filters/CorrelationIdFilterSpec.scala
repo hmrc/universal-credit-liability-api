@@ -16,17 +16,17 @@
 
 package uk.gov.hmrc.universalcreditliabilityapi.filters
 
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.{Materializer, SystemMaterializer}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.mvc.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.correlationId
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.CorrelationId
 
 import scala.concurrent.{ExecutionContext, Future}
-import org.apache.pekko.actor.ActorSystem
-import org.apache.pekko.stream.{Materializer, SystemMaterializer}
-import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.correlationId
 
 class CorrelationIdFilterSpec extends AnyWordSpec with Matchers {
 
