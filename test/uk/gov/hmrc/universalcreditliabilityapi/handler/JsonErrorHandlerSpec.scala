@@ -21,7 +21,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.correlationId
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.CorrelationId
 
@@ -29,21 +29,28 @@ import scala.concurrent.Future
 
 class JsonErrorHandlerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  val requestHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("Accept" -> "application/json")
-  val handler: JsonErrorHandler = app.injector.instanceOf[JsonErrorHandler]
+  val requestHeader: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest().withHeaders("Accept" -> "application/json")
+
+  val handler: JsonErrorHandler =
+    app.injector.instanceOf[JsonErrorHandler]
 
   "JsonErrorHandler" must {
 
     "return 500 with CorrelationId header when present" in {
-      val req: FakeRequest[AnyContentAsEmpty.type] = requestHeader.withHeaders(CorrelationId -> correlationId)
-      val result: Future[Result] = handler.onServerError(req, new RuntimeException("test error"))
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        requestHeader.withHeaders(CorrelationId -> correlationId)
+
+      val result: Future[Result] =
+        handler.onServerError(req, new RuntimeException("test error"))
 
       status(result) mustBe INTERNAL_SERVER_ERROR
       header(CorrelationId, result) mustBe Some(correlationId)
     }
 
     "return 500 without CorrelationId header when missing" in {
-      val result: Future[Result] = handler.onServerError(requestHeader, new RuntimeException("test error"))
+      val result: Future[Result] =
+        handler.onServerError(requestHeader, new RuntimeException("test error"))
 
       status(result) mustBe INTERNAL_SERVER_ERROR
       header(CorrelationId, result) mustBe None
