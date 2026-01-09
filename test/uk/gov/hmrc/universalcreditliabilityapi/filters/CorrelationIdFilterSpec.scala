@@ -30,16 +30,16 @@ import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.correlationId
 
 class CorrelationIdFilterSpec extends AnyWordSpec with Matchers {
 
-  given actorSystem: ActorSystem = ActorSystem("test-system")
+  given actorSystem: ActorSystem   = ActorSystem("test-system")
   given materializer: Materializer = SystemMaterializer(actorSystem).materializer
-  given ec: ExecutionContext = actorSystem.dispatcher
+  given ec: ExecutionContext       = actorSystem.dispatcher
 
-    val filter: CorrelationIdFilter = new CorrelationIdFilter()
+  val filter: CorrelationIdFilter = new CorrelationIdFilter()
 
-    val next: RequestHeader => Future[Result] =
-      _ => Future.successful(Results.Ok)
+  val next: RequestHeader => Future[Result] =
+    _ => Future.successful(Results.Ok)
 
-  "CorrelationIdFilter" should {
+  "CorrelationIdFilter" must {
 
     "add the CorrelationId header when present in the request" in {
       val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(CorrelationId -> correlationId)
