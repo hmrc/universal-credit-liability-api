@@ -30,9 +30,11 @@ import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.correlationId
 
 class CorrelationIdFilterSpec extends AnyWordSpec with Matchers {
 
-  given actorSystem: ActorSystem   = ActorSystem("test-system")
+  given actorSystem: ActorSystem = ActorSystem("test-system")
+
   given materializer: Materializer = SystemMaterializer(actorSystem).materializer
-  given ec: ExecutionContext       = actorSystem.dispatcher
+
+  given ec: ExecutionContext = actorSystem.dispatcher
 
   val filter: CorrelationIdFilter = new CorrelationIdFilter()
 

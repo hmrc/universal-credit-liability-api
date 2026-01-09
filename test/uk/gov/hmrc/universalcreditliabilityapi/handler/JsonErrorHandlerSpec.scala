@@ -30,13 +30,13 @@ import scala.concurrent.Future
 class JsonErrorHandlerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   val requestHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("Accept" -> "application/json")
-  val handler: JsonErrorHandler                          = app.injector.instanceOf[JsonErrorHandler]
+  val handler: JsonErrorHandler = app.injector.instanceOf[JsonErrorHandler]
 
   "JsonErrorHandler" must {
 
     "return 500 with CorrelationId header when present" in {
       val req: FakeRequest[AnyContentAsEmpty.type] = requestHeader.withHeaders(CorrelationId -> correlationId)
-      val result: Future[Result]                   = handler.onServerError(req, new RuntimeException("test error"))
+      val result: Future[Result] = handler.onServerError(req, new RuntimeException("test error"))
 
       status(result) mustBe INTERNAL_SERVER_ERROR
       header(CorrelationId, result) mustBe Some(correlationId)
