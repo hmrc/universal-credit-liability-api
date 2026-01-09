@@ -57,11 +57,11 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
 
         val testInsertLiabilityRequest = UniversalCreditLiabilityDetails(
           universalCreditRecordType = LCW_LCWRA,
-          dateOfBirth = "2002-02-29",
+          dateOfBirth = "2000-02-29",
           liabilityStartDate = "2024-02-29"
         )
 
-        val requestInsert = InsertLiabilityRequest(testInsertLiabilityRequest)
+        InsertLiabilityRequest(testInsertLiabilityRequest)
 
         Json.toJson(testInsertLiabilityRequest) mustBe json
       }

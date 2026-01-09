@@ -20,7 +20,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.LCW_LCWRA
-import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{TerminateLiabilityRequest, UcLiabilityTerminationDetails}
+import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.UcLiabilityTerminationDetails
 
 class UcLiabilityTerminationDetailsSpec extends AnyWordSpec with Matchers {
 
@@ -57,7 +57,7 @@ class UcLiabilityTerminationDetailsSpec extends AnyWordSpec with Matchers {
 
         val testTerminateLiabilityRequest = UcLiabilityTerminationDetails(
           universalCreditRecordType = LCW_LCWRA,
-          liabilityStartDate = "2002-02-29",
+          liabilityStartDate = "2000-02-29",
           liabilityEndDate = "2024-02-29"
         )
 
