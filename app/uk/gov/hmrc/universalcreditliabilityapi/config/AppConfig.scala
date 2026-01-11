@@ -34,7 +34,10 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
     "1.0" -> Override(apiPlatformStatus, apiPlatformEndpointsEnabled)
   )
 
-  val hipBaseUrl: String = servicesConfig.baseUrl("hip")
+  val hipBaseUrl: String      = servicesConfig.baseUrl("hip")
+  val hipClientId: String     = config.get[String]("hip.clientId")
+  val hipClientSecret: String = config.get[String]("hip.clientSecret")
+
 }
 
 final case class Override(status: Option[String], endpointsEnabled: Option[Boolean])
