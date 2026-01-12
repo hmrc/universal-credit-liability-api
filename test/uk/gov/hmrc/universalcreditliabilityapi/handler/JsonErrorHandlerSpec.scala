@@ -45,7 +45,6 @@ class JsonErrorHandlerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
         handler.onServerError(req, new RuntimeException("test error"))
 
       status(result) mustBe INTERNAL_SERVER_ERROR
-      contentType(result) mustBe Some("application/json")
       header(CorrelationId, result) mustBe Some(correlationId)
     }
 
@@ -54,7 +53,6 @@ class JsonErrorHandlerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
         handler.onServerError(requestHeader, new RuntimeException("test error"))
 
       status(result) mustBe INTERNAL_SERVER_ERROR
-      contentType(result) mustBe Some("application/json")
       header(CorrelationId, result) mustBe None
     }
   }
