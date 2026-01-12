@@ -59,4 +59,3 @@ class JsonErrorHandlerSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     }
   }
 }
-
