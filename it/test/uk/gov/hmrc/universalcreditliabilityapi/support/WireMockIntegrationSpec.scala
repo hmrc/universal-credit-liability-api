@@ -44,6 +44,9 @@ abstract class WireMockIntegrationSpec
   val wireMockHost                 = "localhost"
   lazy val wireMockBaseUrlAsString = s"http://$wireMockHost:$wireMockPort"
 
+  val testHipClientId: String     = "test-client-id"
+  val testHipClientSecret: String = "test-client-secret"
+
   override def beforeAll(): Unit = {
     super.beforeAll()
     WireMock.configureFor(wireMockHost, wireMockPort)
@@ -63,7 +66,9 @@ abstract class WireMockIntegrationSpec
   def additionalConfigs: Map[String, Any] = Map.empty
   private def configs: Map[String, Any]   = Map(
     "microservice.services.auth.port" -> wireMockPort,
-    "microservice.services.hip.port" -> wireMockPort
+    "microservice.services.hip.port"  -> wireMockPort,
+    "hip.clientId"                    -> testHipClientId,
+    "hip.clientSecret"                -> testHipClientSecret
   ) ++ additionalConfigs
 
   override def fakeApplication(): Application =
