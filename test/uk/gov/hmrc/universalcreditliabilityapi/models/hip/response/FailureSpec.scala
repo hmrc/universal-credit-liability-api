@@ -18,44 +18,60 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.response
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsResultException, Json}
+import play.api.libs.json.{JsError, JsResultException, JsSuccess, JsValue, Json}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failure
 
 class FailureSpec extends AnyWordSpec with Matchers {
 
   "Failure" must {
 
-    "successfully deserialise from valid JSON" in {
-      val failureModel = Json.parse(
-        """{
-          | "code": "12345",
-          | "reason": "Something went wrong"
-          |}""".stripMargin
-      )
+    "successfully deserialise from JSON" when {
 
-      val failureJson: Failure = failureModel.as[Failure]
-      failureJson mustBe Failure("12345", "Something went wrong")
-    }
+      "all fields are present" in {
+        val testJson: JsValue = Json.parse("""
+            |{
+            |  "code": "12345",
+            |  "reason": "Something went wrong"
+            |}""".stripMargin)
 
-    "fail to deserialise when 'reason' is missing" in {
-      val failureModel = Json.parse(
-        """{
-          |"code":"12345"
-          |}""".stripMargin
-      )
-      assertThrows[JsResultException] {
-        failureModel.as[Failure]
+        val result = testJson.validate[Failure]
+
+        result mustBe JsSuccess(Failure(code = "12345", reason = "Something went wrong"))
       }
+
     }
 
-    "fail to deserialise when 'code' is missing" in {
-      val failureModel = Json.parse(
-        """{
-          |"reason":"Something went wrong"
-          |}""".stripMargin
-      )
-      assertThrows[JsResultException] {
-        failureModel.as[Failure]
+    "fail to deserialise from JSON" when {
+
+      "the 'code' is missing" in {
+        val testJson: JsValue = Json.parse("""
+            |{
+            |  "reason": "Something went wrong"
+            |}""".stripMargin)
+
+        val result = testJson.validate[Failure]
+
+        result mustBe a[JsError]
+      }
+
+      "the 'reason' is missing" in {
+        val testJson: JsValue = Json.parse("""
+            |{
+            |  "code": "12345"
+            |}""".stripMargin)
+
+        val result = testJson.validate[Failure]
+
+        result mustBe a[JsError]
+      }
+
+      "it's empty" in {
+        val testJson: JsValue = Json.parse("""
+            |{}""".stripMargin)
+
+        val result = testJson.validate[Failure]
+
+        result mustBe a[JsError]
       }
     }
 
