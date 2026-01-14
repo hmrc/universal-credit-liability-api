@@ -29,7 +29,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
     "successfully deserialise" when {
 
       "given valid JSON with 'UC' record type" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -39,21 +39,22 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val testInsertUcLiabilityRequest: InsertUcLiabilityRequest = InsertUcLiabilityRequest(
-          universalCreditAction = Insert,
-          nationalInsuranceNumber = "AA123456",
-          universalCreditRecordType = UC,
-          liabilityStartDate = "2025-12-15",
-          dateOfBirth = "2002-10-10"
-        )
+        val expectedInsertUcLiabilityRequest: InsertUcLiabilityRequest =
+          InsertUcLiabilityRequest(
+            universalCreditAction = Insert,
+            nationalInsuranceNumber = "AA123456",
+            universalCreditRecordType = UC,
+            liabilityStartDate = "2025-12-15",
+            dateOfBirth = "2002-10-10"
+          )
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
-        result mustBe JsSuccess(testInsertUcLiabilityRequest)
+        result mustBe JsSuccess(expectedInsertUcLiabilityRequest)
       }
 
       "given valid JSON with 'LCW/LCWRA' record type" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -63,21 +64,22 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val testInsertUcLiabilityRequest: InsertUcLiabilityRequest = InsertUcLiabilityRequest(
-          universalCreditAction = Insert,
-          nationalInsuranceNumber = "AA123456",
-          universalCreditRecordType = LCW_LCWRA,
-          liabilityStartDate = "2025-12-15",
-          dateOfBirth = "2002-10-10"
-        )
+        val expectedInsertUcLiabilityRequest: InsertUcLiabilityRequest =
+          InsertUcLiabilityRequest(
+            universalCreditAction = Insert,
+            nationalInsuranceNumber = "AA123456",
+            universalCreditRecordType = LCW_LCWRA,
+            liabilityStartDate = "2025-12-15",
+            dateOfBirth = "2002-10-10"
+          )
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
-        result mustBe JsSuccess(testInsertUcLiabilityRequest)
+        result mustBe JsSuccess(expectedInsertUcLiabilityRequest)
       }
 
       "given valid JSON with valid leap year dates" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -87,24 +89,25 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val testInsertUcLiabilityRequest: InsertUcLiabilityRequest = InsertUcLiabilityRequest(
-          universalCreditAction = Insert,
-          nationalInsuranceNumber = "AA123456",
-          universalCreditRecordType = UC,
-          liabilityStartDate = "2024-02-29",
-          dateOfBirth = "2000-02-29"
-        )
+        val expectedInsertUcLiabilityRequest: InsertUcLiabilityRequest =
+          InsertUcLiabilityRequest(
+            universalCreditAction = Insert,
+            nationalInsuranceNumber = "AA123456",
+            universalCreditRecordType = UC,
+            liabilityStartDate = "2024-02-29",
+            dateOfBirth = "2000-02-29"
+          )
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
-        result mustBe JsSuccess(testInsertUcLiabilityRequest)
+        result mustBe JsSuccess(expectedInsertUcLiabilityRequest)
       }
     }
 
     "fail to deserialise" when {
 
       "given JSON contains invalid record type" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -114,13 +117,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid NINO (too short)" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA1234",
@@ -130,13 +133,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid NINO (too long)" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA1234567890",
@@ -146,13 +149,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid NINO (invalid prefix)" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "DA123456",
@@ -162,13 +165,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid liability start date" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -178,13 +181,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains liability start date with an invalid format" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -194,13 +197,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid date of birth" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -210,13 +213,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains date of birth with invalid format" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -226,13 +229,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON is missing a NINO" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "universalCreditRecordType": "LCW/LCWRA",
@@ -241,13 +244,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON is missing an action" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "nationalInsuranceNumber": "AA123456",
             |  "universalCreditRecordType": "LCW/LCWRA",
@@ -256,13 +259,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON is missing a record type" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -271,13 +274,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON is missing a liability start date" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -286,13 +289,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON is missing a date of birth" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -301,13 +304,13 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid leap year dates" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
@@ -317,7 +320,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUcLiabilityRequest]
 
         result mustBe a[JsError]
       }

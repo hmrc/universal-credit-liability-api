@@ -19,7 +19,7 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.request
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.LCW_LCWRA
+import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.{LCW_LCWRA, UC}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, UniversalCreditLiabilityDetails}
 
 class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
@@ -28,8 +28,40 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
 
     "successfully serialise" when {
 
-      "given valid JSON with 'LCW/LCWRA' record type" in {
-        val json: JsValue = Json.parse("""
+      "record type is 'UC'" in {
+        val testInsertLiabilityRequest: InsertLiabilityRequest =
+          InsertLiabilityRequest(
+            UniversalCreditLiabilityDetails(
+              universalCreditRecordType = UC,
+              dateOfBirth = "2002-10-10",
+              liabilityStartDate = "2025-08-19"
+            )
+          )
+
+        val expectedJson: JsValue = Json.parse("""
+            |{
+            |  "universalCreditLiabilityDetails": {
+            |    "universalCreditRecordType": "UC",
+            |    "dateOfBirth": "2002-10-10",
+            |    "liabilityStartDate": "2025-08-19"
+            |  }
+            |}
+            |""".stripMargin)
+
+        Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
+      }
+
+      "record type is 'LCW/LCWRA'" in {
+        val testInsertLiabilityRequest: InsertLiabilityRequest =
+          InsertLiabilityRequest(
+            UniversalCreditLiabilityDetails(
+              universalCreditRecordType = LCW_LCWRA,
+              dateOfBirth = "2002-10-10",
+              liabilityStartDate = "2025-08-19"
+            )
+          )
+
+        val expectedJson: JsValue = Json.parse("""
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
@@ -39,44 +71,43 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val testInsertLiabilityRequest = UniversalCreditLiabilityDetails(
-          universalCreditRecordType = LCW_LCWRA,
-          dateOfBirth = "2002-10-10",
-          liabilityStartDate = "2025-08-19"
-        )
-
-        val requestInsert = InsertLiabilityRequest(testInsertLiabilityRequest)
-
-        val result: JsValue = Json.toJson(requestInsert)
-        result mustBe json
+        Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
       }
 
-      "given valid JSON with valid leap year dates" in {
-        val json: JsValue = Json.parse("""
+      "dates include leap year values" in {
+        val testInsertLiabilityRequest: InsertLiabilityRequest =
+          InsertLiabilityRequest(
+            UniversalCreditLiabilityDetails(
+              universalCreditRecordType = LCW_LCWRA,
+              dateOfBirth = "2000-02-29",
+              liabilityStartDate = "2024-02-29"
+            )
+          )
+
+        val expectedJson: JsValue = Json.parse("""
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2002-02-29",
+            |    "dateOfBirth": "2000-02-29",
             |    "liabilityStartDate": "2024-02-29"
             |  }
             |}
             |""".stripMargin)
 
-        val testInsertLiabilityRequest = UniversalCreditLiabilityDetails(
-          universalCreditRecordType = LCW_LCWRA,
-          dateOfBirth = "2002-02-29",
-          liabilityStartDate = "2024-02-29"
-        )
-
-        val requestInsert = InsertLiabilityRequest(testInsertLiabilityRequest)
-
-        val result: JsValue = Json.toJson(requestInsert)
-        result mustBe json
+        Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
       }
 
-      "given valid JSON with boundary date values" in {
-        val expectedJson: JsValue = Json.parse(
-          """
+      "dates are at boundary values" in {
+        val testInsertLiabilityRequest: InsertLiabilityRequest =
+          InsertLiabilityRequest(
+            UniversalCreditLiabilityDetails(
+              universalCreditRecordType = LCW_LCWRA,
+              dateOfBirth = "1900-01-01",
+              liabilityStartDate = "2099-12-31"
+            )
+          )
+
+        val expectedJson: JsValue = Json.parse("""
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
@@ -84,43 +115,11 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |    "liabilityStartDate": "2099-12-31"
             |  }
             |}
-            |""".stripMargin
-        )
+            |""".stripMargin)
 
-        val testInsertLiabilityRequest = UniversalCreditLiabilityDetails(
-          universalCreditRecordType = LCW_LCWRA,
-          dateOfBirth = "1900-01-01",
-          liabilityStartDate = "2099-12-31"
-        )
-
-        val request = InsertLiabilityRequest(testInsertLiabilityRequest)
-
-        Json.toJson(request) mustBe expectedJson
+        Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
       }
 
-      "given valid JSON with other record types" in {
-        val expectedJson: JsValue = Json.parse(
-          """
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2001-01-01",
-            |    "liabilityStartDate": "2020-01-01"
-            |  }
-            |}
-            |""".stripMargin
-        )
-
-        val testInsertLiabilityRequest = UniversalCreditLiabilityDetails(
-          universalCreditRecordType = LCW_LCWRA,
-          dateOfBirth = "2001-01-01",
-          liabilityStartDate = "2020-01-01"
-        )
-
-        val request = InsertLiabilityRequest(testInsertLiabilityRequest)
-
-        Json.toJson(request) mustBe expectedJson
-      }
     }
   }
 }

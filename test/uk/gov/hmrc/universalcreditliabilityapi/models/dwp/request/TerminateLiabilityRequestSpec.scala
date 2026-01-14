@@ -29,7 +29,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
     "successfully deserialise" when {
 
       "given valid JSON with 'UC' record type" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -39,21 +39,22 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val testTerminateUcLiabilityRequest: TerminateUcLiabilityRequest = TerminateUcLiabilityRequest(
-          universalCreditAction = Terminate,
-          nationalInsuranceNumber = "AA123456",
-          universalCreditRecordType = UC,
-          liabilityStartDate = "2025-12-15",
-          liabilityEndDate = "2026-12-15"
-        )
+        val expectedTerminateUcLiabilityRequest: TerminateUcLiabilityRequest =
+          TerminateUcLiabilityRequest(
+            universalCreditAction = Terminate,
+            nationalInsuranceNumber = "AA123456",
+            universalCreditRecordType = UC,
+            liabilityStartDate = "2025-12-15",
+            liabilityEndDate = "2026-12-15"
+          )
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
-        result mustBe JsSuccess(testTerminateUcLiabilityRequest)
+        result mustBe JsSuccess(expectedTerminateUcLiabilityRequest)
       }
 
       "given valid JSON with 'LCW/LCWRA' record type" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -63,21 +64,22 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val testTerminateUcLiabilityRequest: TerminateUcLiabilityRequest = TerminateUcLiabilityRequest(
-          universalCreditAction = Terminate,
-          nationalInsuranceNumber = "AA123456",
-          universalCreditRecordType = LCW_LCWRA,
-          liabilityStartDate = "2025-12-15",
-          liabilityEndDate = "2026-12-15"
-        )
+        val expectedTerminateUcLiabilityRequest: TerminateUcLiabilityRequest =
+          TerminateUcLiabilityRequest(
+            universalCreditAction = Terminate,
+            nationalInsuranceNumber = "AA123456",
+            universalCreditRecordType = LCW_LCWRA,
+            liabilityStartDate = "2025-12-15",
+            liabilityEndDate = "2026-12-15"
+          )
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
-        result mustBe JsSuccess(testTerminateUcLiabilityRequest)
+        result mustBe JsSuccess(expectedTerminateUcLiabilityRequest)
       }
 
       "given valid JSON with valid leap year dates" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -87,17 +89,18 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val testTerminateUcLiabilityRequest: TerminateUcLiabilityRequest = TerminateUcLiabilityRequest(
-          universalCreditAction = Terminate,
-          nationalInsuranceNumber = "AA123456",
-          universalCreditRecordType = LCW_LCWRA,
-          liabilityStartDate = "2024-02-29",
-          liabilityEndDate = "2000-02-29"
-        )
+        val expectedTerminateUcLiabilityRequest: TerminateUcLiabilityRequest =
+          TerminateUcLiabilityRequest(
+            universalCreditAction = Terminate,
+            nationalInsuranceNumber = "AA123456",
+            universalCreditRecordType = LCW_LCWRA,
+            liabilityStartDate = "2024-02-29",
+            liabilityEndDate = "2000-02-29"
+          )
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
-        result mustBe JsSuccess(testTerminateUcLiabilityRequest)
+        result mustBe JsSuccess(expectedTerminateUcLiabilityRequest)
       }
 
     }
@@ -105,7 +108,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
     "fail to deserialise" when {
 
       "given JSON contains invalid record type" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -115,13 +118,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid NINO (too short)" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA1234",
@@ -131,13 +134,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid NINO (too long)" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA1234567890",
@@ -147,13 +150,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid NINO (invalid prefix)" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "DA123456",
@@ -163,13 +166,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid liability start date" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -179,13 +182,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains liability start date with an invalid format" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -195,13 +198,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid liability end date" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -211,13 +214,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains liability end date with an invalid format" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -227,13 +230,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON is missing a NINO" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "universalCreditRecordType": "LCW/LCWRA",
@@ -242,13 +245,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON is missing an action" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "nationalInsuranceNumber": "AA123456",
             |  "universalCreditRecordType": "LCW/LCWRA",
@@ -257,13 +260,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON is missing a record type" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -272,13 +275,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON is missing a liability start date" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -287,13 +290,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON is missing a liability end date" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -302,13 +305,13 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }
 
       "given JSON contains invalid leap year dates" in {
-        val json: JsValue = Json.parse("""
+        val testJson: JsValue = Json.parse("""
             |{
             |  "universalCreditAction": "Terminate",
             |  "nationalInsuranceNumber": "AA123456",
@@ -318,7 +321,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = json.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUcLiabilityRequest]
 
         result mustBe a[JsError]
       }

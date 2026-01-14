@@ -26,23 +26,29 @@ class FailureSpec extends AnyWordSpec with Matchers {
   "Failure" must {
 
     "serialise to the expected JSON object" in {
-      val failureModel = Failure("12345", "Something went wrong")
-
-      val failureJson: JsValue = Json.parse(
-        """|{
-           |  "code": "12345",
-           |  "message": "Something went wrong"
-           |}""".stripMargin
+      val testFailure: Failure = Failure(
+        code = "12345",
+        message = "Something went wrong"
       )
 
-      Json.toJson(failureModel) mustBe failureJson
+      val expectedJson: JsValue = Json.parse("""
+          |{
+          |  "code": "12345",
+          |  "message": "Something went wrong"
+          |}""".stripMargin)
+
+      Json.toJson(testFailure) mustBe expectedJson
     }
 
     "contain the keys 'code' and 'message' when serialised" in {
-      val failureModel: Failure                   = Failure("12345", "Something went wrong")
-      val failureJsonKeys: collection.Set[String] = Json.toJson(failureModel).as[JsObject].keys
+      val testFailure: Failure = Failure(
+        code = "12345",
+        message = "Something went wrong"
+      )
 
-      failureJsonKeys mustBe Set("code", "message")
+      val testFailureJsonKeys: collection.Set[String] = Json.toJson(testFailure).as[JsObject].keys
+
+      testFailureJsonKeys mustBe Set("code", "message")
     }
   }
 }
