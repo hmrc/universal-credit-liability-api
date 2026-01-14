@@ -77,7 +77,7 @@ class UcLiabilityTerminationDetailsSpec extends AnyWordSpec with Matchers {
         val expectedJson: JsValue = Json.parse("""
             |{
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2002-02-29",
+            |  "liabilityStartDate": "2000-02-29",
             |  "liabilityEndDate": "2024-02-29"
             |}
             |""".stripMargin)

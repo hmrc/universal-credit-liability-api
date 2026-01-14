@@ -18,7 +18,7 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.response
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import play.api.libs.json.{JsError, JsPath, JsSuccess, JsValue, Json}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failures
 
 class FailuresSpec extends AnyWordSpec with Matchers {
@@ -46,7 +46,7 @@ class FailuresSpec extends AnyWordSpec with Matchers {
 
         val result = testJson.validate[Failures]
 
-        result mustBe JsSuccess(expectedFailures)
+        result mustBe JsSuccess(expectedFailures, JsPath \ "failures")
       }
 
       "given JSON with empty 'failures'" in {
@@ -59,7 +59,7 @@ class FailuresSpec extends AnyWordSpec with Matchers {
 
         val result = testJson.validate[Failures]
 
-        result mustBe JsSuccess(expectedFailures)
+        result mustBe JsSuccess(expectedFailures, JsPath \ "failures")
       }
 
     }

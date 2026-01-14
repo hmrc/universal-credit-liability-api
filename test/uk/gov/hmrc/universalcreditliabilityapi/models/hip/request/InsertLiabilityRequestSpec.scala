@@ -88,7 +88,7 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2002-02-29",
+            |    "dateOfBirth": "2000-02-29",
             |    "liabilityStartDate": "2024-02-29"
             |  }
             |}
