@@ -28,13 +28,17 @@ class UniversalCreditActionSpec extends AnyWordSpec with Matchers {
     "successfully deserialise" when {
 
       "given valid JSON with an 'Insert' action" in {
-        val result = JsString("Insert").validate[UniversalCreditAction]
+        val testJson: JsString = JsString("Insert")
+
+        val result = testJson.validate[UniversalCreditAction]
 
         result mustBe JsSuccess(UniversalCreditAction.Insert)
       }
 
       "given valid JSON with a 'Terminate' action" in {
-        val result = JsString("Terminate").validate[UniversalCreditAction]
+        val testJson: JsString = JsString("Terminate")
+
+        val result = testJson.validate[UniversalCreditAction]
 
         result mustBe JsSuccess(UniversalCreditAction.Terminate)
       }
@@ -42,36 +46,45 @@ class UniversalCreditActionSpec extends AnyWordSpec with Matchers {
 
     "fail to deserialise" when {
       "given JSON contains an unknown action" in {
-        val result = JsString("INVALID").validate[UniversalCreditAction]
+        val testJson: JsString = JsString("INVALID")
+
+        val result = testJson.validate[UniversalCreditAction]
 
         result mustBe a[JsError]
         extractJsErrorMessage(result) mustBe Some("Unknown Universal Credit Action")
       }
 
       "given JSON contains an action with invalid casing of 'Insert' (only expecting 'Insert')" in {
-        val result = JsString("iNsErT").validate[UniversalCreditAction]
+        val testJson: JsString = JsString("iNsErT")
+
+        val result = testJson.validate[UniversalCreditAction]
 
         result mustBe a[JsError]
         extractJsErrorMessage(result) mustBe Some("Unknown Universal Credit Action")
       }
 
       "given JSON contains an action with invalid casing of 'Terminate' (only expecting 'Terminate')" in {
-        val result = JsString("tErMiNaTe").validate[UniversalCreditAction]
+        val testJson: JsString = JsString("tErMiNaTe")
+
+        val result = testJson.validate[UniversalCreditAction]
 
         result mustBe a[JsError]
         extractJsErrorMessage(result) mustBe Some("Unknown Universal Credit Action")
       }
 
       "given JSON is empty" in {
-        val result = JsString("").validate[UniversalCreditAction]
+        val testJson: JsString = JsString("")
+
+        val result = testJson.validate[UniversalCreditAction]
 
         result mustBe a[JsError]
         extractJsErrorMessage(result) mustBe Some("Unknown Universal Credit Action")
       }
 
       "given JSON is not a JsString" in {
-        val nonJsString: JsObject                   = Json.obj("action" -> "Insert")
-        val result: JsResult[UniversalCreditAction] = nonJsString.validate[UniversalCreditAction]
+        val testJson: JsObject = Json.obj("action" -> "Insert")
+
+        val result = testJson.validate[UniversalCreditAction]
 
         result mustBe a[JsError]
         extractJsErrorMessage(result) mustBe Some("Unknown Universal Credit Action")
