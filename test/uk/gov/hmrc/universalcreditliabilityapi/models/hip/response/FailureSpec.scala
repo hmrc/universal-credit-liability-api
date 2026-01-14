@@ -18,16 +18,16 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.response
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsError, JsResultException, JsSuccess, JsValue, Json}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failure
 
 class FailureSpec extends AnyWordSpec with Matchers {
 
   "Failure" must {
 
-    "successfully deserialise from JSON" when {
+    "successfully deserialise" when {
 
-      "all fields are present" in {
+      "given valid JSON with all fields present" in {
         val testJson: JsValue = Json.parse("""
             |{
             |  "code": "12345",
@@ -41,9 +41,9 @@ class FailureSpec extends AnyWordSpec with Matchers {
 
     }
 
-    "fail to deserialise from JSON" when {
+    "fail to deserialise" when {
 
-      "the 'code' is missing" in {
+      "given JSON is missing the 'code'" in {
         val testJson: JsValue = Json.parse("""
             |{
             |  "reason": "Something went wrong"
@@ -54,7 +54,7 @@ class FailureSpec extends AnyWordSpec with Matchers {
         result mustBe a[JsError]
       }
 
-      "the 'reason' is missing" in {
+      "given JSON is missing the 'reason'" in {
         val testJson: JsValue = Json.parse("""
             |{
             |  "code": "12345"
@@ -65,7 +65,7 @@ class FailureSpec extends AnyWordSpec with Matchers {
         result mustBe a[JsError]
       }
 
-      "it's empty" in {
+      "given JSON is empty" in {
         val testJson: JsValue = Json.parse("""
             |{}""".stripMargin)
 

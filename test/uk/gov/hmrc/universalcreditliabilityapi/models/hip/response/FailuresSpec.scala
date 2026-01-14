@@ -18,50 +18,65 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.response
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsResultException, Json}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failures
 
 class FailuresSpec extends AnyWordSpec with Matchers {
 
   "Failures" must {
-    "successfully deserialise from valid JSON through a sequence" in {
-      val failureModel = Json.parse(
-        """{
-          |"failures":[
-          | {"code": "12345", "reason": "Something went wrong"},
-          | {"code": "54321", "reason": "Something went wrong"}
-          | ]
-          |}""".stripMargin
-      )
 
-      val failureJson: Failures = failureModel.as[Failures]
-      failureJson mustBe Failures(
-        Seq(
-          Failure("12345", "Something went wrong"),
-          Failure("54321", "Something went wrong")
-        )
-      )
+    "successfully deserialise" when {
+
+      "given JSON contains multiple 'failures'" in {
+        val testJson: JsValue = Json.parse("""
+            |{
+            |  "failures":[
+            |    { "code": "12345", "reason": "First error" },
+            |    { "code": "54321", "reason": "Second error" }
+            |  ]
+            |}""".stripMargin)
+
+        val expectedFailures: Failures =
+          Failures(
+            failures = Seq(
+              Failure(code = "12345", reason = "First error"),
+              Failure(code = "54321", reason = "Second error")
+            )
+          )
+
+        val result = testJson.validate[Failures]
+
+        result mustBe JsSuccess(expectedFailures)
+      }
+
+      "given JSON with empty 'failures'" in {
+        val testJson: JsValue = Json.parse("""
+            |{
+            |  "failures":[]
+            |}""".stripMargin)
+
+        val expectedFailures: Failures = Failures(failures = Seq.empty[Failure])
+
+        val result = testJson.validate[Failures]
+
+        result mustBe JsSuccess(expectedFailures)
+      }
+
     }
 
-    "successfully deserialise when failures is empty" in {
-      val failureModel          = Json.parse(
-        """{
-          |"failures":[]
-          |}""".stripMargin
-      )
-      val failureJson: Failures = failureModel.as[Failures]
-      failureJson mustBe Failures(Seq.empty)
-    }
+    "fail to deserialise" when {
 
-    "fail to deserialise when 'failures' is missing" in {
-      val failureModel = Json.parse(
-        """{
-          |"":[]
-          |}""".stripMargin
-      )
-      assertThrows[JsResultException] {
-        failureModel.as[Failures]
+      "given JSON is missing the 'failures'" in {
+        val testJson: JsValue = Json.parse("""
+            |{
+            |  "":[]
+            |}""".stripMargin)
+
+        val result = testJson.validate[Failures]
+
+        result mustBe a[JsError]
       }
     }
+
   }
 }
