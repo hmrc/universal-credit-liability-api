@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.universalcreditliabilityapi.helpers
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.UC
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCreditAction.{Insert, Terminate}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest}
@@ -28,60 +28,94 @@ object TestData {
   val correlationId: String = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"
   val originatorId: String  = "DWP"
 
-  val testInsertDwpRequest: InsertUcLiabilityRequest = InsertUcLiabilityRequest(
-    universalCreditAction = Insert,
-    nationalInsuranceNumber = nino,
-    universalCreditRecordType = UC,
-    liabilityStartDate = "2024-01-15",
-    dateOfBirth = "1990-05-20"
-  )
-
-  val testTerminateDwpRequest: TerminateUcLiabilityRequest = TerminateUcLiabilityRequest(
-    universalCreditAction = Terminate,
-    nationalInsuranceNumber = nino,
-    universalCreditRecordType = UC,
-    liabilityStartDate = "2024-01-15",
-    liabilityEndDate = "2024-12-31"
-  )
-
-  val testInsertHipRequest: InsertLiabilityRequest = InsertLiabilityRequest(
-    universalCreditLiabilityDetails = UniversalCreditLiabilityDetails(
+  val baseInsertDwpRequest: InsertUcLiabilityRequest =
+    InsertUcLiabilityRequest(
+      universalCreditAction = Insert,
+      nationalInsuranceNumber = nino,
       universalCreditRecordType = UC,
       liabilityStartDate = "2024-01-15",
       dateOfBirth = "1990-05-20"
     )
-  )
 
-  val testTerminateHipRequest: TerminateLiabilityRequest = TerminateLiabilityRequest(
-    ucLiabilityTerminationDetails = UcLiabilityTerminationDetails(
+  val baseTerminateDwpRequest: TerminateUcLiabilityRequest =
+    TerminateUcLiabilityRequest(
+      universalCreditAction = Terminate,
+      nationalInsuranceNumber = nino,
       universalCreditRecordType = UC,
       liabilityStartDate = "2024-01-15",
       liabilityEndDate = "2024-12-31"
     )
+
+  val baseInsertHipRequest: InsertLiabilityRequest =
+    InsertLiabilityRequest(
+      universalCreditLiabilityDetails = UniversalCreditLiabilityDetails(
+        universalCreditRecordType = UC,
+        liabilityStartDate = "2024-01-15",
+        dateOfBirth = "1990-05-20"
+      )
+    )
+
+  val baseTerminateHipRequest: TerminateLiabilityRequest =
+    TerminateLiabilityRequest(
+      ucLiabilityTerminationDetails = UcLiabilityTerminationDetails(
+        universalCreditRecordType = UC,
+        liabilityStartDate = "2024-01-15",
+        liabilityEndDate = "2024-12-31"
+      )
+    )
+
+  val requiredInsertDwpFields: Set[String] =
+    Set(
+      "universalCreditAction",
+      "nationalInsuranceNumber",
+      "universalCreditRecordType",
+      "liabilityStartDate",
+      "dateOfBirth"
+    )
+
+  val requiredTerminateDwpFields: Set[String] =
+    Set(
+      "universalCreditAction",
+      "nationalInsuranceNumber",
+      "universalCreditRecordType",
+      "liabilityStartDate",
+      "liabilityEndDate"
+    )
+
+  val validRecordTypes: Set[String] = Set("UC", "LCW/LCWRA")
+
+  val invalidInsertDwpRequestValues: Map[String, String] =
+    Map(
+      "universalCreditAction"     -> "INVALID",
+      "nationalInsuranceNumber"   -> "INVALID",
+      "universalCreditRecordType" -> "INVALID",
+      "liabilityStartDate"        -> "not-a-date",
+      "dateOfBirth"               -> "not-a-date"
+    )
+
+  val invalidTerminateDwpRequestValues: Map[String, String] =
+    Map(
+      "universalCreditAction"     -> "INVALID",
+      "nationalInsuranceNumber"   -> "INVALID",
+      "universalCreditRecordType" -> "INVALID",
+      "liabilityStartDate"        -> "not-a-date",
+      "liabilityEndDate"          -> "not-a-date"
+    )
+
+  def insertDwpRequestJson(recordType: String = "UC"): JsObject = Json.obj(
+    "universalCreditAction"     -> "Insert",
+    "nationalInsuranceNumber"   -> "AA123456",
+    "universalCreditRecordType" -> recordType,
+    "liabilityStartDate"        -> "2024-01-15",
+    "dateOfBirth"               -> "1990-05-20"
   )
 
-  val validInsertRequestJson: JsValue = Json.parse(
-    """
-      |{
-      |  "universalCreditAction": "Insert",
-      |  "nationalInsuranceNumber": "AA123456",
-      |  "universalCreditRecordType": "UC",
-      |  "liabilityStartDate": "2024-01-15",
-      |  "dateOfBirth": "1990-05-20"
-      |}
-      |""".stripMargin
-  )
-
-  val validTerminateRequestJson: JsValue = Json.parse(
-    """
-      |{
-      |  "universalCreditAction": "Terminate",
-      |  "nationalInsuranceNumber": "AA123456",
-      |  "universalCreditRecordType": "UC",
-      |  "liabilityStartDate": "2024-01-15",
-      |  "liabilityEndDate": "2024-12-31"
-      |}
-      |""".stripMargin
+  def terminateDwpRequestJson(recordType: String = "UC"): JsObject = Json.obj(
+    "universalCreditAction"     -> "Terminate",
+    "nationalInsuranceNumber"   -> "AA123456",
+    "universalCreditRecordType" -> recordType,
+    "liabilityStartDate"        -> "2024-01-15",
+    "liabilityEndDate"          -> "2024-12-31"
   )
 
   val errorCodes: Seq[(String, String)] = Seq(

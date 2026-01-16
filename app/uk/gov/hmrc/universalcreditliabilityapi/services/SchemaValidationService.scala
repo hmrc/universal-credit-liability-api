@@ -35,16 +35,15 @@ class SchemaValidationService {
   def validateLiabilityNotificationRequest(
     request: Request[JsValue]
   ): Either[Future[Result], (String, InsertUcLiabilityRequest | TerminateUcLiabilityRequest)] = {
-    val correlationIdValidation: EitherNec[Failure, String]                                                      =
+    val correlationIdValidation: EitherNec[Failure, String] =
       validateCorrelationId(
         request.headers.get(HeaderNames.CorrelationId)
       )
+
     val actionValidation: Either[NonEmptyChain[Failure], InsertUcLiabilityRequest | TerminateUcLiabilityRequest] =
       determineActionType(request.body).flatMap {
-        case Insert    =>
-          validateJson[InsertUcLiabilityRequest](request)
-        case Terminate =>
-          validateJson[TerminateUcLiabilityRequest](request)
+        case Insert    => validateJson[InsertUcLiabilityRequest](request)
+        case Terminate => validateJson[TerminateUcLiabilityRequest](request)
       }
 
     (correlationIdValidation, actionValidation)
@@ -75,7 +74,7 @@ class SchemaValidationService {
     }
 
   private def validateJson[T](request: Request[JsValue])(implicit reads: Reads[T]): EitherNec[Failure, T] = {
-    val fieldOrder = List(
+    val fieldOrder: List[String] = List(
       "nationalInsuranceNumber",
       "universalCreditRecordType",
       "dateOfBirth",
@@ -88,12 +87,12 @@ class SchemaValidationService {
         Right(validatedRequest)
 
       case JsError(errors) =>
-        val unorderedFailures = errors.flatMap { case (path, validationErrors) =>
-          val field = path.toString().stripPrefix("/")
+        val unorderedFailures: Seq[(String, Failure)] = errors.flatMap { case (path, validationErrors) =>
+          val field: String = path.toString().stripPrefix("/")
           validationErrors.map(_ => field -> ApplicationConstants.invalidInputFailure(field))
         }.toSeq
 
-        val orderedFailures = unorderedFailures
+        val orderedFailures: Seq[Failure] = unorderedFailures
           .sortBy { case (field, _) =>
             fieldOrder.indexOf(field) match {
               case idx => idx
@@ -101,9 +100,7 @@ class SchemaValidationService {
           }
           .map(_._2)
 
-        Left(
-          NonEmptyChain.fromSeq(orderedFailures).get
-        )
+        Left(NonEmptyChain.fromSeq(orderedFailures).get)
     }
   }
 

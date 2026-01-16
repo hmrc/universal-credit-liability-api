@@ -94,15 +94,15 @@ class UcLiabilityNotificationControllerSpec
     "return 204 No Content" when {
       "HIP returns 204 for Insert request" in {
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
-          .thenReturn(Right((correlationId, testInsertDwpRequest)))
+          .thenReturn(Right((correlationId, baseInsertDwpRequest)))
 
-        when(mockMappingService.mapRequest(eqTo(testInsertDwpRequest)))
-          .thenReturn((nino, testInsertHipRequest))
+        when(mockMappingService.mapRequest(eqTo(baseInsertDwpRequest)))
+          .thenReturn((nino, baseInsertHipRequest))
 
         when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
           .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
-        val request = fakeRequest(validInsertRequestJson)
+        val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe NO_CONTENT
@@ -110,15 +110,15 @@ class UcLiabilityNotificationControllerSpec
 
       "HIP returns 204 for Terminate request" in {
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
-          .thenReturn(Right((correlationId, testTerminateDwpRequest)))
+          .thenReturn(Right((correlationId, baseTerminateDwpRequest)))
 
-        when(mockMappingService.mapRequest(eqTo(testTerminateDwpRequest)))
-          .thenReturn((nino, testTerminateHipRequest))
+        when(mockMappingService.mapRequest(eqTo(baseTerminateDwpRequest)))
+          .thenReturn((nino, baseTerminateHipRequest))
 
         when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
           .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
-        val request = fakeRequest(validTerminateRequestJson)
+        val request = fakeRequest(terminateDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe NO_CONTENT
@@ -140,7 +140,7 @@ class UcLiabilityNotificationControllerSpec
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
           .thenReturn(Left(Future.successful(validationError)))
 
-        val request = fakeRequest(validInsertRequestJson)
+        val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe BAD_REQUEST
@@ -161,7 +161,7 @@ class UcLiabilityNotificationControllerSpec
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any[Request[JsValue]]))
           .thenReturn(Left(Future.successful(validationError)))
 
-        val request = fakeRequest(validInsertRequestJson)
+        val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe BAD_REQUEST
@@ -171,7 +171,7 @@ class UcLiabilityNotificationControllerSpec
 
     "return 403 Forbidden" when {
       "OriginatorId header is missing" in {
-        val request = fakeRequest(validInsertRequestJson, withOriginatorId = false)
+        val request = fakeRequest(insertDwpRequestJson(), withOriginatorId = false)
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe FORBIDDEN
@@ -182,15 +182,15 @@ class UcLiabilityNotificationControllerSpec
 
       "HIP returns 403" in {
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
-          .thenReturn(Right((correlationId, testInsertDwpRequest)))
+          .thenReturn(Right((correlationId, baseInsertDwpRequest)))
 
         when(mockMappingService.mapRequest(any()))
-          .thenReturn((nino, testInsertHipRequest))
+          .thenReturn((nino, baseInsertHipRequest))
 
         when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
           .thenReturn(Future.successful(HttpResponse(FORBIDDEN, "")))
 
-        val request = fakeRequest(validInsertRequestJson)
+        val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe FORBIDDEN
@@ -203,15 +203,15 @@ class UcLiabilityNotificationControllerSpec
     "return 404 Not Found" when {
       "HIP returns 404" in {
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
-          .thenReturn(Right((correlationId, testInsertDwpRequest)))
+          .thenReturn(Right((correlationId, baseInsertDwpRequest)))
 
         when(mockMappingService.mapRequest(any()))
-          .thenReturn((nino, testInsertHipRequest))
+          .thenReturn((nino, baseInsertHipRequest))
 
         when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
           .thenReturn(Future.successful(HttpResponse(NOT_FOUND, "")))
 
-        val request = fakeRequest(validInsertRequestJson)
+        val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe NOT_FOUND
@@ -234,10 +234,10 @@ class UcLiabilityNotificationControllerSpec
           val mappedResponse = DwpFailure(code = code, message = message)
 
           when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
-            .thenReturn(Right((correlationId, testInsertDwpRequest)))
+            .thenReturn(Right((correlationId, baseInsertDwpRequest)))
 
           when(mockMappingService.mapRequest(any()))
-            .thenReturn((nino, testInsertHipRequest))
+            .thenReturn((nino, baseInsertHipRequest))
 
           when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
             .thenReturn(Future.successful(HttpResponse(UNPROCESSABLE_ENTITY, hipFailuresJson.toString)))
@@ -245,7 +245,7 @@ class UcLiabilityNotificationControllerSpec
           when(mockMappingService.map422ResponseErrors(any()))
             .thenReturn(Some(mappedResponse))
 
-          val request = fakeRequest(validInsertRequestJson)
+          val request = fakeRequest(insertDwpRequestJson())
           val result  = testController.submitLiabilityNotification()(request)
 
           status(result) mustBe UNPROCESSABLE_ENTITY
@@ -258,15 +258,15 @@ class UcLiabilityNotificationControllerSpec
     "return 500 Internal Server Error" when {
       "HIP returns 400" in {
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
-          .thenReturn(Right((correlationId, testInsertDwpRequest)))
+          .thenReturn(Right((correlationId, baseInsertDwpRequest)))
 
         when(mockMappingService.mapRequest(any()))
-          .thenReturn((nino, testInsertHipRequest))
+          .thenReturn((nino, baseInsertHipRequest))
 
         when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
           .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, "")))
 
-        val request = fakeRequest(validInsertRequestJson)
+        val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe INTERNAL_SERVER_ERROR
@@ -284,10 +284,10 @@ class UcLiabilityNotificationControllerSpec
         )
 
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
-          .thenReturn(Right((correlationId, testInsertDwpRequest)))
+          .thenReturn(Right((correlationId, baseInsertDwpRequest)))
 
         when(mockMappingService.mapRequest(any()))
-          .thenReturn((nino, testInsertHipRequest))
+          .thenReturn((nino, baseInsertHipRequest))
 
         when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
           .thenReturn(Future.successful(HttpResponse(UNPROCESSABLE_ENTITY, hipFailuresJson.toString)))
@@ -295,7 +295,7 @@ class UcLiabilityNotificationControllerSpec
         when(mockMappingService.map422ResponseErrors(any()))
           .thenReturn(None)
 
-        val request = fakeRequest(validInsertRequestJson)
+        val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe INTERNAL_SERVER_ERROR
@@ -303,15 +303,15 @@ class UcLiabilityNotificationControllerSpec
 
       "HIP returns unexpected status code" in {
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
-          .thenReturn(Right((correlationId, testInsertDwpRequest)))
+          .thenReturn(Right((correlationId, baseInsertDwpRequest)))
 
         when(mockMappingService.mapRequest(any()))
-          .thenReturn((nino, testInsertHipRequest))
+          .thenReturn((nino, baseInsertHipRequest))
 
         when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
           .thenReturn(Future.successful(HttpResponse(IM_A_TEAPOT, "")))
 
-        val request = fakeRequest(validInsertRequestJson)
+        val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe INTERNAL_SERVER_ERROR
@@ -322,15 +322,15 @@ class UcLiabilityNotificationControllerSpec
     "return 503 Service Unavailable" when {
       "HIP returns 503" in {
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
-          .thenReturn(Right((correlationId, testInsertDwpRequest)))
+          .thenReturn(Right((correlationId, baseInsertDwpRequest)))
 
         when(mockMappingService.mapRequest(any()))
-          .thenReturn((nino, testInsertHipRequest))
+          .thenReturn((nino, baseInsertHipRequest))
 
         when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
           .thenReturn(Future.successful(HttpResponse(SERVICE_UNAVAILABLE, "")))
 
-        val request = fakeRequest(validInsertRequestJson)
+        val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe SERVICE_UNAVAILABLE

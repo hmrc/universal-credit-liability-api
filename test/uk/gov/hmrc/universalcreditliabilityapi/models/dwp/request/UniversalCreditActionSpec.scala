@@ -19,7 +19,7 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.*
-import uk.gov.hmrc.universalcreditliabilityapi.helpers.JsonTestHelpers.extractJsErrorMessage
+import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestHelpers.extractJsErrorMessage
 
 class UniversalCreditActionSpec extends AnyWordSpec with Matchers {
 
