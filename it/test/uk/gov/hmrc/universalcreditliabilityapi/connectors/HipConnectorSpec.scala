@@ -25,6 +25,7 @@ import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditReco
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, TerminateLiabilityRequest, UcLiabilityTerminationDetails, UniversalCreditLiabilityDetails}
 import uk.gov.hmrc.universalcreditliabilityapi.support.WireMockIntegrationSpec
 
+import java.time.LocalDate
 import java.util.Base64
 
 class HipConnectorSpec extends WireMockIntegrationSpec {
@@ -48,16 +49,16 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
   private val insertPayload: InsertLiabilityRequest = InsertLiabilityRequest(
     universalCreditLiabilityDetails = UniversalCreditLiabilityDetails(
       universalCreditRecordType = LCW_LCWRA,
-      dateOfBirth = "2002-10-10",
-      liabilityStartDate = "2015-08-19"
+      dateOfBirth = LocalDate.parse("2002-10-10"),
+      liabilityStartDate = LocalDate.parse("2015-08-19")
     )
   )
 
   private val terminatePayload: TerminateLiabilityRequest = TerminateLiabilityRequest(
     ucLiabilityTerminationDetails = UcLiabilityTerminationDetails(
       universalCreditRecordType = LCW_LCWRA,
-      liabilityStartDate = "2015-08-19",
-      liabilityEndDate = "2025-01-04"
+      liabilityStartDate = LocalDate.parse("2015-08-19"),
+      liabilityEndDate = LocalDate.parse("2025-01-04")
     )
   )
 

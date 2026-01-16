@@ -22,6 +22,8 @@ import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.{LCW_LCWRA, UC}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCreditAction.Terminate
 
+import java.time.LocalDate
+
 class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
 
   "TerminateUcLiabilityRequest" must {
@@ -44,8 +46,8 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             universalCreditAction = Terminate,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = UC,
-            liabilityStartDate = "2025-12-15",
-            liabilityEndDate = "2026-12-15"
+            liabilityStartDate = LocalDate.parse("2025-12-15"),
+            liabilityEndDate = LocalDate.parse("2026-12-15")
           )
 
         val result = testJson.validate[TerminateUcLiabilityRequest]
@@ -69,8 +71,8 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             universalCreditAction = Terminate,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = LCW_LCWRA,
-            liabilityStartDate = "2025-12-15",
-            liabilityEndDate = "2026-12-15"
+            liabilityStartDate = LocalDate.parse("2025-12-15"),
+            liabilityEndDate = LocalDate.parse("2026-12-15")
           )
 
         val result = testJson.validate[TerminateUcLiabilityRequest]
@@ -94,8 +96,8 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             universalCreditAction = Terminate,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = LCW_LCWRA,
-            liabilityStartDate = "2024-02-29",
-            liabilityEndDate = "2000-02-29"
+            liabilityStartDate = LocalDate.parse("2024-02-29"),
+            liabilityEndDate = LocalDate.parse("2000-02-29")
           )
 
         val result = testJson.validate[TerminateUcLiabilityRequest]

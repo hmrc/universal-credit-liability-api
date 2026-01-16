@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.universalcreditliabilityapi.models.hip.request
+package uk.gov.hmrc.universalcreditliabilityapi.utils
 
-import play.api.libs.json.*
-import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType
+import java.time.*
+import java.time.format.DateTimeFormatter
 
-import java.time.LocalDate
+object DateUtils {
 
-final case class UniversalCreditLiabilityDetails(
-  universalCreditRecordType: UniversalCreditRecordType,
-  dateOfBirth: LocalDate,
-  liabilityStartDate: LocalDate
-)
+  private val datePattern: String = "d MMMM yyyy"
 
-object UniversalCreditLiabilityDetails {
-  implicit val format: OWrites[UniversalCreditLiabilityDetails] = Json.writes[UniversalCreditLiabilityDetails]
+  private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(datePattern)
+
+  val isoLocalDateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+
+  extension (localDate: LocalDate) {
+    def toDateFormat: String = localDate.format(dateFormatter)
+  }
+
 }
