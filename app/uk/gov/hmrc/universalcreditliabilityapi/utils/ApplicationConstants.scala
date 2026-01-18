@@ -58,6 +58,12 @@ object ApplicationConstants {
       code = ErrorCodes.InvalidInput
     )
 
+  def forbiddenFailure: Failure =
+    Failure(
+      message = ForbiddenReason,
+      code = ErrorCodes.ForbiddenCode
+    )
+
   private object ErrorMessages {
     def invalidInput(field: String): String =
       s"Constraint Violation - Invalid/Missing input parameter: $field"

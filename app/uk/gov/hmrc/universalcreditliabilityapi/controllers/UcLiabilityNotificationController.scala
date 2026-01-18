@@ -26,12 +26,9 @@ import uk.gov.hmrc.universalcreditliabilityapi.connectors.HipConnector
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failures as HipFailures
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorCodes.ForbiddenCode
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ForbiddenReason
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.OriginatorId
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class UcLiabilityNotificationController @Inject() (
@@ -47,7 +44,7 @@ class UcLiabilityNotificationController @Inject() (
 
   def submitLiabilityNotification(): Action[JsValue] = authAction.async(parse.json) { implicit request =>
     (for {
-      originatorId                            <- validateOriginatorId(request)
+      originatorId                            <- validationService.validateOriginatorId(request)
       validatedRequest                        <- validationService.validateLiabilityNotificationRequest(request)
       (correlationId, requestObject)           = validatedRequest
       (nationalInsuranceNumber, mappedRequest) = mappingService.mapRequest(requestObject)
@@ -91,13 +88,4 @@ class UcLiabilityNotificationController @Inject() (
       }).merge
   }
 
-  private def validateOriginatorId[T](request: Request[T]) =
-    request.headers
-      .get(OriginatorId)
-      .filter(_ => true)
-      .toRight(
-        Future.successful(
-          Results.Forbidden(Json.toJson(Failure(message = ForbiddenReason, code = ForbiddenCode)))
-        )
-      )
 }

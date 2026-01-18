@@ -15,6 +15,7 @@
  */
 
 package uk.gov.hmrc.universalcreditliabilityapi.services
+
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -24,7 +25,8 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.*
 import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestHelpers.{buildFakeRequest, extractLeftOrFail, jsObjectWith, jsObjectWithout}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest}
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.CorrelationId
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, OriginatorId}
 
 import scala.concurrent.Future
 
@@ -37,9 +39,49 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
       actualResult.header.status mustBe BAD_REQUEST
 
       val body = contentAsJson(Future.successful(actualResult))
-      (body \ "code").as[String] mustBe "400.1"
-      (body \ "message").as[String] mustBe s"Constraint Violation - Invalid/Missing input parameter: $expectedField"
+      (body \ "code").as[String] mustBe ApplicationConstants.ErrorCodes.InvalidInput
+      (body \ "message").as[String] mustBe ApplicationConstants.invalidInputFailure(expectedField).message
     }
+
+  private def assertForbidden(result: Either[Future[Result], _]): Unit =
+    whenReady(extractLeftOrFail(result)) { actualResult =>
+      actualResult.header.status mustBe FORBIDDEN
+
+      val body = contentAsJson(Future.successful(actualResult))
+      (body \ "code").as[String] mustBe ApplicationConstants.ErrorCodes.ForbiddenCode
+      (body \ "message").as[String] mustBe ApplicationConstants.forbiddenFailure.message
+    }
+
+  "SchemaValidationServiceSpec.validateOriginatorId" must {
+    "return Right" when {
+      "originatorId is present and valid" in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = OriginatorId -> originatorId)
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        result mustBe Right(originatorId)
+      }
+    }
+
+    "return Left (403 Forbidden)" when {
+      "originatorId header is missing" in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json)
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        assertForbidden(result)
+      }
+
+      // FIXME: this test will fail as the current logic only checks if OriginatorId header exists
+      "originatorId header is invalid" ignore {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = OriginatorId -> "INVALID_ORIGINATOR_ID")
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        assertForbidden(result)
+      }
+    }
+  }
 
   "SchemaValidationServiceSpec.validateLiabilityNotificationRequest" must {
 
@@ -65,7 +107,7 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
 
     }
 
-    "return Left" when {
+    "return Left (400 Bad Request)" when {
 
       for {
         recordType <- validRecordTypes
@@ -124,14 +166,14 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
       }
 
       "given an 'Insert' Request with invalid correlationId" in {
-        val request = buildFakeRequest(insertDwpRequestJson(), CorrelationId -> "invalid")
+        val request = buildFakeRequest(insertDwpRequestJson(), CorrelationId -> "INVALID_CORRELATION_ID")
         val result  = testSchemaValidationService.validateLiabilityNotificationRequest(request)
 
         assertBadRequest(result, "correlationId")
       }
 
       "given a 'Terminate' Request with invalid correlationId" in {
-        val request = buildFakeRequest(terminateDwpRequestJson(), CorrelationId -> "invalid")
+        val request = buildFakeRequest(terminateDwpRequestJson(), CorrelationId -> "INVALID_CORRELATION_ID")
         val result  = testSchemaValidationService.validateLiabilityNotificationRequest(request)
 
         assertBadRequest(result, "correlationId")

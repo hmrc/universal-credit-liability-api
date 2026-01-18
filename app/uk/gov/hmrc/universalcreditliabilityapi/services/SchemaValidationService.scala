@@ -19,7 +19,7 @@ package uk.gov.hmrc.universalcreditliabilityapi.services
 import cats.data.{EitherNec, NonEmptyChain}
 import cats.syntax.all.*
 import play.api.libs.json.*
-import play.api.mvc.Results.BadRequest
+import play.api.mvc.Results.{BadRequest, Forbidden}
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCreditAction.{Insert, Terminate}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest, UniversalCreditAction}
@@ -31,6 +31,16 @@ import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.Valida
 import scala.concurrent.Future
 
 class SchemaValidationService {
+
+  def validateOriginatorId[T](request: Request[T]): Either[Future[Result], String] =
+    request.headers
+      .get(HeaderNames.OriginatorId)
+      .filter(_ => true) // FIXME: add expected OriginatorId value here e.g. `.filter(_ == "DWP_UC")`
+      .toRight(
+        Future.successful(
+          Forbidden(Json.toJson(ApplicationConstants.forbiddenFailure))
+        )
+      )
 
   def validateLiabilityNotificationRequest(
     request: Request[JsValue]
@@ -48,7 +58,7 @@ class SchemaValidationService {
 
     (correlationIdValidation, actionValidation)
       .parMapN((correlationId, requestObject) => (correlationId, requestObject))
-      .leftMap(mergeBadRequestFailures)
+      .leftMap(convertFirstBadRequestToResult)
   }
 
   private def validateCorrelationId(correlationId: Option[String]): EitherNec[Failure, String] =
@@ -104,10 +114,11 @@ class SchemaValidationService {
     }
   }
 
-  private def mergeBadRequestFailures(failures: NonEmptyChain[Failure]): Future[Result] = {
-    val allFailures: Seq[Failure] = failures.toList
+  private def convertFirstBadRequestToResult(badRequestFailures: NonEmptyChain[Failure]): Future[Result] = {
+    val allBadRequestFailures: Seq[Failure] = badRequestFailures.toList
     Future.successful(
-      BadRequest(Json.toJson(allFailures.head))
+      BadRequest(Json.toJson(allBadRequestFailures.head))
     )
   }
+
 }
