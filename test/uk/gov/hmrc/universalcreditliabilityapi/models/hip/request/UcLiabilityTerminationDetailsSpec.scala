@@ -105,28 +105,6 @@ class UcLiabilityTerminationDetailsSpec extends AnyWordSpec with Matchers {
 
         Json.toJson(testTerminateLiabilityRequest) mustBe expectedJson
       }
-
-      "start date with an invalid format" in
-        Json.parse("""
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "liabilityStartDate": "2000/02/29",
-            |    "liabilityEndDate": "2024-02-29"
-            |  }
-            |}
-            |""".stripMargin)
-      "end date with an invalid format" in
-        Json.parse("""
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "liabilityStartDate": "2000-02-29",
-            |    "liabilityEndDate": "2024/02/29"
-            |  }
-            |}
-            |""".stripMargin)
-
     }
   }
 }

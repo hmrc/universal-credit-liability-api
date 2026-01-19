@@ -105,28 +105,6 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
 
         Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
       }
-
-      "dateOfBirth with an invalid format" in
-        Json.parse("""
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2000/02/29",
-            |    "liabilityStartDate": "2024-02-29"
-            |  }
-            |}
-            |""".stripMargin)
-      "start date with an invalid format" in
-        Json.parse("""
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2000-02-29",
-            |    "liabilityStartDate": "2024/02/29"
-            |  }
-            |}
-            |""".stripMargin)
-
     }
   }
 }

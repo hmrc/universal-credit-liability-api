@@ -18,9 +18,9 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Reads}
+import uk.gov.hmrc.universalcreditliabilityapi.models.common.LocalDateFormats.localDateReads
 import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ValidationPatterns.validNino
-import uk.gov.hmrc.universalcreditliabilityapi.utils.DateUtils.isoLocalDateFormatter
 
 import java.time.LocalDate
 
@@ -34,14 +34,12 @@ final case class InsertUcLiabilityRequest(
 
 object InsertUcLiabilityRequest {
 
-  implicit val localDateReads: Reads[LocalDate] = Reads.localDateReads(isoLocalDateFormatter)
-
   implicit val reads: Reads[InsertUcLiabilityRequest] = (
     (JsPath \ "universalCreditAction").read[UniversalCreditAction] and
       (JsPath \ "nationalInsuranceNumber").read(validNino) and
       (JsPath \ "universalCreditRecordType").read[UniversalCreditRecordType] and
-      (JsPath \ "liabilityStartDate").read[LocalDate] and
-      (JsPath \ "dateOfBirth").read[LocalDate]
+      (JsPath \ "liabilityStartDate").read(using localDateReads) and
+      (JsPath \ "dateOfBirth").read(using localDateReads)
   )(InsertUcLiabilityRequest.apply _)
 
 }
