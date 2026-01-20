@@ -22,6 +22,8 @@ import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCredi
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, TerminateLiabilityRequest, UcLiabilityTerminationDetails, UniversalCreditLiabilityDetails}
 
+import java.time.LocalDate
+
 object TestData {
 
   val nino: String          = "AA123456"
@@ -33,8 +35,8 @@ object TestData {
       universalCreditAction = Insert,
       nationalInsuranceNumber = nino,
       universalCreditRecordType = UC,
-      liabilityStartDate = "2024-01-15",
-      dateOfBirth = "1990-05-20"
+      liabilityStartDate = LocalDate.parse("2024-01-15"),
+      dateOfBirth = LocalDate.parse("1990-05-20")
     )
 
   val baseTerminateDwpRequest: TerminateUcLiabilityRequest =
@@ -42,16 +44,16 @@ object TestData {
       universalCreditAction = Terminate,
       nationalInsuranceNumber = nino,
       universalCreditRecordType = UC,
-      liabilityStartDate = "2024-01-15",
-      liabilityEndDate = "2024-12-31"
+      liabilityStartDate = LocalDate.parse("2024-01-15"),
+      liabilityEndDate = LocalDate.parse("2024-12-31")
     )
 
   val baseInsertHipRequest: InsertLiabilityRequest =
     InsertLiabilityRequest(
       universalCreditLiabilityDetails = UniversalCreditLiabilityDetails(
         universalCreditRecordType = UC,
-        liabilityStartDate = "2024-01-15",
-        dateOfBirth = "1990-05-20"
+        liabilityStartDate = LocalDate.parse("2024-01-15"),
+        dateOfBirth = LocalDate.parse("1990-05-20")
       )
     )
 
@@ -59,8 +61,8 @@ object TestData {
     TerminateLiabilityRequest(
       ucLiabilityTerminationDetails = UcLiabilityTerminationDetails(
         universalCreditRecordType = UC,
-        liabilityStartDate = "2024-01-15",
-        liabilityEndDate = "2024-12-31"
+        liabilityStartDate = LocalDate.parse("2024-01-15"),
+        liabilityEndDate = LocalDate.parse("2024-12-31")
       )
     )
 

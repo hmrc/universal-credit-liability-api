@@ -35,11 +35,8 @@ object ApplicationConstants {
     val NinoPattern: Regex =
       "^([ACEHJLMOPRSWXY][A-CEGHJ-NPR-TW-Z]|B[A-CEHJ-NPR-TW-Z]|G[ACEGHJ-NPR-TW-Z]|[KT][A-CEGHJ-MPR-TW-Z]|N[A-CEGHJL-NPR-SW-Z]|Z[A-CEGHJ-NPR-TW-Y])[0-9]{6}$".r
 
-    private def isValidDate(value: String): Boolean = DatePattern.matches(value)
-
     private def isValidNino(nino: String): Boolean = NinoPattern.matches(nino)
 
-    val validDate: Reads[String] = Reads.verifying[String](isValidDate)
     val validNino: Reads[String] = Reads.verifying[String](isValidNino)
 
   }

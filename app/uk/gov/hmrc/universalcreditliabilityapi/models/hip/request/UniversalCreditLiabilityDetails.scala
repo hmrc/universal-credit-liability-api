@@ -19,10 +19,12 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.request
 import play.api.libs.json.*
 import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType
 
+import java.time.LocalDate
+
 final case class UniversalCreditLiabilityDetails(
   universalCreditRecordType: UniversalCreditRecordType,
-  dateOfBirth: String,
-  liabilityStartDate: String
+  dateOfBirth: LocalDate,
+  liabilityStartDate: LocalDate
 )
 
 object UniversalCreditLiabilityDetails {
