@@ -35,7 +35,7 @@ class SchemaValidationService {
   def validateOriginatorId[T](request: Request[T]): Either[Future[Result], String] =
     request.headers
       .get(HeaderNames.OriginatorId)
-      .filter(_ => true) // FIXME: add expected OriginatorId value here e.g. `.filter(_ == "DWP_UC")`
+      .filter(ApplicationConstants.isValidGovUkOriginatorId)
       .toRight(
         Future.successful(
           Forbidden(Json.toJson(ApplicationConstants.forbiddenFailure))

@@ -18,6 +18,7 @@ package uk.gov.hmrc.universalcreditliabilityapi.utils
 
 import play.api.libs.json.Reads
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ValidationPatterns.GovUkOriginatorIdPattern
 
 import scala.util.matching.Regex
 
@@ -35,11 +36,15 @@ object ApplicationConstants {
     val NinoPattern: Regex =
       "^([ACEHJLMOPRSWXY][A-CEGHJ-NPR-TW-Z]|B[A-CEHJ-NPR-TW-Z]|G[ACEGHJ-NPR-TW-Z]|[KT][A-CEGHJ-MPR-TW-Z]|N[A-CEGHJL-NPR-SW-Z]|Z[A-CEGHJ-NPR-TW-Y])[0-9]{6}$".r
 
+    val GovUkOriginatorIdPattern: Regex = "^[a-zA-Z0-9\\-_]{3,40}$".r
+
     private def isValidNino(nino: String): Boolean = NinoPattern.matches(nino)
 
     val validNino: Reads[String] = Reads.verifying[String](isValidNino)
 
   }
+
+  def isValidGovUkOriginatorId(id: String): Boolean = GovUkOriginatorIdPattern.matches(id)
 
   object HeaderNames {
     val Authorization = "authorization"

@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFutures {
 
-  val testSchemaValidationService: SchemaValidationService = new SchemaValidationService()
+  val testSchemaValidationService = new SchemaValidationService()
 
   private def assertBadRequest(result: Either[Future[Result], _], expectedField: String): Unit =
     whenReady(extractLeftOrFail(result)) { actualResult =>
@@ -61,6 +61,28 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
 
         result mustBe Right(originatorId)
       }
+
+      "originatorId has 3 valid characters" in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = OriginatorId -> "ABC")
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        result match {
+          case Right(value) => assert(value == "ABC")
+          case Left(_)      => fail("Expected Right but got Left")
+        }
+      }
+
+      "originatorId has 40 valid characters" in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = OriginatorId -> "A" * 40)
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        result match {
+          case Right(value) => assert(value == "A" * 40)
+          case Left(_)      => fail("Expected Right but got Left")
+        }
+      }
     }
 
     "return Left (403 Forbidden)" when {
@@ -72,10 +94,17 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
         assertForbidden(result)
       }
 
-      // FIXME: this test will fail as the current logic only checks if OriginatorId header exists
-      "originatorId header is invalid" ignore {
+      "originatorId is shorter than 3 characters" in {
         val json    = Json.obj()
-        val request = buildFakeRequest(payload = json, headers = OriginatorId -> "INVALID_ORIGINATOR_ID")
+        val request = buildFakeRequest(payload = json, headers = OriginatorId -> "AB")
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        assertForbidden(result)
+      }
+
+      "originatorId is longer than 40 characters" in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = OriginatorId -> "A" * 41)
         val result  = testSchemaValidationService.validateOriginatorId(request)
 
         assertForbidden(result)
