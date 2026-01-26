@@ -55,15 +55,25 @@ class UcLiabilityNotificationController @Inject() (
       .sendUcLiability(nationalInsuranceNumber, correlationId, originatorId, mappedRequest)
       .map { hipHttpResponse =>
         hipHttpResponse.status match {
-          case NO_CONTENT           => NoContent
+          case NO_CONTENT           =>
+            logger.info(
+              s"Successfully submitted UC Liability notification for NINO: '$nationalInsuranceNumber'"
+            )
+            NoContent
           case BAD_REQUEST          =>
             logger.warn("400 returned by HIP")
             InternalServerError
+          case UNAUTHORIZED         =>
+            logger.warn("401 returned by HIP")
+            InternalServerError
           case FORBIDDEN            =>
+            logger.warn("403 returned by HIP")
             Forbidden(
               Json.toJson(Failure(code = "403.2", message = "Forbidden"))
             )
-          case NOT_FOUND            => NotFound
+          case NOT_FOUND            =>
+            logger.warn("404 returned by HIP")
+            NotFound
           case UNPROCESSABLE_ENTITY =>
             Json.parse(hipHttpResponse.body).validate[HipFailures] match {
               case JsSuccess(hipResponse, _) =>
@@ -78,6 +88,7 @@ class UcLiabilityNotificationController @Inject() (
             }
 
           case SERVICE_UNAVAILABLE =>
+            logger.warn("503 returned by HIP")
             ServiceUnavailable(
               Json.toJson(
                 Failure(
@@ -86,7 +97,9 @@ class UcLiabilityNotificationController @Inject() (
                 )
               )
             )
-          case _                   => InternalServerError
+          case status              =>
+            logger.warn(s"Unexpected status $status from HIP")
+            InternalServerError
         }
       }).merge
   }
