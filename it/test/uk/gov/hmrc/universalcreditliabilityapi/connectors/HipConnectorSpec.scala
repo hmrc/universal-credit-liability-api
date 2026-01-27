@@ -38,8 +38,8 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
 
   private given HeaderCarrier = HeaderCarrier()
 
-  private def hipInsertionUrl(nino: String)   = s"/person/$nino/liability/universal-credit"
-  private def hipTerminationUrl(nino: String) = s"/person/$nino/liability/universal-credit/termination"
+  private def hipInsertionUrl(nino: String)   = s"/ni/person/$nino/liability/universal-credit"
+  private def hipTerminationUrl(nino: String) = s"/ni/person/$nino/liability/universal-credit/termination"
 
   private def expectedBasicAuth: String = {
     val credentials = s"$testHipClientId:$testHipClientSecret"
