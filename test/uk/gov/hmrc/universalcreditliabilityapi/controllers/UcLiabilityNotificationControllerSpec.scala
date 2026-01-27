@@ -36,7 +36,7 @@ import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.*
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure as DwpFailure
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, OriginatorId}
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, GovUkOriginatorId}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.{ErrorCodes, ForbiddenReason}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -92,7 +92,7 @@ class UcLiabilityNotificationControllerSpec
 
     val withCorrelation =
       if (withCorrelationId) baseRequest.withHeaders(CorrelationId -> correlationId) else baseRequest
-    if (withOriginatorId) withCorrelation.withHeaders(OriginatorId -> originatorId) else withCorrelation
+    if (withOriginatorId) withCorrelation.withHeaders(GovUkOriginatorId -> originatorId) else withCorrelation
   }
 
   "UcLiabilityNotificationController.submitLiabilityNotification()" must {

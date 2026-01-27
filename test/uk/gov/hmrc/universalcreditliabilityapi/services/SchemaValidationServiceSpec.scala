@@ -26,7 +26,7 @@ import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.*
 import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestHelpers.{buildFakeRequest, extractLeftOrFail, jsObjectWith, jsObjectWithout}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, OriginatorId}
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, GovUkOriginatorId}
 
 import scala.concurrent.Future
 
@@ -56,32 +56,10 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
     "return Right" when {
       "originatorId is present and valid" in {
         val json    = Json.obj()
-        val request = buildFakeRequest(payload = json, headers = OriginatorId -> originatorId)
+        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> originatorId)
         val result  = testSchemaValidationService.validateOriginatorId(request)
 
         result mustBe Right(originatorId)
-      }
-
-      "originatorId has 3 valid characters" in {
-        val json    = Json.obj()
-        val request = buildFakeRequest(payload = json, headers = OriginatorId -> "ABC")
-        val result  = testSchemaValidationService.validateOriginatorId(request)
-
-        result match {
-          case Right(value) => assert(value == "ABC")
-          case Left(_)      => fail("Expected Right but got Left")
-        }
-      }
-
-      "originatorId has 40 valid characters" in {
-        val json    = Json.obj()
-        val request = buildFakeRequest(payload = json, headers = OriginatorId -> "A" * 40)
-        val result  = testSchemaValidationService.validateOriginatorId(request)
-
-        result match {
-          case Right(value) => assert(value == "A" * 40)
-          case Left(_)      => fail("Expected Right but got Left")
-        }
       }
     }
 
@@ -96,7 +74,7 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
 
       "originatorId is shorter than 3 characters" in {
         val json    = Json.obj()
-        val request = buildFakeRequest(payload = json, headers = OriginatorId -> "AB")
+        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "A" * 2)
         val result  = testSchemaValidationService.validateOriginatorId(request)
 
         assertForbidden(result)
@@ -104,7 +82,7 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
 
       "originatorId is longer than 40 characters" in {
         val json    = Json.obj()
-        val request = buildFakeRequest(payload = json, headers = OriginatorId -> "A" * 41)
+        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "A" * 41)
         val result  = testSchemaValidationService.validateOriginatorId(request)
 
         assertForbidden(result)

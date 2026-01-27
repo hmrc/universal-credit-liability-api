@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.universalcreditliabilityapi.config.AppConfig
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, TerminateLiabilityRequest}
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{Authorization, CorrelationId, OriginatorId}
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{Authorization, CorrelationId, GovUkOriginatorId}
 
 import java.util.Base64
 import javax.inject.Inject
@@ -53,9 +53,9 @@ class HipConnector @Inject() (httpClientV2: HttpClientV2, appConfig: AppConfig)(
     httpClientV2
       .post(url)
       .setHeader(
-        Authorization -> basicAuth,
-        CorrelationId -> correlationId,
-        OriginatorId  -> originatorId
+        Authorization     -> basicAuth,
+        CorrelationId     -> correlationId,
+        GovUkOriginatorId -> originatorId
       )
       .withBody(requestBody)
       .execute[HttpResponse]()

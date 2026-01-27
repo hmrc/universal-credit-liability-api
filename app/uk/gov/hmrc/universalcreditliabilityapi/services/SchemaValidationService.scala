@@ -34,8 +34,8 @@ class SchemaValidationService {
 
   def validateOriginatorId[T](request: Request[T]): Either[Future[Result], String] =
     request.headers
-      .get(HeaderNames.OriginatorId)
-      .filter(ApplicationConstants.isValidGovUkOriginatorId)
+      .get(HeaderNames.GovUkOriginatorId)
+      .filter(originatorId => ApplicationConstants.ValidationPatterns.isValidGovUkOriginatorId(originatorId))
       .toRight(
         Future.successful(
           Forbidden(Json.toJson(ApplicationConstants.forbiddenFailure))
