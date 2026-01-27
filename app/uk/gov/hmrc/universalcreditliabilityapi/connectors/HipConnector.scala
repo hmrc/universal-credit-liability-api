@@ -40,12 +40,12 @@ class HipConnector @Inject() (httpClientV2: HttpClientV2, appConfig: AppConfig)(
     val (url, requestBody) = requestObject match {
       case insert: InsertLiabilityRequest       =>
         (
-          url"${appConfig.hipBaseUrl}/person/$nationalInsuranceNumber/liability/universal-credit",
+          url"${appConfig.hipBaseUrl}/ni/person/$nationalInsuranceNumber/liability/universal-credit",
           Json.toJson(insert)
         )
       case terminate: TerminateLiabilityRequest =>
         (
-          url"${appConfig.hipBaseUrl}/person/$nationalInsuranceNumber/liability/universal-credit/termination",
+          url"${appConfig.hipBaseUrl}/ni/person/$nationalInsuranceNumber/liability/universal-credit/termination",
           Json.toJson(terminate)
         )
     }
