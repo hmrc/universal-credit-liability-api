@@ -39,8 +39,8 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     MockAuthHelper.mockAuthOk()
   }
 
-  def hipInsertionUrl(nino: String)   = s"/person/$nino/liability/universal-credit"
-  def hipTerminationUrl(nino: String) = s"/person/$nino/liability/universal-credit/termination"
+  def hipInsertionUrl(nino: String)   = s"/ni/person/$nino/liability/universal-credit"
+  def hipTerminationUrl(nino: String) = s"/ni/person/$nino/liability/universal-credit/termination"
 
   "POST /notification" must {
     "return 204 when HIP returns 204 for insert" in {
@@ -555,7 +555,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     expectedRequestBody: Option[String] = None
   ): StubMapping = {
 
-    val mappingBuilder = post(urlEqualTo(s"/person/$nino/liability/universal-credit"))
+    val mappingBuilder = post(urlEqualTo(s"/ni/person/$nino/liability/universal-credit"))
 
     val mappingWithBody = expectedRequestBody match {
       case Some(body) => mappingBuilder.withRequestBody(equalToJson(body))
@@ -580,7 +580,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     expectedRequestBody: Option[String] = None
   ): StubMapping = {
 
-    val mappingBuilder = post(urlEqualTo(s"/person/$nino/liability/universal-credit/termination"))
+    val mappingBuilder = post(urlEqualTo(s"/ni/person/$nino/liability/universal-credit/termination"))
 
     val mappingWithBody = expectedRequestBody match {
       case Some(body) => mappingBuilder.withRequestBody(equalToJson(body))
