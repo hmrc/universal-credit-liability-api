@@ -26,6 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.*
+import play.api.mvc.Results.Forbidden
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -34,7 +35,8 @@ import uk.gov.hmrc.universalcreditliabilityapi.connectors.HipConnector
 import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.*
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure as DwpFailure
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, OriginatorId}
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, GovUkOriginatorId}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.{ErrorCodes, ForbiddenReason}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -68,6 +70,9 @@ class UcLiabilityNotificationControllerSpec
     super.beforeEach()
     reset(mockAuthAction, mockSchemaValidationService, mockMappingService, mockHipConnector)
 
+    when(mockSchemaValidationService.validateOriginatorId(any()))
+      .thenReturn(Right("SOME_GOVUK_ORIGINATOR_ID"))
+
     when(mockAuthAction.async(any[BodyParser[JsValue]])(any()))
       .thenAnswer { invocation =>
         val bodyParser = invocation.getArgument[BodyParser[JsValue]](0)
@@ -87,7 +92,7 @@ class UcLiabilityNotificationControllerSpec
 
     val withCorrelation =
       if (withCorrelationId) baseRequest.withHeaders(CorrelationId -> correlationId) else baseRequest
-    if (withOriginatorId) withCorrelation.withHeaders(OriginatorId -> originatorId) else withCorrelation
+    if (withOriginatorId) withCorrelation.withHeaders(GovUkOriginatorId -> originatorId) else withCorrelation
   }
 
   "UcLiabilityNotificationController.submitLiabilityNotification()" must {
@@ -129,12 +134,7 @@ class UcLiabilityNotificationControllerSpec
 
       "validation service returns Left" in {
         val validationError = Results.BadRequest(
-          Json.toJson(
-            DwpFailure(
-              code = "400.1",
-              message = "Constraint Violation - Invalid/Missing input parameter: nationalInsuranceNumber"
-            )
-          )
+          Json.toJson(ApplicationConstants.invalidInputFailure("nationalInsuranceNumber"))
         )
 
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
@@ -150,12 +150,7 @@ class UcLiabilityNotificationControllerSpec
 
       "validation fails with constraint violation (400.1)" in {
         val validationError = Results.BadRequest(
-          Json.toJson(
-            DwpFailure(
-              code = "400.1",
-              message = "Constraint Violation - Invalid/Missing input parameter: nationalInsuranceNumber"
-            )
-          )
+          Json.toJson(ApplicationConstants.invalidInputFailure("nationalInsuranceNumber"))
         )
 
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any[Request[JsValue]]))
@@ -171,6 +166,11 @@ class UcLiabilityNotificationControllerSpec
 
     "return 403 Forbidden" when {
       "OriginatorId header is missing" in {
+        when(mockSchemaValidationService.validateOriginatorId(any()))
+          .thenReturn(
+            Left(Future.successful(Forbidden(Json.toJson(ApplicationConstants.forbiddenFailure))))
+          )
+
         val request = fakeRequest(insertDwpRequestJson(), withOriginatorId = false)
         val result  = testController.submitLiabilityNotification()(request)
 

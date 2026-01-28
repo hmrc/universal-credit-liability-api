@@ -35,6 +35,10 @@ object ApplicationConstants {
     val NinoPattern: Regex =
       "^([ACEHJLMOPRSWXY][A-CEGHJ-NPR-TW-Z]|B[A-CEHJ-NPR-TW-Z]|G[ACEGHJ-NPR-TW-Z]|[KT][A-CEGHJ-MPR-TW-Z]|N[A-CEGHJL-NPR-SW-Z]|Z[A-CEGHJ-NPR-TW-Y])[0-9]{6}$".r
 
+    val GovUkOriginatorIdPattern: Regex = "^[a-zA-Z0-9\\-_]{3,40}$".r
+
+    def isValidGovUkOriginatorId(id: String): Boolean = GovUkOriginatorIdPattern.matches(id)
+
     private def isValidNino(nino: String): Boolean = NinoPattern.matches(nino)
 
     val validNino: Reads[String] = Reads.verifying[String](isValidNino)
@@ -42,9 +46,9 @@ object ApplicationConstants {
   }
 
   object HeaderNames {
-    val Authorization = "authorization"
-    val CorrelationId = "correlationId"
-    val OriginatorId  = "gov-uk-originator-id"
+    val Authorization     = "authorization"
+    val CorrelationId     = "correlationId"
+    val GovUkOriginatorId = "gov-uk-originator-id"
   }
 
   object ErrorCodes {
@@ -56,6 +60,12 @@ object ApplicationConstants {
     Failure(
       message = ErrorMessages.invalidInput(field),
       code = ErrorCodes.InvalidInput
+    )
+
+  def forbiddenFailure: Failure =
+    Failure(
+      message = ForbiddenReason,
+      code = ErrorCodes.ForbiddenCode
     )
 
   private object ErrorMessages {
