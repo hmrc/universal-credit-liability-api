@@ -34,7 +34,7 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
         val testInsertLiabilityRequest: UniversalCreditLiabilityDetails =
           UniversalCreditLiabilityDetails(
             universalCreditRecordType = UC,
-            dateOfBirth = LocalDate.parse("2002-10-10"),
+            dateOfBirth = Some(LocalDate.parse("2002-10-10")),
             liabilityStartDate = LocalDate.parse("2025-08-19")
           )
 
@@ -53,7 +53,7 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
         val testInsertLiabilityRequest: UniversalCreditLiabilityDetails =
           UniversalCreditLiabilityDetails(
             universalCreditRecordType = LCW_LCWRA,
-            dateOfBirth = LocalDate.parse("2002-10-10"),
+            dateOfBirth = Some(LocalDate.parse("2002-10-10")),
             liabilityStartDate = LocalDate.parse("2025-08-19")
           )
 
@@ -72,7 +72,7 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
         val testInsertLiabilityRequest: UniversalCreditLiabilityDetails =
           UniversalCreditLiabilityDetails(
             universalCreditRecordType = LCW_LCWRA,
-            dateOfBirth = LocalDate.parse("2000-02-29"),
+            dateOfBirth = Some(LocalDate.parse("2000-02-29")),
             liabilityStartDate = LocalDate.parse("2024-02-29")
           )
 
@@ -91,7 +91,7 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
         val testInsertLiabilityRequest: UniversalCreditLiabilityDetails =
           UniversalCreditLiabilityDetails(
             universalCreditRecordType = LCW_LCWRA,
-            dateOfBirth = LocalDate.parse("1900-01-01"),
+            dateOfBirth = Some(LocalDate.parse("1900-01-01")),
             liabilityStartDate = LocalDate.parse("2099-12-31")
           )
 
@@ -102,6 +102,24 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
             |  "liabilityStartDate": "2099-12-31"
             |}
             |""".stripMargin)
+
+        Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
+      }
+
+      "datesOfBirth is None" in {
+        val testInsertLiabilityRequest: UniversalCreditLiabilityDetails =
+          UniversalCreditLiabilityDetails(
+            universalCreditRecordType = LCW_LCWRA,
+            dateOfBirth = None,
+            liabilityStartDate = LocalDate.parse("2099-12-31")
+          )
+
+        val expectedJson: JsValue = Json.parse("""
+                                                 |{
+                                                 |  "universalCreditRecordType": "LCW/LCWRA",
+                                                 |  "liabilityStartDate": "2099-12-31"
+                                                 |}
+                                                 |""".stripMargin)
 
         Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
       }

@@ -36,7 +36,7 @@ object TestData {
       nationalInsuranceNumber = nino,
       universalCreditRecordType = UC,
       liabilityStartDate = LocalDate.parse("2024-01-15"),
-      dateOfBirth = LocalDate.parse("1990-05-20")
+      dateOfBirth = Some(LocalDate.parse("1990-05-20"))
     )
 
   val baseTerminateDwpRequest: TerminateUcLiabilityRequest =
@@ -53,7 +53,7 @@ object TestData {
       universalCreditLiabilityDetails = UniversalCreditLiabilityDetails(
         universalCreditRecordType = UC,
         liabilityStartDate = LocalDate.parse("2024-01-15"),
-        dateOfBirth = LocalDate.parse("1990-05-20")
+        dateOfBirth = Some(LocalDate.parse("1990-05-20"))
       )
     )
 
@@ -71,8 +71,7 @@ object TestData {
       "universalCreditAction",
       "nationalInsuranceNumber",
       "universalCreditRecordType",
-      "liabilityStartDate",
-      "dateOfBirth"
+      "liabilityStartDate"
     )
 
   val requiredTerminateDwpFields: Set[String] =
