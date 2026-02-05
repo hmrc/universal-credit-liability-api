@@ -114,8 +114,7 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
             liabilityStartDate = LocalDate.parse("2099-12-31")
           )
 
-        val expectedJson: JsValue = Json.parse(
-          """
+        val expectedJson: JsValue = Json.parse("""
             |{
             |  "universalCreditRecordType": "LCW/LCWRA",
             |  "liabilityStartDate": "2099-12-31"

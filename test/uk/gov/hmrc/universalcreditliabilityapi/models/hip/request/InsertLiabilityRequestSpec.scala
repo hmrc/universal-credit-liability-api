@@ -135,8 +135,7 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
             )
           )
 
-        val expectedJson: JsValue = Json.parse(
-          """
+        val expectedJson: JsValue = Json.parse("""
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
@@ -158,8 +157,7 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
             )
           )
 
-        val expectedJson: JsValue = Json.parse(
-          """
+        val expectedJson: JsValue = Json.parse("""
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
