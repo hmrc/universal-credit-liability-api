@@ -47,7 +47,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = UC,
             liabilityStartDate = LocalDate.parse("2025-12-15"),
-            dateOfBirth = LocalDate.parse("2002-10-10")
+            dateOfBirth = Some(LocalDate.parse("2002-10-10"))
           )
 
         val result = testJson.validate[InsertUcLiabilityRequest]
@@ -72,7 +72,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = LCW_LCWRA,
             liabilityStartDate = LocalDate.parse("2025-12-15"),
-            dateOfBirth = LocalDate.parse("2002-10-10")
+            dateOfBirth = Some(LocalDate.parse("2002-10-10"))
           )
 
         val result = testJson.validate[InsertUcLiabilityRequest]
@@ -97,7 +97,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = UC,
             liabilityStartDate = LocalDate.parse("2024-02-29"),
-            dateOfBirth = LocalDate.parse("2000-02-29")
+            dateOfBirth = Some(LocalDate.parse("2000-02-29"))
           )
 
         val result = testJson.validate[InsertUcLiabilityRequest]
@@ -288,21 +288,6 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |  "nationalInsuranceNumber": "AA123456",
             |  "universalCreditRecordType": "LCW/LCWRA",
             |  "dateOfBirth": "2002-10-10"
-            |}
-            |""".stripMargin)
-
-        val result = testJson.validate[InsertUcLiabilityRequest]
-
-        result mustBe a[JsError]
-      }
-
-      "given JSON is missing a date of birth" in {
-        val testJson: JsValue = Json.parse("""
-            |{
-            |  "universalCreditAction": "Insert",
-            |  "nationalInsuranceNumber": "AA123456",
-            |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2025-12-15"
             |}
             |""".stripMargin)
 

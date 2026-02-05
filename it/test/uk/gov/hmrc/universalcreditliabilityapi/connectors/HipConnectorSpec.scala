@@ -49,7 +49,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
   private val insertPayload: InsertLiabilityRequest = InsertLiabilityRequest(
     universalCreditLiabilityDetails = UniversalCreditLiabilityDetails(
       universalCreditRecordType = LCW_LCWRA,
-      dateOfBirth = LocalDate.parse("2002-10-10"),
+      dateOfBirth = Some(LocalDate.parse("2002-10-10")),
       liabilityStartDate = LocalDate.parse("2015-08-19")
     )
   )

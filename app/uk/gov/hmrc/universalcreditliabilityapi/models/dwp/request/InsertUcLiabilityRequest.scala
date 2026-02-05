@@ -29,7 +29,7 @@ final case class InsertUcLiabilityRequest(
   nationalInsuranceNumber: String,
   universalCreditRecordType: UniversalCreditRecordType,
   liabilityStartDate: LocalDate,
-  dateOfBirth: LocalDate
+  dateOfBirth: Option[LocalDate]
 )
 
 object InsertUcLiabilityRequest {
@@ -39,7 +39,7 @@ object InsertUcLiabilityRequest {
       (JsPath \ "nationalInsuranceNumber").read(validNino) and
       (JsPath \ "universalCreditRecordType").read[UniversalCreditRecordType] and
       (JsPath \ "liabilityStartDate").read(using localDateReads) and
-      (JsPath \ "dateOfBirth").read(using localDateReads)
+      (JsPath \ "dateOfBirth").readNullable(using localDateReads)
   )(InsertUcLiabilityRequest.apply _)
 
 }
