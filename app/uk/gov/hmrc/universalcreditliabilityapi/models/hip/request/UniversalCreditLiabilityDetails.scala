@@ -28,5 +28,5 @@ final case class UniversalCreditLiabilityDetails(
 )
 
 object UniversalCreditLiabilityDetails {
-  implicit val format: OWrites[UniversalCreditLiabilityDetails] = Json.writes[UniversalCreditLiabilityDetails]
+  given format: OWrites[UniversalCreditLiabilityDetails] = Json.writes[UniversalCreditLiabilityDetails]
 }

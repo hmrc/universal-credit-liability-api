@@ -34,7 +34,7 @@ final case class InsertUcLiabilityRequest(
 
 object InsertUcLiabilityRequest {
 
-  implicit val reads: Reads[InsertUcLiabilityRequest] = (
+  given reads: Reads[InsertUcLiabilityRequest] = (
     (JsPath \ "universalCreditAction").read[UniversalCreditAction] and
       (JsPath \ "nationalInsuranceNumber").read(validNino) and
       (JsPath \ "universalCreditRecordType").read[UniversalCreditRecordType] and

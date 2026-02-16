@@ -24,7 +24,7 @@ import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.Valida
 
 import java.time.LocalDate
 
-case class TerminateUcLiabilityRequest(
+final case class TerminateUcLiabilityRequest(
   universalCreditAction: UniversalCreditAction,
   nationalInsuranceNumber: String,
   universalCreditRecordType: UniversalCreditRecordType,
@@ -34,7 +34,7 @@ case class TerminateUcLiabilityRequest(
 
 object TerminateUcLiabilityRequest {
 
-  implicit val reads: Reads[TerminateUcLiabilityRequest] = (
+  given reads: Reads[TerminateUcLiabilityRequest] = (
     (JsPath \ "universalCreditAction").read[UniversalCreditAction] and
       (JsPath \ "nationalInsuranceNumber").read(validNino) and
       (JsPath \ "universalCreditRecordType").read[UniversalCreditRecordType] and

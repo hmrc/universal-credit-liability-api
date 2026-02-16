@@ -25,9 +25,10 @@ enum UniversalCreditAction {
 
 object UniversalCreditAction {
 
-  implicit val reads: Reads[UniversalCreditAction] = Reads {
+  given reads: Reads[UniversalCreditAction] = Reads {
     case JsString("Insert")    => JsSuccess(Insert)
     case JsString("Terminate") => JsSuccess(Terminate)
     case _                     => JsError("Unknown Universal Credit Action")
   }
+
 }
