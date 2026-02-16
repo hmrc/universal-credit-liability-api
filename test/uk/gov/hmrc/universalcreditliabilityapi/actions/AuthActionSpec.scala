@@ -71,7 +71,7 @@ class AuthActionSpec extends AnyWordSpec with GuiceOneAppPerSuite with MockitoSu
       await(blockFutureResult) mustBe happyPathResult
     }
 
-    "return 401 with MISSING_CREDENTIALS when MissingBearerToken is throw" in {
+    "return 401 with MISSING_CREDENTIALS when MissingBearerToken is thrown" in {
       val testMessage = "testMessage"
       when(
         mockAuthConnector.authorise(any[Predicate], any[Retrieval[Unit]]())(

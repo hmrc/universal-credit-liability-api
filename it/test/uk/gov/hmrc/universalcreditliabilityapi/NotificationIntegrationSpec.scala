@@ -23,6 +23,7 @@ import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse, readableAsJson, writeableOf_String}
 import uk.gov.hmrc.universalcreditliabilityapi.support.{MockAuthHelper, OpenApiValidator, WireMockIntegrationSpec}
+import play.api.libs.ws.readableAsString
 
 import java.util.UUID
 import scala.util.Random
@@ -134,7 +135,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       )
 
       response.status mustBe Status.BAD_REQUEST
-      (response.body \ "message")
+      (response.body[JsValue] \ "message")
         .as[String] mustBe "Constraint Violation - Invalid/Missing input parameter: correlationId"
 
       verify(0, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
@@ -228,9 +229,10 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
       stubHipInsert(nino, status = 404)
 
-      val response = callPostNotification(requestBody)
+      val response: WSResponse = callPostNotification(requestBody)
 
       response.status mustBe Status.NOT_FOUND
+      response.body[String] mustBe ""
 
       verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
       MockAuthHelper.verifyAuthWasCalled()
@@ -245,6 +247,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       val response = callPostNotification(requestBody)
 
       response.status mustBe Status.NOT_FOUND
+      response.body[String] mustBe ""
 
       verify(1, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
       MockAuthHelper.verifyAuthWasCalled()

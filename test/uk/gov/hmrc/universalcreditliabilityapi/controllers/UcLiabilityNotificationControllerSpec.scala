@@ -70,8 +70,7 @@ class UcLiabilityNotificationControllerSpec
     super.beforeEach()
     reset(mockAuthAction, mockSchemaValidationService, mockMappingService, mockHipConnector)
 
-    when(mockSchemaValidationService.validateOriginatorId(any()))
-      .thenReturn(Right("SOME_GOVUK_ORIGINATOR_ID"))
+    when(mockSchemaValidationService.validateOriginatorId(any())).thenReturn(Right(originatorId))
 
     when(mockAuthAction.async(any[BodyParser[JsValue]])(any()))
       .thenAnswer { invocation =>
@@ -127,6 +126,7 @@ class UcLiabilityNotificationControllerSpec
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe NO_CONTENT
+        contentAsString(result) mustBe ""
       }
     }
 
@@ -215,6 +215,7 @@ class UcLiabilityNotificationControllerSpec
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe NOT_FOUND
+        contentAsString(result) mustBe ""
       }
     }
 
@@ -299,6 +300,7 @@ class UcLiabilityNotificationControllerSpec
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe INTERNAL_SERVER_ERROR
+        contentAsString(result) mustBe ""
       }
 
       "HIP returns unexpected status code" in {
@@ -315,6 +317,7 @@ class UcLiabilityNotificationControllerSpec
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe INTERNAL_SERVER_ERROR
+        contentAsString(result) mustBe ""
       }
 
     }

@@ -29,4 +29,5 @@ class CorrelationIdFilter @Inject() (implicit val mat: Materializer, ec: Executi
     nextFilter(request).map { result =>
       request.headers.get(CorrelationId).map(id => result.withHeaders(CorrelationId -> id)).getOrElse(result)
     }
+
 }

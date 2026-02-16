@@ -17,7 +17,8 @@
 package uk.gov.hmrc.universalcreditliabilityapi.handler
 
 import play.api.Configuration
-import play.api.mvc.Results.InternalServerError
+import play.api.http.Status.NOT_FOUND
+import play.api.mvc.Results.{InternalServerError, NotFound}
 import play.api.mvc.{RequestHeader, Result}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.backend.http.JsonErrorHandler as DefaultJsonErrorHandler
@@ -33,6 +34,22 @@ class JsonErrorHandler @Inject() (
   configuration: Configuration
 )(implicit ec: ExecutionContext)
     extends DefaultJsonErrorHandler(auditConnector, httpAuditEvent, configuration) {
+
+  override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] =
+    statusCode.match {
+      case NOT_FOUND =>
+        super
+          .onClientError(request, statusCode, message)
+          .map(_ =>
+            request.headers
+              .get(CorrelationId)
+              .map(id => NotFound.withHeaders(CorrelationId -> id))
+              .getOrElse(NotFound)
+          )
+      case _         =>
+        super
+          .onClientError(request, statusCode, message)
+    }
 
   override def onServerError(request: RequestHeader, ex: Throwable): Future[Result] =
     super

@@ -28,7 +28,7 @@ object TestData {
 
   val nino: String          = "AA123456"
   val correlationId: String = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"
-  val originatorId: String  = "SOME_GOVUK_ORIGINATOR_ID"
+  val originatorId: String  = "TEST-GOV-UK-ORIGINATOR-ID"
 
   val baseInsertDwpRequest: InsertUcLiabilityRequest =
     InsertUcLiabilityRequest(

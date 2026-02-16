@@ -19,41 +19,65 @@ package uk.gov.hmrc.universalcreditliabilityapi.handler
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.mvc.{AnyContentAsEmpty, Result}
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.correlationId
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.CorrelationId
 
-import scala.concurrent.Future
-
 class JsonErrorHandlerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  val requestHeader: FakeRequest[AnyContentAsEmpty.type] =
+  private val fakeRequestHeader: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest().withHeaders("Accept" -> "application/json")
 
-  val handler: JsonErrorHandler =
-    app.injector.instanceOf[JsonErrorHandler]
+  private val jsonErrorHandler: JsonErrorHandler = app.injector.instanceOf[JsonErrorHandler]
 
-  "JsonErrorHandler.onServerError" must {
+  "JsonErrorHandler.onClientError" must {
+    "return 404 with empty body and CorrelationId header" in {
+      val request = fakeRequestHeader.withHeaders(CorrelationId -> correlationId)
+      val result  = jsonErrorHandler.onClientError(request, NOT_FOUND, "URI not found")
 
-    "return 500 with CorrelationId header when present" in {
-      val req: FakeRequest[AnyContentAsEmpty.type] =
-        requestHeader.withHeaders(CorrelationId -> correlationId)
-
-      val result: Future[Result] =
-        handler.onServerError(req, new RuntimeException("test error"))
-
-      status(result) mustBe INTERNAL_SERVER_ERROR
+      status(result) mustBe NOT_FOUND
+      contentAsString(result) mustBe ""
       header(CorrelationId, result) mustBe Some(correlationId)
     }
 
-    "return 500 without CorrelationId header when missing" in {
-      val result: Future[Result] =
-        handler.onServerError(requestHeader, new RuntimeException("test error"))
+    "return 404 with empty body and generated CorrelationId when header is missing" in {
+      val result = jsonErrorHandler.onClientError(fakeRequestHeader, NOT_FOUND, "URI not found")
+
+      status(result) mustBe NOT_FOUND
+      contentAsString(result) mustBe ""
+      header(CorrelationId, result) mustBe None
+    }
+
+    "return the same code and body for any non-404 error e.g. 403" in {
+      val request = fakeRequestHeader.withHeaders(CorrelationId -> correlationId)
+      val result  = jsonErrorHandler.onClientError(request, FORBIDDEN, "Forbidden")
+
+      status(result) mustBe FORBIDDEN
+      contentAsString(result) must not be empty
+      header(CorrelationId, result) mustBe None // correlationId added by CorrelationIdFilter
+    }
+
+  }
+
+  "JsonErrorHandler.onServerError" must {
+
+    "return 500 with empty body when CorrelationId header is present" in {
+      val request = fakeRequestHeader.withHeaders(CorrelationId -> correlationId)
+      val result  = jsonErrorHandler.onServerError(request, new RuntimeException("test error"))
 
       status(result) mustBe INTERNAL_SERVER_ERROR
-      header(CorrelationId, result) mustBe None
+      contentAsString(result) mustBe ""
+      header(CorrelationId, result) mustBe Some(correlationId)
+    }
+
+    "return 500 with empty body when CorrelationId header is missing" in {
+      val result = jsonErrorHandler.onServerError(fakeRequestHeader, new RuntimeException("test error"))
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      contentAsString(result) mustBe ""
+      header(CorrelationId, result) mustBe None // correlationId added by CorrelationIdFilter
     }
   }
 }
