@@ -63,6 +63,40 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
       }
     }
 
+    "return right" when {
+      "given a valid originatorId" in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> ("A" * 3))
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        result mustBe Right("A" * 3)
+      }
+
+      "given a valid originatorId for Special characters: '{}, [], (), @, !, *, -, ?'" in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "{[(V@l!d-0r!g!n4t*r-1D?)]}")
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        result mustBe Right("{[(V@l!d-0r!g!n4t*r-1D?)]}")
+      }
+
+      "given a valid originatorId for Special characters: '//, \\, €, £, $, !, *, -, &, +, ?' " in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "//:€anc£l_Orignin&t+r_1D$;\\")
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        result mustBe Right("//:€anc£l_Orignin&t+r_1D$;\\")
+      }
+
+      "given a valid originatorId for Special characters: '<>, `, #, ',' ~, ^, ., %,' " in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "<`#,Va|1d~0rig^nator=ID.%`>")
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        result mustBe Right("<`#,Va|1d~0rig^nator=ID.%`>")
+      }
+    }
+
     "return Left (403 Forbidden)" when {
       "GovUkOriginatorId header is missing" in {
         val json    = Json.obj()
@@ -84,6 +118,30 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
         val json    = Json.obj()
         val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "A" * 41)
         val result  = testSchemaValidationService.validateGovUkOriginatorId(request)
+
+        assertForbidden(result)
+      }
+
+      "originatorId contains a space" in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "contains space")
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        assertForbidden(result)
+      }
+
+      "originatorId contains a tab" in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "tab\tchar")
+        val result  = testSchemaValidationService.validateOriginatorId(request)
+
+        assertForbidden(result)
+      }
+
+      "originatorId contains a new line" in {
+        val json    = Json.obj()
+        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "new\nline")
+        val result  = testSchemaValidationService.validateOriginatorId(request)
 
         assertForbidden(result)
       }

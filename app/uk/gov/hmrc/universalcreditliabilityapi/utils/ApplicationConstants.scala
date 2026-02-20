@@ -35,7 +35,7 @@ object ApplicationConstants {
     val NinoPattern: Regex =
       "^([ACEHJLMOPRSWXY][A-CEGHJ-NPR-TW-Z]|B[A-CEHJ-NPR-TW-Z]|G[ACEGHJ-NPR-TW-Z]|[KT][A-CEGHJ-MPR-TW-Z]|N[A-CEGHJL-NPR-SW-Z]|Z[A-CEGHJ-NPR-TW-Y])[0-9]{6}$".r
 
-    val GovUkOriginatorIdPattern: Regex = "^[a-zA-Z0-9\\-_]{3,40}$".r
+    val GovUkOriginatorIdPattern: Regex = """^[\S]{3,40}$""".r
 
     def isValidGovUkOriginatorId(id: String): Boolean = GovUkOriginatorIdPattern.matches(id)
 
