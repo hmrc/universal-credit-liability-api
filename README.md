@@ -61,7 +61,6 @@ sbt clean coverage test it/test coverageReport
 
 **Description**: Provides the capability to insert and terminate Universal Credit Liability details for a given individual.
 
-
 ## Previewing the OpenAPI Specification
 
 To preview the OpenAPI Specification (OAS) locally, start the `DEVHUB_PREVIEW_OPENAPI` service with Service Manager:

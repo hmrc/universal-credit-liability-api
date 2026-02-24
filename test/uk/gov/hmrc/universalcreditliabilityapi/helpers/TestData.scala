@@ -19,7 +19,7 @@ package uk.gov.hmrc.universalcreditliabilityapi.helpers
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.UC
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCreditAction.{Insert, Terminate}
-import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUniversalCreditLiability, TerminateUniversalCreditLiability}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, TerminateLiabilityRequest, UcLiabilityTerminationDetails, UniversalCreditLiabilityDetails}
 
 import java.time.LocalDate
@@ -30,8 +30,8 @@ object TestData {
   val correlationId: String = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"
   val originatorId: String  = "SOME_GOVUK_ORIGINATOR_ID"
 
-  val baseInsertDwpRequest: InsertUcLiabilityRequest =
-    InsertUcLiabilityRequest(
+  val baseInsertDwpRequest: InsertUniversalCreditLiability =
+    InsertUniversalCreditLiability(
       universalCreditAction = Insert,
       nationalInsuranceNumber = nino,
       universalCreditRecordType = UC,
@@ -39,8 +39,8 @@ object TestData {
       dateOfBirth = Some(LocalDate.parse("1990-05-20"))
     )
 
-  val baseTerminateDwpRequest: TerminateUcLiabilityRequest =
-    TerminateUcLiabilityRequest(
+  val baseTerminateDwpRequest: TerminateUniversalCreditLiability =
+    TerminateUniversalCreditLiability(
       universalCreditAction = Terminate,
       nationalInsuranceNumber = nino,
       universalCreditRecordType = UC,

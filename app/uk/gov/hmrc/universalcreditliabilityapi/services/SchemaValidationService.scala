@@ -22,11 +22,11 @@ import play.api.libs.json.*
 import play.api.mvc.Results.{BadRequest, Forbidden}
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCreditAction.{Insert, Terminate}
-import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest, UniversalCreditAction}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUniversalCreditLiability, TerminateUniversalCreditLiability, UniversalCreditAction}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ValidationPatterns.CorrelationIdPattern
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ValidationPatterns.{CorrelationIdPattern, isValidGovUkOriginatorId}
 
 import scala.concurrent.Future
 
@@ -35,7 +35,7 @@ class SchemaValidationService {
   def validateOriginatorId[T](request: Request[T]): Either[Future[Result], String] =
     request.headers
       .get(HeaderNames.GovUkOriginatorId)
-      .filter(originatorId => ApplicationConstants.ValidationPatterns.isValidGovUkOriginatorId(originatorId))
+      .filter(isValidGovUkOriginatorId)
       .toRight(
         Future.successful(
           Forbidden(Json.toJson(ApplicationConstants.forbiddenFailure))
@@ -44,16 +44,17 @@ class SchemaValidationService {
 
   def validateLiabilityNotificationRequest(
     request: Request[JsValue]
-  ): Either[Future[Result], (String, InsertUcLiabilityRequest | TerminateUcLiabilityRequest)] = {
+  ): Either[Future[Result], (String, InsertUniversalCreditLiability | TerminateUniversalCreditLiability)] = {
     val correlationIdValidation: EitherNec[Failure, String] =
       validateCorrelationId(
         request.headers.get(HeaderNames.CorrelationId)
       )
 
-    val actionValidation: Either[NonEmptyChain[Failure], InsertUcLiabilityRequest | TerminateUcLiabilityRequest] =
+    val actionValidation
+      : Either[NonEmptyChain[Failure], InsertUniversalCreditLiability | TerminateUniversalCreditLiability] =
       determineActionType(request.body).flatMap {
-        case Insert    => validateJson[InsertUcLiabilityRequest](request)
-        case Terminate => validateJson[TerminateUcLiabilityRequest](request)
+        case Insert    => validateJson[InsertUniversalCreditLiability](request)
+        case Terminate => validateJson[TerminateUniversalCreditLiability](request)
       }
 
     (correlationIdValidation, actionValidation)

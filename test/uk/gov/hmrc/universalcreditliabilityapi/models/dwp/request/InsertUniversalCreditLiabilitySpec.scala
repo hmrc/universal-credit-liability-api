@@ -24,7 +24,7 @@ import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCredi
 
 import java.time.LocalDate
 
-class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
+class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
 
   "InsertUcLiabilityRequest" must {
 
@@ -41,8 +41,8 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val expectedInsertUcLiabilityRequest: InsertUcLiabilityRequest =
-          InsertUcLiabilityRequest(
+        val expectedInsertUcLiabilityRequest: InsertUniversalCreditLiability =
+          InsertUniversalCreditLiability(
             universalCreditAction = Insert,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = UC,
@@ -50,7 +50,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             dateOfBirth = Some(LocalDate.parse("2002-10-10"))
           )
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe JsSuccess(expectedInsertUcLiabilityRequest)
       }
@@ -66,8 +66,8 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val expectedInsertUcLiabilityRequest: InsertUcLiabilityRequest =
-          InsertUcLiabilityRequest(
+        val expectedInsertUcLiabilityRequest: InsertUniversalCreditLiability =
+          InsertUniversalCreditLiability(
             universalCreditAction = Insert,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = LCW_LCWRA,
@@ -75,7 +75,55 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             dateOfBirth = Some(LocalDate.parse("2002-10-10"))
           )
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
+
+        result mustBe JsSuccess(expectedInsertUcLiabilityRequest)
+      }
+
+      "given valid JSON with 'UC' record type missing optional dateOfBirth" in {
+        val testJson: JsValue = Json.parse("""
+            |{
+            |  "universalCreditAction": "Insert",
+            |  "nationalInsuranceNumber": "AA123456",
+            |  "universalCreditRecordType": "UC",
+            |  "liabilityStartDate": "2025-12-15"
+            |}
+            |""".stripMargin)
+
+        val expectedInsertUcLiabilityRequest: InsertUniversalCreditLiability =
+          InsertUniversalCreditLiability(
+            universalCreditAction = Insert,
+            nationalInsuranceNumber = "AA123456",
+            universalCreditRecordType = UC,
+            liabilityStartDate = LocalDate.parse("2025-12-15"),
+            dateOfBirth = None
+          )
+
+        val result = testJson.validate[InsertUniversalCreditLiability]
+
+        result mustBe JsSuccess(expectedInsertUcLiabilityRequest)
+      }
+
+      "given valid JSON with 'LCW/LCWRA' record type missing optional dateOfBirth" in {
+        val testJson: JsValue = Json.parse("""
+            |{
+            |  "universalCreditAction": "Insert",
+            |  "nationalInsuranceNumber": "AA123456",
+            |  "universalCreditRecordType": "LCW/LCWRA",
+            |  "liabilityStartDate": "2025-12-15"
+            |}
+            |""".stripMargin)
+
+        val expectedInsertUcLiabilityRequest: InsertUniversalCreditLiability =
+          InsertUniversalCreditLiability(
+            universalCreditAction = Insert,
+            nationalInsuranceNumber = "AA123456",
+            universalCreditRecordType = LCW_LCWRA,
+            liabilityStartDate = LocalDate.parse("2025-12-15"),
+            dateOfBirth = None
+          )
+
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe JsSuccess(expectedInsertUcLiabilityRequest)
       }
@@ -91,8 +139,8 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val expectedInsertUcLiabilityRequest: InsertUcLiabilityRequest =
-          InsertUcLiabilityRequest(
+        val expectedInsertUcLiabilityRequest: InsertUniversalCreditLiability =
+          InsertUniversalCreditLiability(
             universalCreditAction = Insert,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = UC,
@@ -100,7 +148,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             dateOfBirth = Some(LocalDate.parse("2000-02-29"))
           )
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe JsSuccess(expectedInsertUcLiabilityRequest)
       }
@@ -119,7 +167,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -135,7 +183,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -151,7 +199,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -167,7 +215,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -183,7 +231,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -199,7 +247,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -215,7 +263,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -231,7 +279,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -246,7 +294,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -261,7 +309,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -276,7 +324,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -291,7 +339,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -307,7 +355,7 @@ class InsertUcLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[InsertUcLiabilityRequest]
+        val result = testJson.validate[InsertUniversalCreditLiability]
 
         result mustBe a[JsError]
       }

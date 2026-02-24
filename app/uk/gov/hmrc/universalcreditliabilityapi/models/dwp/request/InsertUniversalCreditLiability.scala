@@ -24,7 +24,7 @@ import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.Valida
 
 import java.time.LocalDate
 
-final case class InsertUcLiabilityRequest(
+final case class InsertUniversalCreditLiability(
   universalCreditAction: UniversalCreditAction,
   nationalInsuranceNumber: String,
   universalCreditRecordType: UniversalCreditRecordType,
@@ -32,14 +32,14 @@ final case class InsertUcLiabilityRequest(
   dateOfBirth: Option[LocalDate]
 )
 
-object InsertUcLiabilityRequest {
+object InsertUniversalCreditLiability {
 
-  given reads: Reads[InsertUcLiabilityRequest] = (
+  given reads: Reads[InsertUniversalCreditLiability] = (
     (JsPath \ "universalCreditAction").read[UniversalCreditAction] and
       (JsPath \ "nationalInsuranceNumber").read(validNino) and
       (JsPath \ "universalCreditRecordType").read[UniversalCreditRecordType] and
       (JsPath \ "liabilityStartDate").read(using localDateReads) and
       (JsPath \ "dateOfBirth").readNullable(using localDateReads)
-  )(InsertUcLiabilityRequest.apply _)
+  )(InsertUniversalCreditLiability.apply _)
 
 }

@@ -41,8 +41,8 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val expectedTerminateUcLiabilityRequest: TerminateUcLiabilityRequest =
-          TerminateUcLiabilityRequest(
+        val expectedTerminateUcLiabilityRequest: TerminateUniversalCreditLiability =
+          TerminateUniversalCreditLiability(
             universalCreditAction = Terminate,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = UC,
@@ -50,7 +50,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             liabilityEndDate = LocalDate.parse("2026-12-15")
           )
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe JsSuccess(expectedTerminateUcLiabilityRequest)
       }
@@ -66,8 +66,8 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val expectedTerminateUcLiabilityRequest: TerminateUcLiabilityRequest =
-          TerminateUcLiabilityRequest(
+        val expectedTerminateUcLiabilityRequest: TerminateUniversalCreditLiability =
+          TerminateUniversalCreditLiability(
             universalCreditAction = Terminate,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = LCW_LCWRA,
@@ -75,7 +75,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             liabilityEndDate = LocalDate.parse("2026-12-15")
           )
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe JsSuccess(expectedTerminateUcLiabilityRequest)
       }
@@ -91,8 +91,8 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val expectedTerminateUcLiabilityRequest: TerminateUcLiabilityRequest =
-          TerminateUcLiabilityRequest(
+        val expectedTerminateUcLiabilityRequest: TerminateUniversalCreditLiability =
+          TerminateUniversalCreditLiability(
             universalCreditAction = Terminate,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = LCW_LCWRA,
@@ -100,7 +100,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             liabilityEndDate = LocalDate.parse("2000-02-29")
           )
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe JsSuccess(expectedTerminateUcLiabilityRequest)
       }
@@ -120,7 +120,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -136,7 +136,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -152,7 +152,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -168,7 +168,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -184,7 +184,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -200,7 +200,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -216,7 +216,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -232,7 +232,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -247,7 +247,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -262,7 +262,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -277,7 +277,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -292,7 +292,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -307,7 +307,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }
@@ -323,7 +323,7 @@ class TerminateLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |}
             |""".stripMargin)
 
-        val result = testJson.validate[TerminateUcLiabilityRequest]
+        val result = testJson.validate[TerminateUniversalCreditLiability]
 
         result mustBe a[JsError]
       }

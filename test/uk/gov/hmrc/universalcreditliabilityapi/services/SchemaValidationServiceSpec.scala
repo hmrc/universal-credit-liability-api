@@ -24,7 +24,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers.*
 import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.*
 import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestHelpers.{buildFakeRequest, extractLeftOrFail, jsObjectWith, jsObjectWithout}
-import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUniversalCreditLiability, TerminateUniversalCreditLiability}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, GovUkOriginatorId}
 
@@ -100,7 +100,7 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
           val request = buildFakeRequest(json, CorrelationId -> correlationId)
           val result  = testSchemaValidationService.validateLiabilityNotificationRequest(request)
 
-          result mustBe Right((correlationId, json.as[InsertUcLiabilityRequest]))
+          result mustBe Right((correlationId, json.as[InsertUniversalCreditLiability]))
         }
 
         s"given a valid 'Terminate' Request of '$recordType' record type" in {
@@ -108,7 +108,7 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
           val request = buildFakeRequest(json, CorrelationId -> correlationId)
           val result  = testSchemaValidationService.validateLiabilityNotificationRequest(request)
 
-          result mustBe Right((correlationId, json.as[TerminateUcLiabilityRequest]))
+          result mustBe Right((correlationId, json.as[TerminateUniversalCreditLiability]))
         }
       }
 
