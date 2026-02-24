@@ -73,11 +73,12 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
       }
 
       "given a valid GovUkOriginatorId for Special characters: '{}, [], (), @, !, *, -, ?'" in {
-        val json    = Json.obj()
-        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "{[(V@l!d-0r!g!n4t*r-1D?)]}")
-        val result  = testSchemaValidationService.validateOriginatorId(request)
+        val validOriginatorId = "{[(V@l!d-0r!g!n4t*r-1D?)]}"
+        val json              = Json.obj()
+        val request           = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> validOriginatorId)
+        val result            = testSchemaValidationService.validateOriginatorId(request)
 
-        result mustBe Right("{[(V@l!d-0r!g!n4t*r-1D?)]}")
+        result mustBe Right(validOriginatorId)
       }
     }
 
