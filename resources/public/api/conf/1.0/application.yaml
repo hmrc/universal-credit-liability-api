@@ -156,6 +156,10 @@ paths:
                   value:
                     code: "65537"
                     message: 'End date before start date'
+                422_MissingTerminationEndDate:
+                  value:
+                    code: "65538"
+                    message: 'End date missing but the input was a Termination'
                 422_PseudoAccount:
                   value:
                     code: "65541"
@@ -346,6 +350,7 @@ components:
         55039 - NO corresponding liability found<br>
         65536 - Start date before 29/04/2013<br>
         65537 - End date before start date<br>
+        65538 - End date missing but the input was a Termination<br>
         65541 - The NINO input matches a Pseudo Account<br>
         65542 - The NINO input matches a non-live account (including redundant, amalgamated and administrative account types)<br>
         65543 - The NINO input matches an account that has been transferred to the Isle of Man<br>
@@ -365,6 +370,7 @@ components:
         - 65026
         - 65536
         - 65537
+        - 65538
         - 65541
         - 65542
         - 65543
