@@ -22,17 +22,18 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse, readableAsJson, writeableOf_String}
-import uk.gov.hmrc.universalcreditliabilityapi.support.{MockAuthHelper, OpenApiValidator, WireMockIntegrationSpec}
-
-import java.util.UUID
-import scala.util.Random
+import uk.gov.hmrc.universalcreditliabilityapi.support.{MockAuthHelper, OpenApiValidator, TestData, WireMockIntegrationSpec}
 
 class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
   private given WSClient       = app.injector.instanceOf[WSClient]
   private val openApiValidator = OpenApiValidator
     .fromResource("public/api/conf/1.0/application.yaml")
-    .forPath(method = "POST", context = "/misc/universal-credit/liability", path = "/notification")
+    .forPath(
+      method = "POST",
+      context = "/misc/universal-credit/liability",
+      path = "/notification"
+    )
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -663,40 +664,4 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     response
   }
 
-}
-
-object TestData {
-  val testGovUkOriginatorId             = "TEST-GOV-UK-ORIGINATOR-ID"
-  val correlationId: String             = UUID.randomUUID().toString
-  val validHeaders: Map[String, String] = Map(
-    "authorization"        -> "",
-    "correlationId"        -> correlationId,
-    "gov-uk-originator-id" -> testGovUkOriginatorId
-  )
-
-  def generateNino(): String = {
-    val number = f"${Random.nextInt(100000)}%06d"
-    val nino   = s"AA$number"
-    nino
-  }
-
-  def validInsertionRequest(nino: String): JsValue = Json.parse(s"""
-       |{
-       |  "nationalInsuranceNumber": "$nino",
-       |  "universalCreditRecordType": "LCW/LCWRA",
-       |  "universalCreditAction": "Insert",
-       |  "dateOfBirth": "2002-04-27",
-       |  "liabilityStartDate": "2025-08-19"
-       |}
-       |""".stripMargin)
-
-  def validTerminateRequest(nino: String): JsValue = Json.parse(s"""
-       |{
-       |  "nationalInsuranceNumber": "$nino",
-       |  "universalCreditRecordType": "LCW/LCWRA",
-       |  "universalCreditAction": "Terminate",
-       |  "liabilityStartDate": "2025-08-19",
-       |  "liabilityEndDate": "2025-08-19"
-       |}
-       |""".stripMargin)
 }
