@@ -121,11 +121,8 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
 
         Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
       }
-    }
 
-    "Handle optional dateOfBirth" when {
-
-      "dateOfBirth is None" in {
+      "optional dateOfBirth is missing" in {
         val testInsertLiabilityRequest: InsertLiabilityRequest =
           InsertLiabilityRequest(
             UniversalCreditLiabilityDetails(
@@ -146,29 +143,7 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
 
         Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
       }
-
-      "dateOfBirth is valid" in {
-        val testInsertLiabilityRequest: InsertLiabilityRequest =
-          InsertLiabilityRequest(
-            UniversalCreditLiabilityDetails(
-              universalCreditRecordType = LCW_LCWRA,
-              dateOfBirth = Some(LocalDate.parse("1990-05-20")),
-              liabilityStartDate = LocalDate.parse("2024-01-15")
-            )
-          )
-
-        val expectedJson: JsValue = Json.parse("""
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "1990-05-20",
-            |    "liabilityStartDate": "2024-01-15"
-            |  }
-            |}
-            |""".stripMargin)
-
-        Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
-      }
     }
+
   }
 }

@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class SchemaValidationService {
 
-  def validateOriginatorId[T](request: Request[T]): Either[Future[Result], String] =
+  def validateGovUkOriginatorId[T](request: Request[T]): Either[Future[Result], String] =
     request.headers
       .get(HeaderNames.GovUkOriginatorId)
       .filter(isValidGovUkOriginatorId)

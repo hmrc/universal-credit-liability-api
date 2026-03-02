@@ -70,7 +70,7 @@ class UcLiabilityNotificationControllerSpec
     super.beforeEach()
     reset(mockAuthAction, mockSchemaValidationService, mockMappingService, mockHipConnector)
 
-    when(mockSchemaValidationService.validateOriginatorId(any()))
+    when(mockSchemaValidationService.validateGovUkOriginatorId(any()))
       .thenReturn(Right("SOME_GOVUK_ORIGINATOR_ID"))
 
     when(mockAuthAction.async(any[BodyParser[JsValue]])(any()))
@@ -92,7 +92,7 @@ class UcLiabilityNotificationControllerSpec
 
     val withCorrelation =
       if (withCorrelationId) baseRequest.withHeaders(CorrelationId -> correlationId) else baseRequest
-    if (withOriginatorId) withCorrelation.withHeaders(GovUkOriginatorId -> originatorId) else withCorrelation
+    if (withOriginatorId) withCorrelation.withHeaders(GovUkOriginatorId -> govUkOriginatorId) else withCorrelation
   }
 
   "UcLiabilityNotificationController.submitLiabilityNotification()" must {
@@ -166,7 +166,7 @@ class UcLiabilityNotificationControllerSpec
 
     "return 403 Forbidden" when {
       "OriginatorId header is missing" in {
-        when(mockSchemaValidationService.validateOriginatorId(any()))
+        when(mockSchemaValidationService.validateGovUkOriginatorId(any()))
           .thenReturn(
             Left(Future.successful(Forbidden(Json.toJson(ApplicationConstants.forbiddenFailure))))
           )

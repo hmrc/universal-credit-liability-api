@@ -44,12 +44,12 @@ class UcLiabilityNotificationController @Inject() (
 
   def submitLiabilityNotification(): Action[JsValue] = authAction.async(parse.json) { implicit request =>
     (for {
-      originatorId                            <- validationService.validateOriginatorId(request)
+      govUkOriginatorId                       <- validationService.validateGovUkOriginatorId(request)
       validatedRequest                        <- validationService.validateLiabilityNotificationRequest(request)
       (correlationId, requestObject)           = validatedRequest
       (nationalInsuranceNumber, mappedRequest) = mappingService.mapRequest(requestObject)
     } yield hipConnector
-      .sendUcLiability(nationalInsuranceNumber, correlationId, originatorId, mappedRequest)
+      .sendUcLiability(nationalInsuranceNumber, correlationId, govUkOriginatorId, mappedRequest)
       .map { hipHttpResponse =>
         hipHttpResponse.status match {
           case NO_CONTENT           => NoContent

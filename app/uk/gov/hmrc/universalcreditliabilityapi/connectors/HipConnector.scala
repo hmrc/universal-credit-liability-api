@@ -34,7 +34,7 @@ class HipConnector @Inject() (httpClientV2: HttpClientV2, appConfig: AppConfig)(
   def sendUcLiability(
     nationalInsuranceNumber: String,
     correlationId: String,
-    originatorId: String,
+    govUkOriginatorId: String,
     requestObject: InsertLiabilityRequest | TerminateLiabilityRequest
   )(using hc: HeaderCarrier): Future[HttpResponse] = {
     val (url, requestBody) = requestObject match {
@@ -55,7 +55,7 @@ class HipConnector @Inject() (httpClientV2: HttpClientV2, appConfig: AppConfig)(
       .setHeader(
         Authorization     -> basicAuth,
         CorrelationId     -> correlationId,
-        GovUkOriginatorId -> originatorId
+        GovUkOriginatorId -> govUkOriginatorId
       )
       .withBody(requestBody)
       .execute[HttpResponse]()

@@ -17,33 +17,40 @@
 package uk.gov.hmrc.universalcreditliabilityapi.helpers
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType.UC
+import uk.gov.hmrc.universalcreditliabilityapi.models.common.UniversalCreditRecordType
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.UniversalCreditAction.{Insert, Terminate}
-import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUniversalCreditLiability, TerminateUniversalCreditLiability}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUniversalCreditLiability, TerminateUniversalCreditLiability, UniversalCreditAction}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, TerminateLiabilityRequest, UcLiabilityTerminationDetails, UniversalCreditLiabilityDetails}
 
 import java.time.LocalDate
+import java.util.UUID
+import scala.util.Random
 
 object TestData {
 
-  val nino: String          = "AA123456"
-  val correlationId: String = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"
-  val originatorId: String  = "SOME_GOVUK_ORIGINATOR_ID"
+  val nino: String              = "AA123456"
+  val correlationId: String     = UUID.randomUUID().toString
+  val govUkOriginatorId: String = "TEST-GOV-UK-ORIGINATOR-ID"
+
+  val universalCreditRecordTypes: Array[UniversalCreditRecordType] = UniversalCreditRecordType.values
+  val universalCreditActions: Array[UniversalCreditAction]         = UniversalCreditAction.values
+
+  private val randomRecordType: UniversalCreditRecordType = Random.shuffle(universalCreditRecordTypes).head
 
   val baseInsertDwpRequest: InsertUniversalCreditLiability =
     InsertUniversalCreditLiability(
       universalCreditAction = Insert,
       nationalInsuranceNumber = nino,
-      universalCreditRecordType = UC,
+      universalCreditRecordType = randomRecordType,
       liabilityStartDate = LocalDate.parse("2024-01-15"),
-      dateOfBirth = Some(LocalDate.parse("1990-05-20"))
+      dateOfBirth = Some(LocalDate.parse("2002-04-27"))
     )
 
   val baseTerminateDwpRequest: TerminateUniversalCreditLiability =
     TerminateUniversalCreditLiability(
       universalCreditAction = Terminate,
       nationalInsuranceNumber = nino,
-      universalCreditRecordType = UC,
+      universalCreditRecordType = randomRecordType,
       liabilityStartDate = LocalDate.parse("2024-01-15"),
       liabilityEndDate = LocalDate.parse("2024-12-31")
     )
@@ -51,16 +58,16 @@ object TestData {
   val baseInsertHipRequest: InsertLiabilityRequest =
     InsertLiabilityRequest(
       universalCreditLiabilityDetails = UniversalCreditLiabilityDetails(
-        universalCreditRecordType = UC,
+        universalCreditRecordType = randomRecordType,
         liabilityStartDate = LocalDate.parse("2024-01-15"),
-        dateOfBirth = Some(LocalDate.parse("1990-05-20"))
+        dateOfBirth = Some(LocalDate.parse("2002-04-27"))
       )
     )
 
   val baseTerminateHipRequest: TerminateLiabilityRequest =
     TerminateLiabilityRequest(
       ucLiabilityTerminationDetails = UcLiabilityTerminationDetails(
-        universalCreditRecordType = UC,
+        universalCreditRecordType = randomRecordType,
         liabilityStartDate = LocalDate.parse("2024-01-15"),
         liabilityEndDate = LocalDate.parse("2024-12-31")
       )
@@ -83,8 +90,6 @@ object TestData {
       "liabilityEndDate"
     )
 
-  val validRecordTypes: Set[String] = Set("UC", "LCW/LCWRA")
-
   val invalidInsertDwpRequestValues: Map[String, String] =
     Map(
       "universalCreditAction"     -> "INVALID",
@@ -103,15 +108,20 @@ object TestData {
       "liabilityEndDate"          -> "not-a-date"
     )
 
-  def insertDwpRequestJson(recordType: String = "UC"): JsObject = Json.obj(
+  def optionalField(key: String, value: Option[String]): JsObject =
+    value.fold(Json.obj())(v => Json.obj(key -> v))
+
+  def insertDwpRequestJson(
+    recordType: String = randomRecordType.code,
+    dateOfBirth: Option[String] = Some("2002-04-27")
+  ): JsObject = Json.obj(
     "universalCreditAction"     -> "Insert",
     "nationalInsuranceNumber"   -> "AA123456",
     "universalCreditRecordType" -> recordType,
-    "liabilityStartDate"        -> "2024-01-15",
-    "dateOfBirth"               -> "1990-05-20"
-  )
+    "liabilityStartDate"        -> "2024-01-15"
+  ) ++ optionalField("dateOfBirth", dateOfBirth)
 
-  def terminateDwpRequestJson(recordType: String = "UC"): JsObject = Json.obj(
+  def terminateDwpRequestJson(recordType: String = randomRecordType.code): JsObject = Json.obj(
     "universalCreditAction"     -> "Terminate",
     "nationalInsuranceNumber"   -> "AA123456",
     "universalCreditRecordType" -> recordType,

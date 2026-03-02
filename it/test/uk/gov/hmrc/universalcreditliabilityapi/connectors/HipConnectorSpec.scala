@@ -26,13 +26,13 @@ import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabili
 import uk.gov.hmrc.universalcreditliabilityapi.support.WireMockIntegrationSpec
 
 import java.time.LocalDate
-import java.util.Base64
+import java.util.{Base64, UUID}
 
 class HipConnectorSpec extends WireMockIntegrationSpec {
 
-  private val testNino: String          = "AA123456"
-  private val testCorrelationId: String = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"
-  private val testOriginatorId: String  = "testOriginatorId"
+  private val testNino: String              = "AA123456"
+  private val testCorrelationId: String     = UUID.randomUUID().toString
+  private val testGovUkOriginatorId: String = "TEST-GOV-UK-ORIGINATOR-ID"
 
   private lazy val hipConnector: HipConnector = app.injector.instanceOf[HipConnector]
 
@@ -54,7 +54,14 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
     )
   )
 
-  private val terminatePayload: TerminateLiabilityRequest = TerminateLiabilityRequest(
+  private val insertPayloadWithoutDateOfBirth: InsertLiabilityRequest = InsertLiabilityRequest(
+    universalCreditLiabilityDetails = UniversalCreditLiabilityDetails(
+      universalCreditRecordType = LCW_LCWRA,
+      dateOfBirth = None,
+      liabilityStartDate = LocalDate.parse("2015-08-19")
+    )
+  )
+  private val terminatePayload: TerminateLiabilityRequest             = TerminateLiabilityRequest(
     ucLiabilityTerminationDetails = UcLiabilityTerminationDetails(
       universalCreditRecordType = LCW_LCWRA,
       liabilityStartDate = LocalDate.parse("2015-08-19"),
@@ -73,11 +80,11 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
         )
     )
 
-  private def verifyHipHeaders(url: String, expectedBody: Option[String] = None): Unit = {
+  private def verifyHipRequest(url: String, expectedBody: Option[String] = None): Unit = {
     val requestBuilder = postRequestedFor(urlEqualTo(url))
       .withHeader("Authorization", equalTo(expectedBasicAuth))
       .withHeader("correlationId", equalTo(testCorrelationId))
-      .withHeader("gov-uk-originator-id", equalTo(testOriginatorId))
+      .withHeader("gov-uk-originator-id", equalTo(testGovUkOriginatorId))
 
     val withBody = expectedBody.fold(requestBuilder)(body => requestBuilder.withRequestBody(equalToJson(body)))
 
@@ -95,16 +102,38 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
         .sendUcLiability(
           nationalInsuranceNumber = testNino,
           correlationId = testCorrelationId,
-          originatorId = testOriginatorId,
+          govUkOriginatorId = testGovUkOriginatorId,
           requestObject = insertPayload
         )
         .futureValue
 
       result.status mustBe NO_CONTENT
 
-      verifyHipHeaders(
+      verifyHipRequest(
         hipInsertionUrl(testNino),
         Some(Json.toJson(insertPayload).toString())
+      )
+    }
+
+    "send an 'Insert' request without dateOfBirth and return 204" in {
+      implicit val responseBody: JsObject = Json.obj()
+
+      stubHipResponseFor(hipInsertionUrl(testNino), NO_CONTENT)
+
+      val result = hipConnector
+        .sendUcLiability(
+          nationalInsuranceNumber = testNino,
+          correlationId = testCorrelationId,
+          govUkOriginatorId = testGovUkOriginatorId,
+          requestObject = insertPayloadWithoutDateOfBirth
+        )
+        .futureValue
+
+      result.status mustBe NO_CONTENT
+
+      verifyHipRequest(
+        hipInsertionUrl(testNino),
+        Some(Json.toJson(insertPayloadWithoutDateOfBirth).toString())
       )
     }
 
@@ -117,14 +146,14 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
         .sendUcLiability(
           nationalInsuranceNumber = testNino,
           correlationId = testCorrelationId,
-          originatorId = testOriginatorId,
+          govUkOriginatorId = testGovUkOriginatorId,
           requestObject = terminatePayload
         )
         .futureValue
 
       result.status mustBe NO_CONTENT
 
-      verifyHipHeaders(
+      verifyHipRequest(
         hipTerminationUrl(testNino),
         Some(Json.toJson(terminatePayload).toString())
       )
@@ -146,7 +175,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
         .sendUcLiability(
           nationalInsuranceNumber = testNino,
           correlationId = testCorrelationId,
-          originatorId = testOriginatorId,
+          govUkOriginatorId = testGovUkOriginatorId,
           requestObject = insertPayload
         )
         .futureValue
@@ -167,7 +196,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
         .sendUcLiability(
           nationalInsuranceNumber = testNino,
           correlationId = testCorrelationId,
-          originatorId = testOriginatorId,
+          govUkOriginatorId = testGovUkOriginatorId,
           requestObject = insertPayload
         )
         .futureValue
@@ -188,7 +217,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
         .sendUcLiability(
           nationalInsuranceNumber = testNino,
           correlationId = testCorrelationId,
-          originatorId = testOriginatorId,
+          govUkOriginatorId = testGovUkOriginatorId,
           requestObject = insertPayload
         )
         .futureValue
@@ -213,7 +242,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
         .sendUcLiability(
           nationalInsuranceNumber = testNino,
           correlationId = testCorrelationId,
-          originatorId = testOriginatorId,
+          govUkOriginatorId = testGovUkOriginatorId,
           requestObject = insertPayload
         )
         .futureValue
@@ -238,7 +267,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
         .sendUcLiability(
           nationalInsuranceNumber = testNino,
           correlationId = testCorrelationId,
-          originatorId = testOriginatorId,
+          govUkOriginatorId = testGovUkOriginatorId,
           requestObject = insertPayload
         )
         .futureValue
@@ -263,7 +292,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
         .sendUcLiability(
           nationalInsuranceNumber = testNino,
           correlationId = testCorrelationId,
-          originatorId = testOriginatorId,
+          govUkOriginatorId = testGovUkOriginatorId,
           requestObject = insertPayload
         )
         .futureValue
