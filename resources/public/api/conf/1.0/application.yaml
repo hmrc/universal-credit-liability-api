@@ -334,7 +334,6 @@ components:
     ExistingErrorCodes:
       description:
         "These are all error codes that can occur at the time of writing, we do not anticipate changes in the foreseeable future.<br/>
-        00000 - The NINO input exists but has no adult registration<br>
         55038 - A conflicting or identical Liability is already recorded<br>
         65026 - Start date must not be before 16th birthday<br>
         55029 - Start Date later than SPA<br>
@@ -350,11 +349,11 @@ components:
         65541 - The NINO input matches a Pseudo Account<br>
         65542 - The NINO input matches a non-live account (including redundant, amalgamated and administrative account types)<br>
         65543 - The NINO input matches an account that has been transferred to the Isle of Man<br>
+        65544 - Account held on NPS, but has not gone through adult registration.<br>
         99999 - Start Date after Death
         "
       type: string
       enum:
-        - 00000
         - 55006
         - 55008
         - 55027
@@ -370,6 +369,7 @@ components:
         - 65541
         - 65542
         - 65543
+        - 65544
         - 99999
     FutureExtensions:
       description:
