@@ -139,6 +139,7 @@ object TestData {
       "The NINO input matches a non-live account (including redundant, amalgamated and administrative account types)"
     ),
     ("65543", "The NINO input matches an account that has been transferred to the Isle of Man"),
+    ("65544", "Account held on NPS, but has not gone through adult registration."),
     ("99999", "Start Date after Death")
   )
 
