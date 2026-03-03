@@ -334,6 +334,7 @@ components:
     ExistingErrorCodes:
       description:
         "These are all error codes that can occur at the time of writing, we do not anticipate changes in the foreseeable future.<br/>
+        00000 - The NINO input exists but has no adult registration<br>
         55038 - A conflicting or identical Liability is already recorded<br>
         65026 - Start date must not be before 16th birthday<br>
         55029 - Start Date later than SPA<br>
@@ -353,6 +354,7 @@ components:
         "
       type: string
       enum:
+        - 00000
         - 55006
         - 55008
         - 55027

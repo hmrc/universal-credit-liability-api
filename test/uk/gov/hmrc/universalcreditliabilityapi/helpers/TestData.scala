@@ -121,6 +121,7 @@ object TestData {
   )
 
   val errorCodes: Seq[(String, String)] = Seq(
+    ("00000", "The NINO input exists but has no adult registration"),
     ("55006", "Start Date and End Date must be earlier than Date of Death"),
     ("55008", "End Date must be earlier than State Pension Age"),
     ("55027", "End Date later than Date of Death"),
