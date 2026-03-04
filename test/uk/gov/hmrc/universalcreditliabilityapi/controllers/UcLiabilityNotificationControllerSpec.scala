@@ -36,8 +36,9 @@ import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.*
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure as DwpFailure
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorCodes
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorMessages.ForbiddenReason
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, GovUkOriginatorId}
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.{ErrorCodes, ForbiddenReason}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -145,7 +146,7 @@ class UcLiabilityNotificationControllerSpec
 
         status(result) mustBe BAD_REQUEST
         val jsonResponse = contentAsJson(result)
-        (jsonResponse \ "code").as[String] mustBe ErrorCodes.InvalidInput
+        (jsonResponse \ "code").as[String] mustBe ErrorCodes.InvalidInputCode
       }
 
       "validation fails with constraint violation (400.1)" in {
@@ -160,12 +161,12 @@ class UcLiabilityNotificationControllerSpec
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe BAD_REQUEST
-        (contentAsJson(result) \ "code").as[String] mustBe ErrorCodes.InvalidInput
+        (contentAsJson(result) \ "code").as[String] mustBe ErrorCodes.InvalidInputCode
       }
     }
 
     "return 403 Forbidden" when {
-      "OriginatorId header is missing" in {
+      "GovUkOriginatorId header is missing" in {
         when(mockSchemaValidationService.validateGovUkOriginatorId(any()))
           .thenReturn(
             Left(Future.successful(Forbidden(Json.toJson(ApplicationConstants.forbiddenFailure))))
