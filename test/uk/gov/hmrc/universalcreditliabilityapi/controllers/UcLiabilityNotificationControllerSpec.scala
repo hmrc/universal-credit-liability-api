@@ -166,7 +166,7 @@ class UcLiabilityNotificationControllerSpec
     }
 
     "return 403 Forbidden" when {
-      "GovUkOriginatorId header is missing" in {
+      "GovUkOriginatorId header is missing/invalid" in {
         when(mockSchemaValidationService.validateGovUkOriginatorId(any()))
           .thenReturn(
             Left(Future.successful(Forbidden(Json.toJson(ApplicationConstants.forbiddenFailure))))
