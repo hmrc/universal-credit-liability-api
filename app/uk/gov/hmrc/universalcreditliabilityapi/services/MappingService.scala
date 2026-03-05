@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.universalcreditliabilityapi.services
 
-import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUniversalCreditLiability, TerminateUniversalCreditLiability}
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure as DwpFailure
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.request.{InsertLiabilityRequest, TerminateLiabilityRequest, UcLiabilityTerminationDetails, UniversalCreditLiabilityDetails}
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failures as HipFailures
@@ -24,9 +24,9 @@ import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failures as H
 class MappingService {
 
   def mapRequest(
-    request: InsertUcLiabilityRequest | TerminateUcLiabilityRequest
+    request: InsertUniversalCreditLiability | TerminateUniversalCreditLiability
   ): (String, InsertLiabilityRequest | TerminateLiabilityRequest) = request match {
-    case insert: InsertUcLiabilityRequest       =>
+    case insert: InsertUniversalCreditLiability       =>
       (
         insert.nationalInsuranceNumber,
         InsertLiabilityRequest(
@@ -37,7 +37,7 @@ class MappingService {
           )
         )
       )
-    case terminate: TerminateUcLiabilityRequest =>
+    case terminate: TerminateUniversalCreditLiability =>
       (
         terminate.nationalInsuranceNumber,
         TerminateLiabilityRequest(

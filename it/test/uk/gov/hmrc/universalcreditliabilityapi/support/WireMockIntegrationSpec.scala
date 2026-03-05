@@ -40,9 +40,9 @@ abstract class WireMockIntegrationSpec
     server
   }
 
-  lazy val wireMockPort: Int       = wireMockServer.port()
-  val wireMockHost                 = "localhost"
-  lazy val wireMockBaseUrlAsString = s"http://$wireMockHost:$wireMockPort"
+  lazy val wireMockPort: Int               = wireMockServer.port()
+  val wireMockHost                         = "localhost"
+  lazy val wireMockBaseUrlAsString: String = s"http://$wireMockHost:$wireMockPort"
 
   val testHipClientId: String     = "test-client-id"
   val testHipClientSecret: String = "test-client-secret"

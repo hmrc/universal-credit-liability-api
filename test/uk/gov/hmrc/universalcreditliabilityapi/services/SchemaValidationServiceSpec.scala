@@ -24,7 +24,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers.*
 import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.*
 import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestHelpers.{buildFakeRequest, extractLeftOrFail, jsObjectWith, jsObjectWithout}
-import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUcLiabilityRequest, TerminateUcLiabilityRequest}
+import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.request.{InsertUniversalCreditLiability, TerminateUniversalCreditLiability}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, GovUkOriginatorId}
 
@@ -54,36 +54,36 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
 
   "SchemaValidationServiceSpec.validateOriginatorId" must {
     "return Right" when {
-      "originatorId is present and valid" in {
+      "GovUkOriginatorId is present and valid" in {
         val json    = Json.obj()
-        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> originatorId)
-        val result  = testSchemaValidationService.validateOriginatorId(request)
+        val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> govUkOriginatorId)
+        val result  = testSchemaValidationService.validateGovUkOriginatorId(request)
 
-        result mustBe Right(originatorId)
+        result mustBe Right(govUkOriginatorId)
       }
     }
 
     "return Left (403 Forbidden)" when {
-      "originatorId header is missing" in {
+      "GovUkOriginatorId header is missing" in {
         val json    = Json.obj()
         val request = buildFakeRequest(payload = json)
-        val result  = testSchemaValidationService.validateOriginatorId(request)
+        val result  = testSchemaValidationService.validateGovUkOriginatorId(request)
 
         assertForbidden(result)
       }
 
-      "originatorId is shorter than 3 characters" in {
+      "GovUkOriginatorId is shorter than 3 characters" in {
         val json    = Json.obj()
         val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "A" * 2)
-        val result  = testSchemaValidationService.validateOriginatorId(request)
+        val result  = testSchemaValidationService.validateGovUkOriginatorId(request)
 
         assertForbidden(result)
       }
 
-      "originatorId is longer than 40 characters" in {
+      "GovUkOriginatorId is longer than 40 characters" in {
         val json    = Json.obj()
         val request = buildFakeRequest(payload = json, headers = GovUkOriginatorId -> "A" * 41)
-        val result  = testSchemaValidationService.validateOriginatorId(request)
+        val result  = testSchemaValidationService.validateGovUkOriginatorId(request)
 
         assertForbidden(result)
       }
@@ -94,21 +94,21 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
 
     "return Right" when {
 
-      for (recordType <- validRecordTypes) {
+      for (recordType <- universalCreditRecordTypes) {
         s"given a valid 'Insert' Request of '$recordType' record type" in {
-          val json    = insertDwpRequestJson(recordType)
+          val json    = insertDwpRequestJson(recordType.code)
           val request = buildFakeRequest(json, CorrelationId -> correlationId)
           val result  = testSchemaValidationService.validateLiabilityNotificationRequest(request)
 
-          result mustBe Right((correlationId, json.as[InsertUcLiabilityRequest]))
+          result mustBe Right((correlationId, json.as[InsertUniversalCreditLiability]))
         }
 
         s"given a valid 'Terminate' Request of '$recordType' record type" in {
-          val json    = terminateDwpRequestJson(recordType)
+          val json    = terminateDwpRequestJson(recordType.code)
           val request = buildFakeRequest(json, CorrelationId -> correlationId)
           val result  = testSchemaValidationService.validateLiabilityNotificationRequest(request)
 
-          result mustBe Right((correlationId, json.as[TerminateUcLiabilityRequest]))
+          result mustBe Right((correlationId, json.as[TerminateUniversalCreditLiability]))
         }
       }
 
@@ -117,11 +117,11 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
     "return Left (400 Bad Request)" when {
 
       for {
-        recordType <- validRecordTypes
+        recordType <- universalCreditRecordTypes
         field      <- requiredInsertDwpFields
       }
         s"given an 'Insert' Request of '$recordType' missing $field" in {
-          val invalidJson = jsObjectWithout(insertDwpRequestJson(recordType), field)
+          val invalidJson = jsObjectWithout(insertDwpRequestJson(recordType.code), field)
           val request     = buildFakeRequest(invalidJson, CorrelationId -> correlationId)
           val result      = testSchemaValidationService.validateLiabilityNotificationRequest(request)
 
@@ -129,11 +129,11 @@ class SchemaValidationServiceSpec extends AnyWordSpec with Matchers with ScalaFu
         }
 
       for {
-        recordType <- validRecordTypes
+        recordType <- universalCreditRecordTypes
         field      <- requiredTerminateDwpFields
       }
         s"given a 'Terminate' Request of '$recordType' missing $field" in {
-          val invalidJson = jsObjectWithout(terminateDwpRequestJson(recordType), field)
+          val invalidJson = jsObjectWithout(terminateDwpRequestJson(recordType.code), field)
           val request     = buildFakeRequest(invalidJson, CorrelationId -> correlationId)
           val result      = testSchemaValidationService.validateLiabilityNotificationRequest(request)
 

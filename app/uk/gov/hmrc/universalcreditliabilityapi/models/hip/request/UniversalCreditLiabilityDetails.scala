@@ -23,10 +23,10 @@ import java.time.LocalDate
 
 final case class UniversalCreditLiabilityDetails(
   universalCreditRecordType: UniversalCreditRecordType,
-  dateOfBirth: LocalDate,
+  dateOfBirth: Option[LocalDate],
   liabilityStartDate: LocalDate
 )
 
 object UniversalCreditLiabilityDetails {
-  implicit val format: OWrites[UniversalCreditLiabilityDetails] = Json.writes[UniversalCreditLiabilityDetails]
+  given format: OWrites[UniversalCreditLiabilityDetails] = Json.writes[UniversalCreditLiabilityDetails]
 }

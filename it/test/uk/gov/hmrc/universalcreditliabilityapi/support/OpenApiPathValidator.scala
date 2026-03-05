@@ -17,15 +17,16 @@
 package uk.gov.hmrc.universalcreditliabilityapi.support
 
 import com.atlassian.oai.validator.OpenApiInteractionValidator
-import com.atlassian.oai.validator.model.{SimpleRequest, SimpleResponse}
-import com.atlassian.oai.validator.report.ValidationReport.Level.IGNORE
-import com.atlassian.oai.validator.report.{LevelResolver, ValidationReport}
-import play.api.libs.ws.{EmptyBody, InMemoryBody, WSClient, WSRequest, WSResponse}
-import play.api.libs.ws.DefaultBodyReadables.readableAsString
 import com.atlassian.oai.validator.model.Request.Method
+import com.atlassian.oai.validator.model.{SimpleRequest, SimpleResponse}
+import com.atlassian.oai.validator.report.LevelResolver
+import com.atlassian.oai.validator.report.ValidationReport.Level.IGNORE
 import org.scalatestplus.play.PortNumber
-import scala.jdk.CollectionConverters._
+import play.api.libs.ws.DefaultBodyReadables.readableAsString
+import play.api.libs.ws.{EmptyBody, InMemoryBody, WSClient, WSRequest, WSResponse}
+
 import scala.io.Source
+import scala.jdk.CollectionConverters.*
 
 final class OpenApiValidator private (openapi: String) {
 

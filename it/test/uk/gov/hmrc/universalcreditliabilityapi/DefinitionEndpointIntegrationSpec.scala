@@ -17,8 +17,8 @@
 package uk.gov.hmrc.universalcreditliabilityapi
 
 import org.scalactic.source.Position
-import org.scalatest.{ConfigMap, Outcome, TestData}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.{ConfigMap, Outcome, TestData}
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
 import play.api.Application

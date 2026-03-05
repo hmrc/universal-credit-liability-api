@@ -18,7 +18,9 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.response
 
 import play.api.libs.json.{JsPath, Reads}
 
-final case class Failures(failures: Seq[Failure])
+final case class Failures(
+  failures: Seq[Failure]
+)
 
 object Failures {
   given Reads[Failures] =

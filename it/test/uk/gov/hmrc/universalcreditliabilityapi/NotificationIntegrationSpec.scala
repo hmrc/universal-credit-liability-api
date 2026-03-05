@@ -39,18 +39,18 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     MockAuthHelper.mockAuthOk()
   }
 
-  def hipInsertionUrl(nino: String)   = s"/ni/person/$nino/liability/universal-credit"
-  def hipTerminationUrl(nino: String) = s"/ni/person/$nino/liability/universal-credit/termination"
+  def hipInsertionUrl(nino: String): String   = s"/ni/person/$nino/liability/universal-credit"
+  def hipTerminationUrl(nino: String): String = s"/ni/person/$nino/liability/universal-credit/termination"
 
   "POST /notification" must {
-    "return 204 when HIP returns 204 for insert" in {
+    "return 204 when HIP returns 204 for Insert" in {
       val nino        = TestData.generateNino()
       val requestBody = Json.parse(s"""
                                    |{
                                    |  "nationalInsuranceNumber": "$nino",
                                    |  "universalCreditRecordType": "UC",
                                    |  "universalCreditAction": "Insert",
-                                   |  "dateOfBirth": "2002-10-10",
+                                   |  "dateOfBirth": "2002-04-27",
                                    |  "liabilityStartDate": "2025-08-19"
                                    |}
                                    |""".stripMargin)
@@ -65,7 +65,28 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       MockAuthHelper.verifyAuthWasCalled()
     }
 
-    "return 204 when HIP returns 204 for terminate" in {
+    "return 204 when HIP returns 204 for Insert without dateOfBirth" in {
+      val nino        = TestData.generateNino()
+      val requestBody = Json.parse(s"""
+           |{
+           |  "nationalInsuranceNumber": "$nino",
+           |  "universalCreditRecordType": "UC",
+           |  "universalCreditAction": "Insert",
+           |  "liabilityStartDate": "2025-08-19"
+           |}
+           |""".stripMargin)
+
+      stubHipInsert(nino)
+
+      val response = callPostNotification(requestBody)
+
+      response.status mustBe Status.NO_CONTENT
+
+      verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
+      MockAuthHelper.verifyAuthWasCalled()
+    }
+
+    "return 204 when HIP returns 204 for Terminate" in {
       val nino        = TestData.generateNino()
       val requestBody = TestData.validTerminateRequest(nino)
 
@@ -78,7 +99,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       verify(1, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
     }
 
-    "return 403 when originatorId header is missing from request" in {
+    "return 403 when GovUkOriginatorId header is missing from request" in {
       val nino = TestData.generateNino()
 
       val requestBody = TestData.validInsertionRequest(nino)
@@ -102,7 +123,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
                                       |  "nationalInsuranceNumber": "$nino",
                                       |  "universalCreditRecordType": "UC",
                                       |  "universalCreditAction": "Insrt",
-                                      |  "dateOfBirth": "2002-10-10",
+                                      |  "dateOfBirth": "2002-04-27",
                                       |  "liabilityStartDate": "2025-08-19"
                                       |}
                                       |""".stripMargin)
@@ -122,7 +143,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
                                       |  "nationalInsuranceNumber": "$nino",
                                       |  "universalCreditRecordType": "UCW",
                                       |  "universalCreditAction": "Insert",
-                                      |  "dateOfBirth": "2002-10-10",
+                                      |  "dateOfBirth": "2002-04-27",
                                       |  "liabilityStartDate": "2025-14-19"
                                       |}
                                       |""".stripMargin)
@@ -465,7 +486,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
            |  "nationalInsuranceNumber": "$nino",
            |  "universalCreditRecordType": "UC",
            |  "universalCreditAction": "Insert",
-           |  "dateOfBirth": "2002-10-10",
+           |  "dateOfBirth": "2002-04-27",
            |  "liabilityEndDate": "2015-08-19",
            |  "liabilityStartDate": "2025-08-19"
            |}
@@ -475,7 +496,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
                               |{
                               |  "universalCreditLiabilityDetails": {
                               |    "universalCreditRecordType": "UC",
-                              |    "dateOfBirth": "2002-10-10",
+                              |    "dateOfBirth": "2002-04-27",
                               |    "liabilityStartDate": "2025-08-19"
                               |  }
                               |}
@@ -645,12 +666,12 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 }
 
 object TestData {
-  val testOriginatorId                  = "testId"
+  val testGovUkOriginatorId             = "TEST-GOV-UK-ORIGINATOR-ID"
   val correlationId: String             = UUID.randomUUID().toString
   val validHeaders: Map[String, String] = Map(
     "authorization"        -> "",
     "correlationId"        -> correlationId,
-    "gov-uk-originator-id" -> testOriginatorId
+    "gov-uk-originator-id" -> testGovUkOriginatorId
   )
 
   def generateNino(): String = {
@@ -664,7 +685,7 @@ object TestData {
        |  "nationalInsuranceNumber": "$nino",
        |  "universalCreditRecordType": "LCW/LCWRA",
        |  "universalCreditAction": "Insert",
-       |  "dateOfBirth": "2002-10-10",
+       |  "dateOfBirth": "2002-04-27",
        |  "liabilityStartDate": "2025-08-19"
        |}
        |""".stripMargin)

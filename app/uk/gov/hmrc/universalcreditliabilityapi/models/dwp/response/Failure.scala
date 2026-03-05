@@ -18,7 +18,10 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response
 
 import play.api.libs.json.{Json, OWrites}
 
-final case class Failure(code: String, message: String)
+final case class Failure(
+  code: String,
+  message: String
+)
 
 object Failure {
   given OWrites[Failure] = Json.writes[Failure]

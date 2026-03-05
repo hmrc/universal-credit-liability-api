@@ -38,6 +38,22 @@ class MappingServiceSpec extends AnyWordSpec with Matchers {
         hipInsertRequest mustBe a[InsertLiabilityRequest]
       }
 
+      // TODO
+      "given a valid 'Insert' request without dateOfBirth" in {
+        val insertDwpRequestWithoutDateOfBirth = baseInsertDwpRequest.copy(dateOfBirth = None)
+
+        val expectedHip = baseInsertHipRequest.copy(
+          universalCreditLiabilityDetails = baseInsertHipRequest.universalCreditLiabilityDetails
+            .copy(dateOfBirth = None)
+        )
+
+        val (nino, hipInsertRequest) = testMappingService.mapRequest(insertDwpRequestWithoutDateOfBirth)
+
+        nino mustBe insertDwpRequestWithoutDateOfBirth.nationalInsuranceNumber
+        hipInsertRequest mustBe expectedHip
+        hipInsertRequest mustBe a[InsertLiabilityRequest]
+      }
+
       "given a valid 'Terminate' request" in {
         val (nino, hipTerminateRequest) = testMappingService.mapRequest(baseTerminateDwpRequest)
 

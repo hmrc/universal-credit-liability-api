@@ -19,7 +19,10 @@ package uk.gov.hmrc.universalcreditliabilityapi.models.hip.response
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 
-final case class Failure(code: String, reason: String)
+final case class Failure(
+  code: String,
+  reason: String
+)
 
 object Failure {
   given Reads[Failure] = (

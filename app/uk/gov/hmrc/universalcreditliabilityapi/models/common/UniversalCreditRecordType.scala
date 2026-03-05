@@ -29,6 +29,6 @@ object UniversalCreditRecordType {
   implicit val reads: Reads[UniversalCreditRecordType] = Reads {
     case JsString("UC")        => JsSuccess(UniversalCreditRecordType.UC)
     case JsString("LCW/LCWRA") => JsSuccess(UniversalCreditRecordType.LCW_LCWRA)
-    case _                     => JsError("Unknown RecordType")
+    case _                     => JsError("Unknown UniversalCreditRecordType")
   }
 }
