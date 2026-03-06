@@ -4,11 +4,6 @@ info:
   description: |-
     # Usage Terms
     These interfaces are business-critical interfaces for HMRC and DWP, supporting thousands of staff - all consumption, or change in consumption levels, should be registered and fully approved (see Registered Consumers below).
-    ## Version Log
-    | Version | Date       | Author                        | Description                                                                 |
-    |---------|------------|-------------------------------|-----------------------------------------------------------------------------|
-    | 1.0.0   | 01/12/2025 | HMRC Digital Development Team | Initial                                                                     |
-    | 1.1.0   | 27/02/2026 | HMRC Digital Development Team | Amended date of birth to optional in InsertUniversalCreditLiability request |
   version: "1.1.0"
   contact: {}
   license:
