@@ -58,6 +58,16 @@ paths:
             correlationId:
               $ref: '#/components/headers/correlationId'
         '400':
+          description: Bad Request
+          headers:
+            correlationId:
+              required: false
+              schema:
+                type: string
+                description: Correlation ID - used for traceability purposes - note that this
+                  value will always match the header in the request to allow correlation,
+                  and will only exist if it was sent.
+                example: e470d658-99f7-4292-a4a1-ed12c72f1337
           content:
             application/json;charset=UTF-8:
               schema:
@@ -71,17 +81,8 @@ paths:
                   value:
                     code: '400.2'
                     message: "HTTP message not readable"
-          description: Bad Request
-          headers:
-            correlationId:
-              required: false
-              schema:
-                type: string
-                description: Correlation ID - used for traceability purposes - note that this
-                  value will always match the header in the request to allow correlation,
-                  and will only exist if it was sent.
-                example: e470d658-99f7-4292-a4a1-ed12c72f1337
         '403':
+          description: 'Forbidden'
           content:
             application/json;charset=UTF-8:
               schema:
@@ -91,7 +92,6 @@ paths:
                   value:
                     code: '403.2'
                     message: Forbidden
-          description: 'Forbidden'
           headers:
             correlationId:
               $ref: '#/components/headers/correlationId'
@@ -184,7 +184,10 @@ paths:
                     code: "99999"
                     message: 'Start Date after Death'
         '500':
-          $ref: '#/components/responses/internalServerErrorResponse'
+          description: Internal Server Error
+          headers:
+            correlationId:
+              $ref: '#/components/headers/correlationId'
 components:
   securitySchemes:
     applicationRestricted:
@@ -219,12 +222,6 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/govUkOriginatorId'
-  responses:
-    internalServerErrorResponse:
-      description: Internal Server Error
-      headers:
-        correlationId:
-          $ref: '#/components/headers/correlationId'
   schemas:
     correlationId:
       type: string
