@@ -23,8 +23,6 @@ import scala.util.matching.Regex
 
 object ApplicationConstants {
 
-  val ForbiddenReason = "Forbidden"
-
   object ValidationPatterns {
     val DatePattern: Regex =
       "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$".r
@@ -32,10 +30,10 @@ object ApplicationConstants {
     val CorrelationIdPattern: Regex =
       "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$".r
 
-    val NinoPattern: Regex =
+    private val NinoPattern: Regex =
       "^([ACEHJLMOPRSWXY][A-CEGHJ-NPR-TW-Z]|B[A-CEHJ-NPR-TW-Z]|G[ACEGHJ-NPR-TW-Z]|[KT][A-CEGHJ-MPR-TW-Z]|N[A-CEGHJL-NPR-SW-Z]|Z[A-CEGHJ-NPR-TW-Y])[0-9]{6}$".r
 
-    val GovUkOriginatorIdPattern: Regex = "^[a-zA-Z0-9\\-_]{3,40}$".r
+    private val GovUkOriginatorIdPattern: Regex = """^\S{3,40}$""".r
 
     def isValidGovUkOriginatorId(id: String): Boolean = GovUkOriginatorIdPattern.matches(id)
 
@@ -52,24 +50,27 @@ object ApplicationConstants {
   }
 
   object ErrorCodes {
-    val InvalidInput  = "400.1"
-    val ForbiddenCode = "403.2"
+    val InvalidInputCode = "400.1"
+    val ForbiddenCode    = "403.2"
+  }
+
+  object ErrorMessages {
+    val ForbiddenReason = "Forbidden"
+
+    def invalidInput(field: String): String =
+      s"Constraint Violation - Invalid/Missing input parameter: $field"
   }
 
   def invalidInputFailure(field: String): Failure =
     Failure(
       message = ErrorMessages.invalidInput(field),
-      code = ErrorCodes.InvalidInput
+      code = ErrorCodes.InvalidInputCode
     )
 
   def forbiddenFailure: Failure =
     Failure(
-      message = ForbiddenReason,
+      message = ErrorMessages.ForbiddenReason,
       code = ErrorCodes.ForbiddenCode
     )
 
-  private object ErrorMessages {
-    def invalidInput(field: String): String =
-      s"Constraint Violation - Invalid/Missing input parameter: $field"
-  }
 }
