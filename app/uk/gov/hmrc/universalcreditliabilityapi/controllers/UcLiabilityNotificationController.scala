@@ -26,6 +26,7 @@ import uk.gov.hmrc.universalcreditliabilityapi.connectors.HipConnector
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure
 import uk.gov.hmrc.universalcreditliabilityapi.models.hip.response.Failures as HipFailures
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.{ErrorCodes, ErrorMessages}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -58,20 +59,12 @@ class UcLiabilityNotificationController @Inject() (
             InternalServerError
           case FORBIDDEN            =>
             Forbidden(
-              Json.toJson(Failure(code = "403.2", message = "Forbidden"))
+              Json.toJson(Failure(code = ErrorCodes.ForbiddenCode, message = ErrorMessages.ForbiddenMessage))
             )
           case NOT_FOUND            =>
-            Json.parse(hipHttpResponse.body).validate[HipFailures] match {
-              case JsSuccess(hip404Response, _) =>
-                val maybe404Response = mappingService.map404ResponseErrors(hip404Response)
-                maybe404Response.map(response => NotFound(Json.toJson(response))).getOrElse {
-                  logger.warn("404 with no reasons returned by HIP")
-                  InternalServerError
-                }
-              case _                            =>
-                logger.warn("Unreadable 404 returned by HIP")
-                InternalServerError
-            }
+            NotFound(
+              Json.toJson(Failure(code = ErrorCodes.NotFoundCode, message = ErrorMessages.NotFoundMessage))
+            )
           case UNPROCESSABLE_ENTITY =>
             Json.parse(hipHttpResponse.body).validate[HipFailures] match {
               case JsSuccess(hipResponse, _) =>

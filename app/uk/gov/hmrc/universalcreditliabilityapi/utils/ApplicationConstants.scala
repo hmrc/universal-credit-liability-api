@@ -40,7 +40,6 @@ object ApplicationConstants {
     private def isValidNino(nino: String): Boolean = NinoPattern.matches(nino)
 
     val validNino: Reads[String] = Reads.verifying[String](isValidNino)
-
   }
 
   object HeaderNames {
@@ -60,13 +59,13 @@ object ApplicationConstants {
       s"Constraint Violation - Invalid/Missing input parameter: $field"
 
     val ForbiddenMessage: String = "Forbidden"
-    val NotFoundMessage: String  = "Resource Not Found"
+    val NotFoundMessage: String  = "Resource not found"
   }
 
   def invalidInputFailure(field: String): Failure =
     Failure(
-      message = ErrorMessages.invalidInputMessage(field),
-      code = ErrorCodes.InvalidInputCode
+      code = ErrorCodes.InvalidInputCode,
+      message = ErrorMessages.invalidInputMessage(field)
     )
 
   def forbiddenFailure: Failure =

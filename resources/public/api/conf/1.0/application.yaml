@@ -108,7 +108,7 @@ paths:
                 NotFound_Response:
                   value:
                     code: '404'
-                    message: NotFound
+                    message: 'Resource not found'
         '422':
           description: Unprocessable Entity
           headers:
@@ -331,12 +331,12 @@ components:
           description: The error code representing the NotFound Error.
           type: string
           enum:
-            - "404"
+            - '404'
         message:
           description: Displays the reason of the failure.
           type: string
           enum:
-            - NotFound
+            - 'Resource not found'
     errorResponse_422:
       type: object
       required:

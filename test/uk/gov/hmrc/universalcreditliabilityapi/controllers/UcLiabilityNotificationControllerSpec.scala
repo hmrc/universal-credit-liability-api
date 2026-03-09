@@ -36,10 +36,10 @@ import uk.gov.hmrc.universalcreditliabilityapi.helpers.TestData.*
 import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure as DwpFailure
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorCodes
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorCodes.NotFoundCode
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorMessages.{ForbiddenMessage, NotFoundMessage}
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorMessages.NotFoundMessage
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, GovUkOriginatorId}
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.{ErrorCodes, ErrorMessages}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -133,36 +133,40 @@ class UcLiabilityNotificationControllerSpec
     }
 
     "return 400 Bad Request" when {
-
-      "validation service returns Left" in {
-        val validationError = Results.BadRequest(
+      "validation fails for Insert request" in {
+        val validationResult = Results.BadRequest(
           Json.toJson(ApplicationConstants.invalidInputFailure("nationalInsuranceNumber"))
         )
 
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
-          .thenReturn(Left(Future.successful(validationError)))
+          .thenReturn(Left(Future.successful(validationResult)))
 
         val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe BAD_REQUEST
+
         val jsonResponse = contentAsJson(result)
         (jsonResponse \ "code").as[String] mustBe ErrorCodes.InvalidInputCode
+        (jsonResponse \ "message").as[String] mustBe ErrorMessages.invalidInputMessage("nationalInsuranceNumber")
       }
 
-      "validation fails with constraint violation (400.1)" in {
-        val validationError = Results.BadRequest(
-          Json.toJson(ApplicationConstants.invalidInputFailure("nationalInsuranceNumber"))
+      "validation fails for Terminate request" in {
+        val validationResult = Results.BadRequest(
+          Json.toJson(ApplicationConstants.invalidInputFailure("universalCreditRecordType"))
         )
 
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any[Request[JsValue]]))
-          .thenReturn(Left(Future.successful(validationError)))
+          .thenReturn(Left(Future.successful(validationResult)))
 
-        val request = fakeRequest(insertDwpRequestJson())
+        val request = fakeRequest(terminateDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe BAD_REQUEST
-        (contentAsJson(result) \ "code").as[String] mustBe ErrorCodes.InvalidInputCode
+
+        val jsonResponse = contentAsJson(result)
+        (jsonResponse \ "code").as[String] mustBe ErrorCodes.InvalidInputCode
+        (jsonResponse \ "message").as[String] mustBe ErrorMessages.invalidInputMessage("universalCreditRecordType")
       }
     }
 
@@ -177,9 +181,10 @@ class UcLiabilityNotificationControllerSpec
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe FORBIDDEN
+
         val jsonResponse = contentAsJson(result)
         (jsonResponse \ "code").as[String] mustBe ErrorCodes.ForbiddenCode
-        (jsonResponse \ "message").as[String] mustBe ForbiddenMessage
+        (jsonResponse \ "message").as[String] mustBe ErrorMessages.ForbiddenMessage
       }
 
       "HIP returns 403" in {
@@ -198,22 +203,12 @@ class UcLiabilityNotificationControllerSpec
         status(result) mustBe FORBIDDEN
         val jsonResponse = contentAsJson(result)
         (jsonResponse \ "code").as[String] mustBe ErrorCodes.ForbiddenCode
-        (jsonResponse \ "message").as[String] mustBe ForbiddenMessage
+        (jsonResponse \ "message").as[String] mustBe ErrorMessages.ForbiddenMessage
       }
     }
 
     "return 404 Not Found" when {
       "HIP returns 404" in {
-        val hipFailuresJson = Json.parse(
-          s"""
-             |{
-             |  "failures": [
-             |    {"code": "404", "reason": "NOT FOUND"}
-             |  ]
-             |}
-             |""".stripMargin
-        )
-
         val mapped404Response = DwpFailure(code = NotFoundCode, message = NotFoundMessage)
 
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
@@ -222,11 +217,8 @@ class UcLiabilityNotificationControllerSpec
         when(mockMappingService.mapRequest(any()))
           .thenReturn((nino, baseInsertHipRequest))
 
-        when(mockMappingService.map404ResponseErrors(any()))
-          .thenReturn(Some(mapped404Response))
-
         when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
-          .thenReturn(Future.successful(HttpResponse(NOT_FOUND, hipFailuresJson.toString)))
+          .thenReturn(Future.successful(HttpResponse(NOT_FOUND, "")))
 
         when(mockMappingService.map422ResponseErrors(any()))
           .thenReturn(Some(mapped404Response))
@@ -235,6 +227,9 @@ class UcLiabilityNotificationControllerSpec
         val result  = testController.submitLiabilityNotification()(request)
 
         status(result) mustBe NOT_FOUND
+        val jsonResponse = contentAsJson(result)
+        (jsonResponse \ "code").as[String] mustBe ErrorCodes.NotFoundCode
+        (jsonResponse \ "message").as[String] mustBe ErrorMessages.NotFoundMessage
       }
     }
 
@@ -245,7 +240,10 @@ class UcLiabilityNotificationControllerSpec
             s"""
                |{
                |  "failures": [
-               |    {"code": "$code", "reason": "$message"}
+               |    {
+               |      "code": "$code",
+               |      "reason": "$message"
+               |    }
                |  ]
                |}
                |""".stripMargin
@@ -269,6 +267,7 @@ class UcLiabilityNotificationControllerSpec
           val result  = testController.submitLiabilityNotification()(request)
 
           status(result) mustBe UNPROCESSABLE_ENTITY
+
           val jsonResponse = contentAsJson(result)
           (jsonResponse \ "code").as[String] mustBe code
           (jsonResponse \ "message").as[String] mustBe message
@@ -292,41 +291,15 @@ class UcLiabilityNotificationControllerSpec
         status(result) mustBe INTERNAL_SERVER_ERROR
       }
 
-      "HIP returns 404 with no mapped errors" in {
-        val hipFailuresJson = Json.parse(
-          """
-            |{
-            |  "failures": [
-            |    {"code": "UNKNOWN", "reason": "Unknown error"}
-            |  ]
-            |}
-            |""".stripMargin
-        )
-
-        when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
-          .thenReturn(Right((correlationId, baseInsertDwpRequest)))
-
-        when(mockMappingService.mapRequest(any()))
-          .thenReturn((nino, baseInsertHipRequest))
-
-        when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
-          .thenReturn(Future.successful(HttpResponse(NOT_FOUND, hipFailuresJson.toString)))
-
-        when(mockMappingService.map404ResponseErrors(any()))
-          .thenReturn(None)
-
-        val request = fakeRequest(insertDwpRequestJson())
-        val result  = testController.submitLiabilityNotification()(request)
-
-        status(result) mustBe INTERNAL_SERVER_ERROR
-      }
-
       "HIP returns 422 with no mapped errors" in {
         val hipFailuresJson = Json.parse(
           """
             |{
             |  "failures": [
-            |    {"code": "UNKNOWN", "reason": "Unknown error"}
+            |    {
+            |      "code": "UNKNOWN",
+            |      "reason": "Unknown error"
+            |    }
             |  ]
             |}
             |""".stripMargin
@@ -388,7 +361,6 @@ class UcLiabilityNotificationControllerSpec
           .as[String] mustBe "The 'misc/universal-credit/liability' API is currently unavailable"
       }
     }
-
   }
 
 }

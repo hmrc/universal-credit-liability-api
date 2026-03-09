@@ -50,9 +50,6 @@ class MappingService {
       )
   }
 
-  def map404ResponseErrors(response: HipFailures): Option[DwpFailure] =
-    response.failures.map(f => DwpFailure(code = f.code, message = f.reason)).headOption
-
   def map422ResponseErrors(response: HipFailures): Option[DwpFailure] =
     response.failures.map(f => DwpFailure(code = f.code, message = f.reason)).headOption
 }
