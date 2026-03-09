@@ -97,7 +97,18 @@ paths:
               $ref: '#/components/headers/correlationId'
         '404':
           description: Not Found Response
-          $ref: '#/components/responses/notFoundErrorResponse'
+          headers:
+            correlationId:
+              $ref: '#/components/headers/correlationId'
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/errorResponse_404'
+              examples:
+                NotFound_Response:
+                  value:
+                    code: '404'
+                    message: NotFound
         '422':
           description: Unprocessable Entity
           headers:
@@ -214,11 +225,6 @@ components:
       headers:
         correlationId:
           $ref: '#/components/headers/correlationId'
-    notFoundErrorResponse:
-      headers:
-        correlationId:
-          $ref: '#/components/headers/correlationId'
-      description: The requested resource could not be found
   schemas:
     correlationId:
       type: string
@@ -315,6 +321,22 @@ components:
           type: string
           enum:
             - Forbidden
+    errorResponse_404:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          description: The error code representing the NotFound Error.
+          type: string
+          enum:
+            - "404"
+        message:
+          description: Displays the reason of the failure.
+          type: string
+          enum:
+            - NotFound
     errorResponse_422:
       type: object
       required:

@@ -60,12 +60,23 @@ class UcLiabilityNotificationController @Inject() (
             Forbidden(
               Json.toJson(Failure(code = "403.2", message = "Forbidden"))
             )
-          case NOT_FOUND            => NotFound
+          case NOT_FOUND            =>
+            Json.parse(hipHttpResponse.body).validate[HipFailures] match {
+              case JsSuccess(hip404Response, _) =>
+                val maybe404Response = mappingService.map404ResponseErrors(hip404Response)
+                maybe404Response.map(response => NotFound(Json.toJson(response))).getOrElse {
+                  logger.warn("404 with no reasons returned by HIP")
+                  InternalServerError
+                }
+              case _                            =>
+                logger.warn("Unreadable 404 returned by HIP")
+                InternalServerError
+            }
           case UNPROCESSABLE_ENTITY =>
             Json.parse(hipHttpResponse.body).validate[HipFailures] match {
               case JsSuccess(hipResponse, _) =>
-                val maybeResponse = mappingService.map422ResponseErrors(hipResponse)
-                maybeResponse.map(response => UnprocessableEntity(Json.toJson(response))).getOrElse {
+                val maybe422Response = mappingService.map422ResponseErrors(hipResponse)
+                maybe422Response.map(response => UnprocessableEntity(Json.toJson(response))).getOrElse {
                   logger.warn("422 with no reasons returned by HIP")
                   InternalServerError
                 }

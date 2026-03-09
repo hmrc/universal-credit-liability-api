@@ -37,7 +37,8 @@ import uk.gov.hmrc.universalcreditliabilityapi.models.dwp.response.Failure as Dw
 import uk.gov.hmrc.universalcreditliabilityapi.services.{MappingService, SchemaValidationService}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorCodes
-import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorMessages.ForbiddenReason
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorCodes.NotFoundCode
+import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.ErrorMessages.{ForbiddenMessage, NotFoundMessage}
 import uk.gov.hmrc.universalcreditliabilityapi.utils.ApplicationConstants.HeaderNames.{CorrelationId, GovUkOriginatorId}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -178,7 +179,7 @@ class UcLiabilityNotificationControllerSpec
         status(result) mustBe FORBIDDEN
         val jsonResponse = contentAsJson(result)
         (jsonResponse \ "code").as[String] mustBe ErrorCodes.ForbiddenCode
-        (jsonResponse \ "message").as[String] mustBe ForbiddenReason
+        (jsonResponse \ "message").as[String] mustBe ForbiddenMessage
       }
 
       "HIP returns 403" in {
@@ -197,20 +198,38 @@ class UcLiabilityNotificationControllerSpec
         status(result) mustBe FORBIDDEN
         val jsonResponse = contentAsJson(result)
         (jsonResponse \ "code").as[String] mustBe ErrorCodes.ForbiddenCode
-        (jsonResponse \ "message").as[String] mustBe ForbiddenReason
+        (jsonResponse \ "message").as[String] mustBe ForbiddenMessage
       }
     }
 
     "return 404 Not Found" when {
       "HIP returns 404" in {
+        val hipFailuresJson = Json.parse(
+          s"""
+             |{
+             |  "failures": [
+             |    {"code": "404", "reason": "NOT FOUND"}
+             |  ]
+             |}
+             |""".stripMargin
+        )
+
+        val mapped404Response = DwpFailure(code = NotFoundCode, message = NotFoundMessage)
+
         when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
           .thenReturn(Right((correlationId, baseInsertDwpRequest)))
 
         when(mockMappingService.mapRequest(any()))
           .thenReturn((nino, baseInsertHipRequest))
 
+        when(mockMappingService.map404ResponseErrors(any()))
+          .thenReturn(Some(mapped404Response))
+
         when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
-          .thenReturn(Future.successful(HttpResponse(NOT_FOUND, "")))
+          .thenReturn(Future.successful(HttpResponse(NOT_FOUND, hipFailuresJson.toString)))
+
+        when(mockMappingService.map422ResponseErrors(any()))
+          .thenReturn(Some(mapped404Response))
 
         val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)
@@ -266,6 +285,35 @@ class UcLiabilityNotificationControllerSpec
 
         when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
           .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, "")))
+
+        val request = fakeRequest(insertDwpRequestJson())
+        val result  = testController.submitLiabilityNotification()(request)
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+
+      "HIP returns 404 with no mapped errors" in {
+        val hipFailuresJson = Json.parse(
+          """
+            |{
+            |  "failures": [
+            |    {"code": "UNKNOWN", "reason": "Unknown error"}
+            |  ]
+            |}
+            |""".stripMargin
+        )
+
+        when(mockSchemaValidationService.validateLiabilityNotificationRequest(any()))
+          .thenReturn(Right((correlationId, baseInsertDwpRequest)))
+
+        when(mockMappingService.mapRequest(any()))
+          .thenReturn((nino, baseInsertHipRequest))
+
+        when(mockHipConnector.sendUcLiability(any(), any(), any(), any())(using any[HeaderCarrier]))
+          .thenReturn(Future.successful(HttpResponse(NOT_FOUND, hipFailuresJson.toString)))
+
+        when(mockMappingService.map404ResponseErrors(any()))
+          .thenReturn(None)
 
         val request = fakeRequest(insertDwpRequestJson())
         val result  = testController.submitLiabilityNotification()(request)

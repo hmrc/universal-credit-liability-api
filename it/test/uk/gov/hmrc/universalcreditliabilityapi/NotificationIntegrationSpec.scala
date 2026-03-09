@@ -47,14 +47,14 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     "return 204 when HIP returns 204 for Insert" in {
       val nino        = TestData.generateNino()
       val requestBody = Json.parse(s"""
-                                   |{
-                                   |  "nationalInsuranceNumber": "$nino",
-                                   |  "universalCreditRecordType": "UC",
-                                   |  "universalCreditAction": "Insert",
-                                   |  "dateOfBirth": "2002-04-27",
-                                   |  "liabilityStartDate": "2025-08-19"
-                                   |}
-                                   |""".stripMargin)
+            |{
+            |  "nationalInsuranceNumber": "$nino",
+            |  "universalCreditRecordType": "UC",
+            |  "universalCreditAction": "Insert",
+            |  "dateOfBirth": "2002-04-27",
+            |  "liabilityStartDate": "2025-08-19"
+            |}
+            |""".stripMargin)
 
       stubHipInsert(nino)
 
@@ -69,13 +69,13 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     "return 204 when HIP returns 204 for Insert without dateOfBirth" in {
       val nino        = TestData.generateNino()
       val requestBody = Json.parse(s"""
-           |{
-           |  "nationalInsuranceNumber": "$nino",
-           |  "universalCreditRecordType": "UC",
-           |  "universalCreditAction": "Insert",
-           |  "liabilityStartDate": "2025-08-19"
-           |}
-           |""".stripMargin)
+            |{
+            |  "nationalInsuranceNumber": "$nino",
+            |  "universalCreditRecordType": "UC",
+            |  "universalCreditAction": "Insert",
+            |  "liabilityStartDate": "2025-08-19"
+            |}
+            |""".stripMargin)
 
       stubHipInsert(nino)
 
@@ -120,14 +120,14 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       val nino = TestData.generateNino()
 
       val requestBody = Json.parse(s"""
-                                      |{
-                                      |  "nationalInsuranceNumber": "$nino",
-                                      |  "universalCreditRecordType": "UC",
-                                      |  "universalCreditAction": "Insrt",
-                                      |  "dateOfBirth": "2002-04-27",
-                                      |  "liabilityStartDate": "2025-08-19"
-                                      |}
-                                      |""".stripMargin)
+            |{
+            |  "nationalInsuranceNumber": "$nino",
+            |  "universalCreditRecordType": "UC",
+            |  "universalCreditAction": "Insrt",
+            |  "dateOfBirth": "2002-04-27",
+            |  "liabilityStartDate": "2025-08-19"
+            |}
+            |""".stripMargin)
 
       val response = callPostNotification(requestBody, validateRequestAgainstOwnSchema = false)
 
@@ -140,14 +140,14 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       val nino = TestData.generateNino()
 
       val requestBody = Json.parse(s"""
-                                      |{
-                                      |  "nationalInsuranceNumber": "$nino",
-                                      |  "universalCreditRecordType": "UCW",
-                                      |  "universalCreditAction": "Insert",
-                                      |  "dateOfBirth": "2002-04-27",
-                                      |  "liabilityStartDate": "2025-14-19"
-                                      |}
-                                      |""".stripMargin)
+            |{
+            |  "nationalInsuranceNumber": "$nino",
+            |  "universalCreditRecordType": "UCW",
+            |  "universalCreditAction": "Insert",
+            |  "dateOfBirth": "2002-04-27",
+            |  "liabilityStartDate": "2025-14-19"
+            |}
+            |""".stripMargin)
 
       val response = callPostNotification(
         requestBody,
@@ -245,28 +245,60 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     }
 
     "return 404 when HIP returns 404 for Insert" in {
-      val nino        = TestData.generateNino()
-      val requestBody = TestData.validInsertionRequest(nino)
+      val nino               = TestData.generateNino()
+      val requestBody        = TestData.validInsertionRequest(nino)
+      val hip404ResponseBody = """
+            |{
+            |  "failures": [
+            |    {
+            |      "reason": "Not found",
+            |      "code": "404"
+            |    }
+            |  ]
+            |}
+            |""".stripMargin
 
-      stubHipInsert(nino, status = 404)
+      stubHipInsert(nino, status = 404, responseBody = hip404ResponseBody)
 
       val response = callPostNotification(requestBody)
 
       response.status mustBe NOT_FOUND
+      response.body[JsValue] mustBe Json.parse("""
+          |{
+          |  "code": "404",
+          |  "message": "NotFound"
+          |}
+          |""".stripMargin)
 
       verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
       MockAuthHelper.verifyAuthWasCalled()
     }
 
     "return 404 when HIP returns 404 for Terminate" in {
-      val nino        = TestData.generateNino()
-      val requestBody = TestData.validTerminateRequest(nino)
+      val nino               = TestData.generateNino()
+      val requestBody        = TestData.validTerminateRequest(nino)
+      val hip404ResponseBody = """
+            |{
+            |  "failures": [
+            |    {
+            |      "reason": "Not found",
+            |      "code": "404"
+            |    }
+            |  ]
+            |}
+            |""".stripMargin
 
-      stubHipTermination(nino, status = 404)
+      stubHipTermination(nino, status = 404, responseBody = hip404ResponseBody)
 
       val response = callPostNotification(requestBody)
 
       response.status mustBe NOT_FOUND
+      response.body[JsValue] mustBe Json.parse("""
+          |{
+          |  "code": "404",
+          |  "message": "NotFound"
+          |}
+          |""".stripMargin)
 
       verify(1, postRequestedFor(urlEqualTo(hipTerminationUrl(nino))))
       MockAuthHelper.verifyAuthWasCalled()
@@ -275,17 +307,16 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     "return 422 when HIP returns valid 422 for Insert" in {
       val nino            = TestData.generateNino()
       val requestBody     = TestData.validInsertionRequest(nino)
-      val hipResponseBody =
-        """
-          |{
-          |  "failures": [
-          |    {
-          |      "reason": "Start date before 29/04/2013",
-          |      "code": "65536"
-          |    }
-          |  ]
-          |}
-          |""".stripMargin
+      val hipResponseBody = """
+            |{
+            |  "failures": [
+            |    {
+            |      "reason": "Start date before 29/04/2013",
+            |      "code": "65536"
+            |    }
+            |  ]
+            |}
+            |""".stripMargin
 
       stubHipInsert(nino, status = 422, responseBody = hipResponseBody)
 
@@ -306,17 +337,16 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
     "return 422 when HIP returns valid 422 for Terminate" in {
       val nino            = TestData.generateNino()
       val requestBody     = TestData.validTerminateRequest(nino)
-      val hipResponseBody =
-        """
-          |{
-          |  "failures": [
-          |    {
-          |      "reason": "Start date before 29/04/2013",
-          |      "code": "65536"
-          |    }
-          |  ]
-          |}
-          |""".stripMargin
+      val hipResponseBody = """
+            |{
+            |  "failures": [
+            |    {
+            |      "reason": "Start date before 29/04/2013",
+            |      "code": "65536"
+            |    }
+            |  ]
+            |}
+            |""".stripMargin
 
       stubHipTermination(nino, status = 422, responseBody = hipResponseBody)
 
@@ -450,15 +480,15 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       val nino            = TestData.generateNino()
       val requestBody     = TestData.validInsertionRequest(nino)
       val hipResponseBody = """
-                               |{
-                               |  "failures2": [
-                               |    {
-                               |      "reasons": "Start date before 29/04/2013",
-                               |      "codes": "65536"
-                               |    }
-                               |  ]
-                               |}
-                               |""".stripMargin
+            |{
+            |  "failurez": [
+            |    {
+            |      "reasonz": "Start date before 29/04/2013",
+            |      "codez": "65536"
+            |    }
+            |  ]
+            |}
+            |""".stripMargin
 
       stubHipInsert(nino, status = 422, responseBody = hipResponseBody)
 
@@ -489,10 +519,10 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       val nino            = TestData.generateNino()
       val requestBody     = TestData.validInsertionRequest(nino)
       val hipResponseBody = """
-                              |{
-                              |  "failures": []
-                              |}
-                              |""".stripMargin
+            |{
+            |  "failures": []
+            |}
+            |""".stripMargin
 
       stubHipInsert(nino, status = 422, responseBody = hipResponseBody)
 
@@ -508,10 +538,10 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       val nino            = TestData.generateNino()
       val requestBody     = TestData.validTerminateRequest(nino)
       val hipResponseBody = """
-                              |{
-                              |  "failures": []
-                              |}
-                              |""".stripMargin
+            |{
+            |  "failures": []
+            |}
+            |""".stripMargin
 
       stubHipTermination(nino, status = 422, responseBody = hipResponseBody)
 
@@ -595,25 +625,25 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       val nino = TestData.generateNino()
 
       val requestBody = Json.parse(s"""
-           |{
-           |  "nationalInsuranceNumber": "$nino",
-           |  "universalCreditRecordType": "UC",
-           |  "universalCreditAction": "Insert",
-           |  "dateOfBirth": "2002-04-27",
-           |  "liabilityEndDate": "2015-08-19",
-           |  "liabilityStartDate": "2025-08-19"
-           |}
-           |""".stripMargin)
+            |{
+            |  "nationalInsuranceNumber": "$nino",
+            |  "universalCreditRecordType": "UC",
+            |  "universalCreditAction": "Insert",
+            |  "dateOfBirth": "2002-04-27",
+            |  "liabilityEndDate": "2015-08-19",
+            |  "liabilityStartDate": "2025-08-19"
+            |}
+            |""".stripMargin)
 
       val hipRequestBody = s"""
-                              |{
-                              |  "universalCreditLiabilityDetails": {
-                              |    "universalCreditRecordType": "UC",
-                              |    "dateOfBirth": "2002-04-27",
-                              |    "liabilityStartDate": "2025-08-19"
-                              |  }
-                              |}
-                              |""".stripMargin
+            |{
+            |  "universalCreditLiabilityDetails": {
+            |    "universalCreditRecordType": "UC",
+            |    "dateOfBirth": "2002-04-27",
+            |    "liabilityStartDate": "2025-08-19"
+            |  }
+            |}
+            |""".stripMargin
 
       stubHipInsert(nino, expectedRequestBody = Some(hipRequestBody))
 
@@ -632,25 +662,24 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       val nino = TestData.generateNino()
 
       val requestBody = Json.parse(s"""
-           |{
-           |  "nationalInsuranceNumber": "$nino",
-           |  "universalCreditRecordType": "UC",
-           |  "universalCreditAction": "Terminate",
-           |  "liabilityStartDate": "2025-08-19",
-           |  "liabilityEndDate": "2025-08-20"
-           |}
-           |""".stripMargin)
+            |{
+            |  "nationalInsuranceNumber": "$nino",
+            |  "universalCreditRecordType": "UC",
+            |  "universalCreditAction": "Terminate",
+            |  "liabilityStartDate": "2025-08-19",
+            |  "liabilityEndDate": "2025-08-20"
+            |}
+            |""".stripMargin)
 
-      val hipRequestBody =
-        s"""
-           |{
-           |  "ucLiabilityTerminationDetails": {
-           |    "universalCreditRecordType": "UC",
-           |    "liabilityStartDate": "2025-08-19",
-           |    "liabilityEndDate": "2025-08-20"
-           |  }
-           |}
-           |""".stripMargin
+      val hipRequestBody = s"""
+            |{
+            |  "ucLiabilityTerminationDetails": {
+            |    "universalCreditRecordType": "UC",
+            |    "liabilityStartDate": "2025-08-19",
+            |    "liabilityEndDate": "2025-08-20"
+            |  }
+            |}
+            |""".stripMargin
 
       stubHipTermination(nino, expectedRequestBody = Some(hipRequestBody))
 

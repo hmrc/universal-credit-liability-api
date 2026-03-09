@@ -50,26 +50,28 @@ object ApplicationConstants {
   }
 
   object ErrorCodes {
-    val InvalidInputCode = "400.1"
-    val ForbiddenCode    = "403.2"
+    val InvalidInputCode: String = "400.1"
+    val ForbiddenCode: String    = "403.2"
+    val NotFoundCode: String     = "404"
   }
 
   object ErrorMessages {
-    val ForbiddenReason = "Forbidden"
-
-    def invalidInput(field: String): String =
+    def invalidInputMessage(field: String): String =
       s"Constraint Violation - Invalid/Missing input parameter: $field"
+
+    val ForbiddenMessage: String = "Forbidden"
+    val NotFoundMessage: String  = "Resource Not Found"
   }
 
   def invalidInputFailure(field: String): Failure =
     Failure(
-      message = ErrorMessages.invalidInput(field),
+      message = ErrorMessages.invalidInputMessage(field),
       code = ErrorCodes.InvalidInputCode
     )
 
   def forbiddenFailure: Failure =
     Failure(
-      message = ErrorMessages.ForbiddenReason,
+      message = ErrorMessages.ForbiddenMessage,
       code = ErrorCodes.ForbiddenCode
     )
 
