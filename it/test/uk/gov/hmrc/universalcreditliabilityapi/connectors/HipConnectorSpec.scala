@@ -207,8 +207,8 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
 
     "handle NOT_FOUND (404) response" in {
       implicit val responseBody: JsObject = Json.obj(
-        "code"   -> "NOT_FOUND",
-        "reason" -> "Resource not found"
+        "code"   -> "404",
+        "reason" -> "Resource Not Found"
       )
 
       stubHipResponseFor(hipInsertionUrl(testNino), NOT_FOUND)

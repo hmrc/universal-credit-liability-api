@@ -266,7 +266,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       response.body[JsValue] mustBe Json.parse("""
           |{
           |  "code": "404",
-          |  "message": "Resource not found"
+          |  "message": "Resource Not Found"
           |}
           |""".stripMargin)
 
@@ -296,7 +296,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
       response.body[JsValue] mustBe Json.parse("""
           |{
           |  "code": "404",
-          |  "message": "Resource not found"
+          |  "message": "Resource Not Found"
           |}
           |""".stripMargin)
 

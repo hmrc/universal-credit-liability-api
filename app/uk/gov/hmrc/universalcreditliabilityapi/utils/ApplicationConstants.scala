@@ -59,7 +59,7 @@ object ApplicationConstants {
       s"Constraint Violation - Invalid/Missing input parameter: $field"
 
     val ForbiddenMessage: String = "Forbidden"
-    val NotFoundMessage: String  = "Resource not found"
+    val NotFoundMessage: String  = "Resource Not Found"
   }
 
   def invalidInputFailure(field: String): Failure =
