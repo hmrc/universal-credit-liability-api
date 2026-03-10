@@ -72,7 +72,7 @@ class UcLiabilityNotificationControllerSpec
     reset(mockAuthAction, mockSchemaValidationService, mockMappingService, mockHipConnector)
 
     when(mockSchemaValidationService.validateGovUkOriginatorId(any()))
-      .thenReturn(Right("SOME_GOVUK_ORIGINATOR_ID"))
+      .thenReturn(Right("TEST-GOV-UK-ORIGINATOR-ID"))
 
     when(mockAuthAction.async(any[BodyParser[JsValue]])(any()))
       .thenAnswer { invocation =>
@@ -317,7 +317,6 @@ class UcLiabilityNotificationControllerSpec
 
         status(result) mustBe INTERNAL_SERVER_ERROR
       }
-
     }
 
     "return 503 Service Unavailable" when {

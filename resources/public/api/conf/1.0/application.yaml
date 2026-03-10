@@ -4,7 +4,7 @@ info:
   description: |-
     # Usage Terms
     These interfaces are business-critical interfaces for HMRC and DWP, supporting thousands of staff - all consumption, or change in consumption levels, should be registered and fully approved (see Registered Consumers below).
-  version: "1.1.0"
+  version: "1.1.1"
   contact: {}
   license:
     name: HMRC
@@ -329,7 +329,7 @@ components:
           minLength: 1
           description: Displays the reason of the failure.
           type: string
-          maxLength: 120
+          maxLength: 128
     ExistingErrorCodes:
       description:
         "These are all error codes that can occur at the time of writing, we do not anticipate changes in the foreseeable future.<br/>
