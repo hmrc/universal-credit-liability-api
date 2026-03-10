@@ -70,8 +70,8 @@ object ApplicationConstants {
 
   def forbiddenFailure: Failure =
     Failure(
-      message = ErrorMessages.ForbiddenMessage,
-      code = ErrorCodes.ForbiddenCode
+      code = ErrorCodes.ForbiddenCode,
+      message = ErrorMessages.ForbiddenMessage
     )
 
 }
