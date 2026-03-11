@@ -4,7 +4,7 @@ info:
   description: |-
     # Usage Terms
     These interfaces are business-critical interfaces for HMRC and DWP, supporting thousands of staff - all consumption, or change in consumption levels, should be registered and fully approved (see Registered Consumers below).
-  version: "1.1.2"
+  version: "1.2.0"
   contact: {}
   license:
     name: HMRC
@@ -39,16 +39,16 @@ paths:
             examples:
               insertRequest:
                 value:
-                  nationalInsuranceNumber: "AA123456"
-                  universalCreditRecordType: "LCW/LCWRA"
-                  universalCreditAction: "Insert"
+                  nationalInsuranceNumber: 'AA123456'
+                  universalCreditRecordType: 'LCW/LCWRA'
+                  universalCreditAction: 'Insert'
                   dateOfBirth: '2002-10-10'
                   liabilityStartDate: '2015-08-19'
               terminateRequest:
                 value:
-                  nationalInsuranceNumber: "AA123456"
-                  universalCreditRecordType: "LCW/LCWRA"
-                  universalCreditAction: "Terminate"
+                  nationalInsuranceNumber: 'AA123456'
+                  universalCreditRecordType: 'LCW/LCWRA'
+                  universalCreditAction: 'Terminate'
                   liabilityStartDate: '2015-08-19'
                   liabilityEndDate: '2025-01-04'
       responses:
@@ -58,19 +58,6 @@ paths:
             correlationId:
               $ref: '#/components/headers/correlationId'
         '400':
-          content:
-            application/json;charset=UTF-8:
-              schema:
-                $ref: '#/components/schemas/errorResponse_400'
-              examples:
-                400.1_Response:
-                  value:
-                    code: '400.1'
-                    message: "Constraint Violation - Invalid/Missing input parameter: <parameter>"
-                400.2_Response:
-                  value:
-                    code: '400.2'
-                    message: "HTTP message not readable"
           description: Bad Request
           headers:
             correlationId:
@@ -81,7 +68,24 @@ paths:
                   value will always match the header in the request to allow correlation,
                   and will only exist if it was sent.
                 example: e470d658-99f7-4292-a4a1-ed12c72f1337
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/errorResponse_400'
+              examples:
+                400.1_Response:
+                  value:
+                    code: '400.1'
+                    message: 'Constraint Violation - Invalid/Missing input parameter: <parameter>'
+                400.2_Response:
+                  value:
+                    code: '400.2'
+                    message: 'HTTP message not readable'
         '403':
+          description: 'Forbidden'
+          headers:
+            correlationId:
+              $ref: '#/components/headers/correlationId'
           content:
             application/json;charset=UTF-8:
               schema:
@@ -90,16 +94,23 @@ paths:
                 Forbidden_Response:
                   value:
                     code: '403.2'
-                    message: Forbidden
-          description: 'Forbidden'
+                    message: 'Forbidden'
+        '404':
+          description: 'Not Found'
           headers:
             correlationId:
               $ref: '#/components/headers/correlationId'
-        '404':
-          description: Not Found Response
-          $ref: '#/components/responses/notFoundErrorResponse'
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/errorResponse_404'
+              examples:
+                NotFound_Response:
+                  value:
+                    code: '404'
+                    message: 'Resource Not Found'
         '422':
-          description: Unprocessable Entity
+          description: 'Unprocessable Entity'
           headers:
             correlationId:
               $ref: '#/components/headers/correlationId'
@@ -110,70 +121,73 @@ paths:
               examples:
                 422_ConflictingLiability:
                   value:
-                    code: "55038"
+                    code: '55038'
                     message: 'A conflicting or identical Liability is already recorded'
                 422_StartDateBefore16thBirthday:
                   value:
-                    code: "65026"
+                    code: '65026'
                     message: 'Start date must not be before 16th birthday'
                 422_StartDateAfterStatePensionAge:
                   value:
-                    code: "55029"
+                    code: '55029'
                     message: 'Start Date later than SPA'
                 422_StartDateAfterDeath:
                   value:
-                    code: "64996"
+                    code: '64996'
                     message: 'Start Date is not before date of death'
                 422_StartAndEndDateAfterDeath:
                   value:
-                    code: "55006"
+                    code: '55006'
                     message: 'Start Date and End Date must be earlier than Date of Death'
                 422_EndDateAfterStatePensionAge:
                   value:
-                    code: "55008"
+                    code: '55008'
                     message: 'End Date must be earlier than State Pension Age'
                 422_EndDateAfterDeath:
                   value:
-                    code: "55027"
+                    code: '55027'
                     message: 'End Date later than Date of Death'
                 422_NotWithinUCPeriod:
                   value:
-                    code: "64997"
+                    code: '64997'
                     message: 'LCW/LCWRA not within a period of UC'
                 422_LCWLCWRAOverride:
                   value:
-                    code: "64998"
+                    code: '64998'
                     message: 'LCW/LCWRA Override not within a period of LCW/LCWRA'
                 422_NoMatchingLiability:
                   value:
-                    code: "55039"
+                    code: '55039'
                     message: 'NO corresponding liability found'
                 422_StartDateBefore29042013:
                   value:
-                    code: "65536"
+                    code: '65536'
                     message: 'Start date before 29/04/2013'
                 422_EndDateBeforeStartDate:
                   value:
-                    code: "65537"
+                    code: '65537'
                     message: 'End date before start date'
                 422_PseudoAccount:
                   value:
-                    code: "65541"
+                    code: '65541'
                     message: 'The NINO input matches a Pseudo Account'
                 422_NonLiveAccount:
                   value:
-                    code: "65542"
+                    code: '65542'
                     message: 'The NINO input matches a non-live account (including redundant, amalgamated and administrative account types)'
                 422_AccountTransferredIsleOfMan:
                   value:
-                    code: "65543"
+                    code: '65543'
                     message: 'The NINO input matches an account that has been transferred to the Isle of Man'
                 422_StartDateAfterDeath2:
                   value:
-                    code: "99999"
+                    code: '99999'
                     message: 'Start Date after Death'
         '500':
-          $ref: '#/components/responses/internalServerErrorResponse'
+          description: Internal Server Error
+          headers:
+            correlationId:
+              $ref: '#/components/headers/correlationId'
 components:
   securitySchemes:
     applicationRestricted:
@@ -208,17 +222,6 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/govUkOriginatorId'
-  responses:
-    internalServerErrorResponse:
-      description: Internal Server Error
-      headers:
-        correlationId:
-          $ref: '#/components/headers/correlationId'
-    notFoundErrorResponse:
-      headers:
-        correlationId:
-          $ref: '#/components/headers/correlationId'
-      description: The requested resource could not be found
   schemas:
     correlationId:
       type: string
@@ -279,6 +282,7 @@ components:
           $ref: '#/components/schemas/liabilityEndDate'
       description: Request body for this API.
     errorResponse_400:
+      title: 400_BadRequest
       type: object
       required:
         - code
@@ -309,13 +313,31 @@ components:
           description: The error code representing the Forbidden Error.
           type: string
           enum:
-            - "403.2"
+            - '403.2'
         message:
           description: Displays the reason of the failure.
           type: string
           enum:
             - Forbidden
+    errorResponse_404:
+      title: 404_NotFound
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          description: The error code representing the Not Found Error.
+          type: string
+          enum:
+            - '404'
+        message:
+          description: Displays the reason of the failure.
+          type: string
+          enum:
+            - 'Resource Not Found'
     errorResponse_422:
+      title: 422_UnprocessableEntity
       type: object
       required:
         - code
@@ -372,7 +394,7 @@ components:
         - 99999
     FutureExtensions:
       description:
-        "This is reserved to allow future modifications of 422s without breaking the existing interface."
+        'This is reserved to allow future modifications of 422s without breaking the existing interface.'
       type: string
       minLength: 1
       maxLength: 10
