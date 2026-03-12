@@ -142,6 +142,7 @@ object TestData {
     ("65026", "Start date must not be before 16th birthday"),
     ("65536", "Start date before 29/04/2013"),
     ("65537", "End date before start date"),
+    ("65538", "End date missing but the input was a Termination"),
     ("65541", "The NINO input matches a Pseudo Account"),
     (
       "65542",
