@@ -42,8 +42,7 @@ object TestData {
       universalCreditAction = Insert,
       nationalInsuranceNumber = nino,
       universalCreditRecordType = randomRecordType,
-      liabilityStartDate = LocalDate.parse("2024-01-15"),
-      dateOfBirth = Some(LocalDate.parse("2002-04-27"))
+      liabilityStartDate = LocalDate.parse("2024-01-15")
     )
 
   val baseTerminateDwpRequest: TerminateUniversalCreditLiability =
@@ -59,8 +58,7 @@ object TestData {
     InsertLiabilityRequest(
       universalCreditLiabilityDetails = UniversalCreditLiabilityDetails(
         universalCreditRecordType = randomRecordType,
-        liabilityStartDate = LocalDate.parse("2024-01-15"),
-        dateOfBirth = Some(LocalDate.parse("2002-04-27"))
+        liabilityStartDate = LocalDate.parse("2024-01-15")
       )
     )
 
@@ -95,8 +93,7 @@ object TestData {
       "universalCreditAction"     -> "INVALID",
       "nationalInsuranceNumber"   -> "INVALID",
       "universalCreditRecordType" -> "INVALID",
-      "liabilityStartDate"        -> "not-a-date",
-      "dateOfBirth"               -> "not-a-date"
+      "liabilityStartDate"        -> "not-a-date"
     )
 
   val invalidTerminateDwpRequestValues: Map[String, String] =
@@ -108,18 +105,12 @@ object TestData {
       "liabilityEndDate"          -> "not-a-date"
     )
 
-  def optionalField(key: String, value: Option[String]): JsObject =
-    value.fold(Json.obj())(v => Json.obj(key -> v))
-
-  def insertDwpRequestJson(
-    recordType: String = randomRecordType.code,
-    dateOfBirth: Option[String] = Some("2002-04-27")
-  ): JsObject = Json.obj(
+  def insertDwpRequestJson(recordType: String = randomRecordType.code): JsObject = Json.obj(
     "universalCreditAction"     -> "Insert",
     "nationalInsuranceNumber"   -> "AA123456",
     "universalCreditRecordType" -> recordType,
     "liabilityStartDate"        -> "2024-01-15"
-  ) ++ optionalField("dateOfBirth", dateOfBirth)
+  )
 
   def terminateDwpRequestJson(recordType: String = randomRecordType.code): JsObject = Json.obj(
     "universalCreditAction"     -> "Terminate",

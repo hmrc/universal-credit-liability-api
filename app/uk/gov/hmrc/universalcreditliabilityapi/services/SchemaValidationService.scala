@@ -88,7 +88,6 @@ class SchemaValidationService {
     val fieldOrder: List[String] = List(
       "nationalInsuranceNumber",
       "universalCreditRecordType",
-      "dateOfBirth",
       "liabilityStartDate",
       "liabilityEndDate"
     )

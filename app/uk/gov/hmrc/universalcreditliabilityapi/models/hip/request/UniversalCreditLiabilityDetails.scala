@@ -23,7 +23,6 @@ import java.time.LocalDate
 
 final case class UniversalCreditLiabilityDetails(
   universalCreditRecordType: UniversalCreditRecordType,
-  dateOfBirth: Option[LocalDate],
   liabilityStartDate: LocalDate
 )
 

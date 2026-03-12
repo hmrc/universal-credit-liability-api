@@ -32,7 +32,6 @@ class MappingService {
         InsertLiabilityRequest(
           UniversalCreditLiabilityDetails(
             universalCreditRecordType = insert.universalCreditRecordType,
-            dateOfBirth = insert.dateOfBirth,
             liabilityStartDate = insert.liabilityStartDate
           )
         )

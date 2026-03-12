@@ -36,8 +36,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
             |  "universalCreditRecordType": "UC",
-            |  "liabilityStartDate": "2025-12-15",
-            |  "dateOfBirth": "2002-10-10"
+            |  "liabilityStartDate": "2025-12-15"
             |}
             |""".stripMargin)
 
@@ -46,8 +45,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             universalCreditAction = Insert,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = UC,
-            liabilityStartDate = LocalDate.parse("2025-12-15"),
-            dateOfBirth = Some(LocalDate.parse("2002-10-10"))
+            liabilityStartDate = LocalDate.parse("2025-12-15")
           )
 
         val result = testJson.validate[InsertUniversalCreditLiability]
@@ -61,55 +59,6 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2025-12-15",
-            |  "dateOfBirth": "2002-10-10"
-            |}
-            |""".stripMargin)
-
-        val expectedInsertUcLiabilityRequest: InsertUniversalCreditLiability =
-          InsertUniversalCreditLiability(
-            universalCreditAction = Insert,
-            nationalInsuranceNumber = "AA123456",
-            universalCreditRecordType = LCW_LCWRA,
-            liabilityStartDate = LocalDate.parse("2025-12-15"),
-            dateOfBirth = Some(LocalDate.parse("2002-10-10"))
-          )
-
-        val result = testJson.validate[InsertUniversalCreditLiability]
-
-        result mustBe JsSuccess(expectedInsertUcLiabilityRequest)
-      }
-
-      "given valid JSON with 'UC' record type missing optional dateOfBirth" in {
-        val testJson: JsValue = Json.parse("""
-            |{
-            |  "universalCreditAction": "Insert",
-            |  "nationalInsuranceNumber": "AA123456",
-            |  "universalCreditRecordType": "UC",
-            |  "liabilityStartDate": "2025-12-15"
-            |}
-            |""".stripMargin)
-
-        val expectedInsertUcLiabilityRequest: InsertUniversalCreditLiability =
-          InsertUniversalCreditLiability(
-            universalCreditAction = Insert,
-            nationalInsuranceNumber = "AA123456",
-            universalCreditRecordType = UC,
-            liabilityStartDate = LocalDate.parse("2025-12-15"),
-            dateOfBirth = None
-          )
-
-        val result = testJson.validate[InsertUniversalCreditLiability]
-
-        result mustBe JsSuccess(expectedInsertUcLiabilityRequest)
-      }
-
-      "given valid JSON with 'LCW/LCWRA' record type missing optional dateOfBirth" in {
-        val testJson: JsValue = Json.parse("""
-            |{
-            |  "universalCreditAction": "Insert",
-            |  "nationalInsuranceNumber": "AA123456",
-            |  "universalCreditRecordType": "LCW/LCWRA",
             |  "liabilityStartDate": "2025-12-15"
             |}
             |""".stripMargin)
@@ -119,8 +68,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             universalCreditAction = Insert,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = LCW_LCWRA,
-            liabilityStartDate = LocalDate.parse("2025-12-15"),
-            dateOfBirth = None
+            liabilityStartDate = LocalDate.parse("2025-12-15")
           )
 
         val result = testJson.validate[InsertUniversalCreditLiability]
@@ -134,8 +82,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
             |  "universalCreditRecordType": "UC",
-            |  "liabilityStartDate": "2024-02-29",
-            |  "dateOfBirth": "2000-02-29"
+            |  "liabilityStartDate": "2024-02-29"
             |}
             |""".stripMargin)
 
@@ -144,8 +91,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             universalCreditAction = Insert,
             nationalInsuranceNumber = "AA123456",
             universalCreditRecordType = UC,
-            liabilityStartDate = LocalDate.parse("2024-02-29"),
-            dateOfBirth = Some(LocalDate.parse("2000-02-29"))
+            liabilityStartDate = LocalDate.parse("2024-02-29")
           )
 
         val result = testJson.validate[InsertUniversalCreditLiability]
@@ -162,8 +108,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
             |  "universalCreditRecordType": "INVALID",
-            |  "liabilityStartDate": "2025-12-15",
-            |  "dateOfBirth": "2002-10-10"
+            |  "liabilityStartDate": "2025-12-15"
             |}
             |""".stripMargin)
 
@@ -178,8 +123,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA1234",
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2025-12-15",
-            |  "dateOfBirth": "2002-10-10"
+            |  "liabilityStartDate": "2025-12-15"
             |}
             |""".stripMargin)
 
@@ -194,8 +138,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA1234567890",
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2025-12-15",
-            |  "dateOfBirth": "2002-10-10"
+            |  "liabilityStartDate": "2025-12-15"
             |}
             |""".stripMargin)
 
@@ -210,8 +153,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "DA123456",
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2025-12-15",
-            |  "dateOfBirth": "2002-10-10"
+            |  "liabilityStartDate": "2025-12-15"
             |}
             |""".stripMargin)
 
@@ -226,8 +168,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2025-12-45",
-            |  "dateOfBirth": "2002-10-10"
+            |  "liabilityStartDate": "2025-12-45"
             |}
             |""".stripMargin)
 
@@ -242,40 +183,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2025/12/15",
-            |  "dateOfBirth": "2002-10-10"
-            |}
-            |""".stripMargin)
-
-        val result = testJson.validate[InsertUniversalCreditLiability]
-
-        result mustBe a[JsError]
-      }
-
-      "given JSON contains invalid date of birth" in {
-        val testJson: JsValue = Json.parse("""
-            |{
-            |  "universalCreditAction": "Insert",
-            |  "nationalInsuranceNumber": "AA123456",
-            |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2025-12-15",
-            |  "dateOfBirth": "2002-10-45"
-            |}
-            |""".stripMargin)
-
-        val result = testJson.validate[InsertUniversalCreditLiability]
-
-        result mustBe a[JsError]
-      }
-
-      "given JSON contains date of birth with invalid format" in {
-        val testJson: JsValue = Json.parse("""
-            |{
-            |  "universalCreditAction": "Insert",
-            |  "nationalInsuranceNumber": "AA123456",
-            |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2025-12-15",
-            |  "dateOfBirth": "2002/10/10"
+            |  "liabilityStartDate": "2025/12/15"
             |}
             |""".stripMargin)
 
@@ -289,8 +197,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |{
             |  "universalCreditAction": "Insert",
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2025-12-15",
-            |  "dateOfBirth": "2002-10-10"
+            |  "liabilityStartDate": "2025-12-15"
             |}
             |""".stripMargin)
 
@@ -304,8 +211,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |{
             |  "nationalInsuranceNumber": "AA123456",
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "liabilityStartDate": "2025-12-15",
-            |  "dateOfBirth": "2002-10-10"
+            |  "liabilityStartDate": "2025-12-15"
             |}
             |""".stripMargin)
 
@@ -319,8 +225,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
-            |  "liabilityStartDate": "2025-12-15",
-            |  "dateOfBirth": "2002-10-10"
+            |  "liabilityStartDate": "2025-12-15"
             |}
             |""".stripMargin)
 
@@ -334,8 +239,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |{
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
-            |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "dateOfBirth": "2002-10-10"
+            |  "universalCreditRecordType": "LCW/LCWRA"
             |}
             |""".stripMargin)
 
@@ -350,8 +254,7 @@ class InsertUniversalCreditLiabilitySpec extends AnyWordSpec with Matchers {
             |  "universalCreditAction": "Insert",
             |  "nationalInsuranceNumber": "AA123456",
             |  "universalCreditRecordType": "UC",
-            |  "liabilityStartDate": "2025-02-29",
-            |  "dateOfBirth": "2001-02-29"
+            |  "liabilityStartDate": "2025-02-29"
             |}
             |""".stripMargin)
 
