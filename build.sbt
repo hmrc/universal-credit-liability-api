@@ -2,7 +2,7 @@ import sbt.Keys.dependencyOverrides
 import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "3.3.7"
+ThisBuild / scalaVersion := "3.8.1"
 ThisBuild / semanticdbEnabled := true
 
 lazy val microservice = Project("universal-credit-liability-api", file("."))
