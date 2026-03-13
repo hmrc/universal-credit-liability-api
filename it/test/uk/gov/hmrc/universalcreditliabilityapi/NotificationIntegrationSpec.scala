@@ -51,28 +51,6 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
             |  "nationalInsuranceNumber": "$nino",
             |  "universalCreditRecordType": "UC",
             |  "universalCreditAction": "Insert",
-            |  "dateOfBirth": "2002-04-27",
-            |  "liabilityStartDate": "2025-08-19"
-            |}
-            |""".stripMargin)
-
-      stubHipInsert(nino)
-
-      val response = callPostNotification(requestBody)
-
-      response.status mustBe NO_CONTENT
-
-      verify(1, postRequestedFor(urlEqualTo(hipInsertionUrl(nino))))
-      MockAuthHelper.verifyAuthWasCalled()
-    }
-
-    "return 204 when HIP returns 204 for Insert without dateOfBirth" in {
-      val nino        = TestData.generateNino()
-      val requestBody = Json.parse(s"""
-            |{
-            |  "nationalInsuranceNumber": "$nino",
-            |  "universalCreditRecordType": "UC",
-            |  "universalCreditAction": "Insert",
             |  "liabilityStartDate": "2025-08-19"
             |}
             |""".stripMargin)
@@ -124,7 +102,6 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
             |  "nationalInsuranceNumber": "$nino",
             |  "universalCreditRecordType": "UC",
             |  "universalCreditAction": "Insrt",
-            |  "dateOfBirth": "2002-04-27",
             |  "liabilityStartDate": "2025-08-19"
             |}
             |""".stripMargin)
@@ -144,7 +121,6 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
             |  "nationalInsuranceNumber": "$nino",
             |  "universalCreditRecordType": "UCW",
             |  "universalCreditAction": "Insert",
-            |  "dateOfBirth": "2002-04-27",
             |  "liabilityStartDate": "2025-14-19"
             |}
             |""".stripMargin)
@@ -629,7 +605,6 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
             |  "nationalInsuranceNumber": "$nino",
             |  "universalCreditRecordType": "UC",
             |  "universalCreditAction": "Insert",
-            |  "dateOfBirth": "2002-04-27",
             |  "liabilityEndDate": "2015-08-19",
             |  "liabilityStartDate": "2025-08-19"
             |}
@@ -639,7 +614,6 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "UC",
-            |    "dateOfBirth": "2002-04-27",
             |    "liabilityStartDate": "2025-08-19"
             |  }
             |}

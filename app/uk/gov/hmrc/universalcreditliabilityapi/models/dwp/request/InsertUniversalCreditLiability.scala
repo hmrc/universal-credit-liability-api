@@ -28,8 +28,7 @@ final case class InsertUniversalCreditLiability(
   universalCreditAction: UniversalCreditAction,
   nationalInsuranceNumber: String,
   universalCreditRecordType: UniversalCreditRecordType,
-  liabilityStartDate: LocalDate,
-  dateOfBirth: Option[LocalDate]
+  liabilityStartDate: LocalDate
 )
 
 object InsertUniversalCreditLiability {
@@ -38,8 +37,7 @@ object InsertUniversalCreditLiability {
     (JsPath \ "universalCreditAction").read[UniversalCreditAction] and
       (JsPath \ "nationalInsuranceNumber").read(validNino) and
       (JsPath \ "universalCreditRecordType").read[UniversalCreditRecordType] and
-      (JsPath \ "liabilityStartDate").read(using localDateReads) and
-      (JsPath \ "dateOfBirth").readNullable(using localDateReads)
+      (JsPath \ "liabilityStartDate").read(using localDateReads)
   )(InsertUniversalCreditLiability.apply _)
 
 }
