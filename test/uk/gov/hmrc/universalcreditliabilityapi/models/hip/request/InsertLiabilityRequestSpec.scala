@@ -35,7 +35,6 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
           InsertLiabilityRequest(
             UniversalCreditLiabilityDetails(
               universalCreditRecordType = UC,
-              dateOfBirth = Some(LocalDate.parse("2002-10-10")),
               liabilityStartDate = LocalDate.parse("2025-08-19")
             )
           )
@@ -44,7 +43,6 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "UC",
-            |    "dateOfBirth": "2002-10-10",
             |    "liabilityStartDate": "2025-08-19"
             |  }
             |}
@@ -58,7 +56,6 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
           InsertLiabilityRequest(
             UniversalCreditLiabilityDetails(
               universalCreditRecordType = LCW_LCWRA,
-              dateOfBirth = Some(LocalDate.parse("2002-10-10")),
               liabilityStartDate = LocalDate.parse("2025-08-19")
             )
           )
@@ -67,7 +64,6 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2002-10-10",
             |    "liabilityStartDate": "2025-08-19"
             |  }
             |}
@@ -81,7 +77,6 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
           InsertLiabilityRequest(
             UniversalCreditLiabilityDetails(
               universalCreditRecordType = LCW_LCWRA,
-              dateOfBirth = Some(LocalDate.parse("2000-02-29")),
               liabilityStartDate = LocalDate.parse("2024-02-29")
             )
           )
@@ -90,7 +85,6 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "2000-02-29",
             |    "liabilityStartDate": "2024-02-29"
             |  }
             |}
@@ -104,7 +98,6 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
           InsertLiabilityRequest(
             UniversalCreditLiabilityDetails(
               universalCreditRecordType = LCW_LCWRA,
-              dateOfBirth = Some(LocalDate.parse("1900-01-01")),
               liabilityStartDate = LocalDate.parse("2099-12-31")
             )
           )
@@ -113,7 +106,6 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
             |{
             |  "universalCreditLiabilityDetails": {
             |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "dateOfBirth": "1900-01-01",
             |    "liabilityStartDate": "2099-12-31"
             |  }
             |}
@@ -122,27 +114,6 @@ class InsertLiabilityRequestSpec extends AnyWordSpec with Matchers {
         Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
       }
 
-      "optional dateOfBirth is missing" in {
-        val testInsertLiabilityRequest: InsertLiabilityRequest =
-          InsertLiabilityRequest(
-            UniversalCreditLiabilityDetails(
-              universalCreditRecordType = LCW_LCWRA,
-              dateOfBirth = None,
-              liabilityStartDate = LocalDate.parse("2024-01-15")
-            )
-          )
-
-        val expectedJson: JsValue = Json.parse("""
-            |{
-            |  "universalCreditLiabilityDetails": {
-            |    "universalCreditRecordType": "LCW/LCWRA",
-            |    "liabilityStartDate": "2024-01-15"
-            |  }
-            |}
-            |""".stripMargin)
-
-        Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
-      }
     }
 
   }

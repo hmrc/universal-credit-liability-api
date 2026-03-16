@@ -49,19 +49,11 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
   private val insertPayload: InsertLiabilityRequest = InsertLiabilityRequest(
     universalCreditLiabilityDetails = UniversalCreditLiabilityDetails(
       universalCreditRecordType = LCW_LCWRA,
-      dateOfBirth = Some(LocalDate.parse("2002-10-10")),
       liabilityStartDate = LocalDate.parse("2015-08-19")
     )
   )
 
-  private val insertPayloadWithoutDateOfBirth: InsertLiabilityRequest = InsertLiabilityRequest(
-    universalCreditLiabilityDetails = UniversalCreditLiabilityDetails(
-      universalCreditRecordType = LCW_LCWRA,
-      dateOfBirth = None,
-      liabilityStartDate = LocalDate.parse("2015-08-19")
-    )
-  )
-  private val terminatePayload: TerminateLiabilityRequest             = TerminateLiabilityRequest(
+  private val terminatePayload: TerminateLiabilityRequest = TerminateLiabilityRequest(
     ucLiabilityTerminationDetails = UcLiabilityTerminationDetails(
       universalCreditRecordType = LCW_LCWRA,
       liabilityStartDate = LocalDate.parse("2015-08-19"),
@@ -112,28 +104,6 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
       verifyHipRequest(
         hipInsertionUrl(testNino),
         Some(Json.toJson(insertPayload).toString())
-      )
-    }
-
-    "send an 'Insert' request without dateOfBirth and return 204" in {
-      implicit val responseBody: JsObject = Json.obj()
-
-      stubHipResponseFor(hipInsertionUrl(testNino), NO_CONTENT)
-
-      val result = hipConnector
-        .sendUcLiability(
-          nationalInsuranceNumber = testNino,
-          correlationId = testCorrelationId,
-          govUkOriginatorId = testGovUkOriginatorId,
-          requestObject = insertPayloadWithoutDateOfBirth
-        )
-        .futureValue
-
-      result.status mustBe NO_CONTENT
-
-      verifyHipRequest(
-        hipInsertionUrl(testNino),
-        Some(Json.toJson(insertPayloadWithoutDateOfBirth).toString())
       )
     }
 

@@ -34,14 +34,12 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
         val testInsertLiabilityRequest: UniversalCreditLiabilityDetails =
           UniversalCreditLiabilityDetails(
             universalCreditRecordType = UC,
-            dateOfBirth = Some(LocalDate.parse("2002-04-27")),
             liabilityStartDate = LocalDate.parse("2025-08-19")
           )
 
         val expectedJson: JsValue = Json.parse("""
             |{
             |  "universalCreditRecordType": "UC",
-            |  "dateOfBirth": "2002-04-27",
             |  "liabilityStartDate": "2025-08-19"
             |}
             |""".stripMargin)
@@ -53,14 +51,12 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
         val testInsertLiabilityRequest: UniversalCreditLiabilityDetails =
           UniversalCreditLiabilityDetails(
             universalCreditRecordType = LCW_LCWRA,
-            dateOfBirth = Some(LocalDate.parse("2002-04-27")),
             liabilityStartDate = LocalDate.parse("2025-08-19")
           )
 
         val expectedJson: JsValue = Json.parse("""
             |{
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "dateOfBirth": "2002-04-27",
             |  "liabilityStartDate": "2025-08-19"
             |}
             |""".stripMargin)
@@ -72,14 +68,12 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
         val testInsertLiabilityRequest: UniversalCreditLiabilityDetails =
           UniversalCreditLiabilityDetails(
             universalCreditRecordType = LCW_LCWRA,
-            dateOfBirth = Some(LocalDate.parse("2000-02-29")),
             liabilityStartDate = LocalDate.parse("2024-02-29")
           )
 
         val expectedJson: JsValue = Json.parse("""
             |{
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "dateOfBirth": "2000-02-29",
             |  "liabilityStartDate": "2024-02-29"
             |}
             |""".stripMargin)
@@ -91,14 +85,12 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
         val testInsertLiabilityRequest: UniversalCreditLiabilityDetails =
           UniversalCreditLiabilityDetails(
             universalCreditRecordType = LCW_LCWRA,
-            dateOfBirth = Some(LocalDate.parse("1900-01-01")),
             liabilityStartDate = LocalDate.parse("2099-12-31")
           )
 
         val expectedJson: JsValue = Json.parse("""
             |{
             |  "universalCreditRecordType": "LCW/LCWRA",
-            |  "dateOfBirth": "1900-01-01",
             |  "liabilityStartDate": "2099-12-31"
             |}
             |""".stripMargin)
@@ -106,23 +98,6 @@ class UniversalCreditLiabilityDetailsSpec extends AnyWordSpec with Matchers {
         Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
       }
 
-      "optional dateOfBirth is missing" in {
-        val testInsertLiabilityRequest: UniversalCreditLiabilityDetails =
-          UniversalCreditLiabilityDetails(
-            universalCreditRecordType = UC,
-            dateOfBirth = None,
-            liabilityStartDate = LocalDate.parse("2025-08-19")
-          )
-
-        val expectedJson: JsValue = Json.parse("""
-            |{
-            |  "universalCreditRecordType": "UC",
-            |  "liabilityStartDate": "2025-08-19"
-            |}
-            |""".stripMargin)
-
-        Json.toJson(testInsertLiabilityRequest) mustBe expectedJson
-      }
     }
 
   }

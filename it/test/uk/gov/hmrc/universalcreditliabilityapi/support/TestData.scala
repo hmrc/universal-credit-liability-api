@@ -43,7 +43,6 @@ object TestData {
       |  "nationalInsuranceNumber": "$nino",
       |  "universalCreditRecordType": "LCW/LCWRA",
       |  "universalCreditAction": "Insert",
-      |  "dateOfBirth": "2002-10-10",
       |  "liabilityStartDate": "2025-08-19"
       |}
       |""".stripMargin)
