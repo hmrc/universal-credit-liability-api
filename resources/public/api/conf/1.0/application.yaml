@@ -4,7 +4,7 @@ info:
   description: |-
     # Usage Terms
     These interfaces are business-critical interfaces for HMRC and DWP, supporting thousands of staff - all consumption, or change in consumption levels, should be registered and fully approved (see Registered Consumers below).
-  version: "1.3.0"
+  version: "1.3.1"
   contact: {}
   license:
     name: HMRC
@@ -52,12 +52,12 @@ paths:
                   liabilityEndDate: '2025-01-04'
       responses:
         '204':
-          description: Successful - No Content
+          description: 'Successful - No Content'
           headers:
             correlationId:
               $ref: '#/components/headers/correlationId'
         '400':
-          description: Bad Request
+          description: 'Bad Request'
           headers:
             correlationId:
               required: false
@@ -168,7 +168,7 @@ paths:
                     message: 'End date before start date'
                 422_MissingTerminationEndDate:
                   value:
-                    code: "65538"
+                    code: '65538'
                     message: 'End date missing but the input was a Termination'
                 422_PseudoAccount:
                   value:
@@ -187,10 +187,24 @@ paths:
                     code: '99999'
                     message: 'Start Date after Death'
         '500':
-          description: Internal Server Error
+          description: 'Internal Server Error'
           headers:
             correlationId:
               $ref: '#/components/headers/correlationId'
+        '503':
+          description: 'Service Unavailable'
+          headers:
+            correlationId:
+              $ref: '#/components/headers/correlationId'
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/errorResponse_503'
+              examples:
+                ServiceUnavailable_Response:
+                  value:
+                    code: 'SERVER_ERROR'
+                    message: "The 'misc/universal-credit/liability' API is currently unavailable"
 components:
   securitySchemes:
     applicationRestricted:
@@ -353,6 +367,23 @@ components:
           description: Displays the reason of the failure.
           type: string
           maxLength: 128
+    errorResponse_503:
+      title: 503_ServiceUnavailable
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          description: The error code representing the Service Unavailable Error.
+          type: string
+          enum:
+            - 'SERVER_ERROR'
+        message:
+          description: Displays the reason of the failure.
+          type: string
+          enum:
+            - "The 'misc/universal-credit/liability' API is currently unavailable"
     ExistingErrorCodes:
       description:
         "These are all error codes that can occur at the time of writing, we do not anticipate changes in the foreseeable future.<br/>
