@@ -563,7 +563,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
       stubHipInsert(nino, status = 503)
 
-      val response = callPostNotification(requestBody, validateResponseAgainstOwnSchema = false)
+      val response = callPostNotification(requestBody)
 
       response.status mustBe SERVICE_UNAVAILABLE
       response.body[JsValue] mustBe Json.parse("""
@@ -583,7 +583,7 @@ class NotificationIntegrationSpec extends WireMockIntegrationSpec {
 
       stubHipTermination(nino, status = 503)
 
-      val response = callPostNotification(requestBody, validateResponseAgainstOwnSchema = false)
+      val response = callPostNotification(requestBody)
 
       response.status mustBe SERVICE_UNAVAILABLE
       response.body[JsValue] mustBe Json.parse("""
