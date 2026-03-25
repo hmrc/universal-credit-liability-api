@@ -50,8 +50,8 @@ class UcLiabilityNotificationControllerSpec
     with GuiceOneAppPerSuite
     with BeforeAndAfterEach {
 
-  implicit val ec: ExecutionContext = ExecutionContext.global
-  implicit val mat: Materializer    = app.materializer
+  given ec: ExecutionContext = ExecutionContext.global
+  given mat: Materializer    = app.materializer
 
   private val mockAuthAction              = mock[AuthAction]
   private val mockSchemaValidationService = mock[SchemaValidationService]
