@@ -42,7 +42,7 @@ class AuthActionSpec extends AnyWordSpec with GuiceOneAppPerSuite with MockitoSu
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
-  override implicit def fakeApplication(): Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .overrides(
       bind[AuthConnector].toInstance(mockAuthConnector)
     )

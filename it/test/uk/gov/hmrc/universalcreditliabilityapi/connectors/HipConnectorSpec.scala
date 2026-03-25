@@ -61,7 +61,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
     )
   )
 
-  private def stubHipResponseFor(url: String, status: Int)(implicit responseBody: JsObject): StubMapping =
+  private def stubHipResponseFor(url: String, status: Int)(using responseBody: JsObject): StubMapping =
     stubFor(
       post(urlEqualTo(url))
         .willReturn(
@@ -86,7 +86,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
   "HipConnector.sendUcLiability" must {
 
     "send an 'Insert' request with all required HIP headers and return 204" in {
-      implicit val responseBody: JsObject = Json.obj()
+      given responseBody: JsObject = Json.obj()
 
       stubHipResponseFor(hipInsertionUrl(testNino), NO_CONTENT)
 
@@ -108,7 +108,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
     }
 
     "send a 'Terminate' request with all required HIP headers and return 204" in {
-      implicit val responseBody: JsObject = Json.obj()
+      given responseBody: JsObject = Json.obj()
 
       stubHipResponseFor(hipTerminationUrl(testNino), NO_CONTENT)
 
@@ -130,7 +130,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
     }
 
     "handle BAD_REQUEST (400) response" in {
-      implicit val responseBody: JsObject = Json.obj(
+      given responseBody: JsObject = Json.obj(
         "failures" -> Json.arr(
           Json.obj(
             "code"   -> "INVALID_PAYLOAD",
@@ -155,7 +155,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
     }
 
     "handle FORBIDDEN (403) response" in {
-      implicit val responseBody: JsObject = Json.obj(
+      given responseBody: JsObject = Json.obj(
         "code"   -> "FORBIDDEN",
         "reason" -> "Forbidden"
       )
@@ -176,7 +176,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
     }
 
     "handle NOT_FOUND (404) response" in {
-      implicit val responseBody: JsObject = Json.obj(
+      given responseBody: JsObject = Json.obj(
         "code"   -> "404",
         "reason" -> "Resource Not Found"
       )
@@ -197,7 +197,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
     }
 
     "handle UNPROCESSABLE_ENTITY (422) response" in {
-      implicit val responseBody: JsObject = Json.obj(
+      given responseBody: JsObject = Json.obj(
         "failures" -> Json.arr(
           Json.obj(
             "code"   -> "65536",
@@ -222,7 +222,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
     }
 
     "handle INTERNAL_SERVER_ERROR (500) response" in {
-      implicit val responseBody: JsObject = Json.obj(
+      given responseBody: JsObject = Json.obj(
         "failures" -> Json.arr(
           Json.obj(
             "code"   -> "SERVER_ERROR",
@@ -247,7 +247,7 @@ class HipConnectorSpec extends WireMockIntegrationSpec {
     }
 
     "handle SERVICE_UNAVAILABLE (503) response" in {
-      implicit val responseBody: JsObject = Json.obj(
+      given responseBody: JsObject = Json.obj(
         "failures" -> Json.arr(
           Json.obj(
             "code"   -> "SERVICE_UNAVAILABLE",
