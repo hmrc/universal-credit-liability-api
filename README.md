@@ -4,7 +4,7 @@
 
 This API provides the capability for DWP to send Universal Credit Liability notifications for a given individual on NPS (National Insurance & PAYE Service).
 
-## Endpoints
+## Endpoint
 
 ### Insert/Terminate Universal Credit Liability Details
 
@@ -89,19 +89,17 @@ and click "Submit".
 
 These aliases let you run multiple sbt tasks with a single command.
 
-Run the pre‑PR checks (a subset of the pipeline):
-
+Checks against the Scalafmt and Scalafix rules. This command is part of the PR Builder Jenkins job and fails the PR if the code is not formatted:
 ```shell
 sbt prePrChecks
 ```
 
-Checks code coverage:
+Checks code coverage (includes both unit and integration tests):
 
 ```shell
 sbt checkCodeCoverage
 ```
-
-Check that all project files are correctly formatted:
+Formats all project code. Applies Scalafix and Scalafmt rules:
 
 ```shell
 sbt lintCode
