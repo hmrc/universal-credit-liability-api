@@ -4,6 +4,13 @@
 
 This API provides the capability for DWP to send Universal Credit Liability notifications for a given individual on NPS (National Insurance & PAYE Service).
 
+## Endpoints
+
+### Insert/Terminate Universal Credit Liability Details
+
+**Endpoint**: `POST /misc/universal-credit/liability/notification`
+
+**Description**: Provides the capability to insert and terminate Universal Credit Liability details for a given individual.
 
 ## Running Locally
 
@@ -53,14 +60,6 @@ Check code coverage with:
 sbt clean coverage test it/test coverageReport
 ```
 
-## Endpoints
-
-### Insert/Terminate Universal Credit Liability Details
-
-**Endpoint**: `POST /misc/universal-credit/liability/notification`
-
-**Description**: Provides the capability to insert and terminate Universal Credit Liability details for a given individual.
-
 ## Previewing the OpenAPI Specification
 
 To preview the OpenAPI Specification (OAS) locally, start the `DEVHUB_PREVIEW_OPENAPI` service with Service Manager:
@@ -86,6 +85,27 @@ http://localhost:16107/api/conf/1.0/application.yaml
 
 and click "Submit".
 
+## sbt Aliases
+
+These aliases let you run multiple sbt tasks with a single command.
+
+Run the pre‑PR checks (a subset of the pipeline):
+
+```shell
+sbt prePrChecks
+```
+
+Checks code coverage:
+
+```shell
+sbt checkCodeCoverage
+```
+
+Check that all project files are correctly formatted:
+
+```shell
+sbt lintCode
+```
 
 ## Scalafmt
 
