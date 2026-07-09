@@ -55,7 +55,6 @@ class UcLiabilityNotificationController @Inject() (
         hipHttpResponse.status match {
           case NO_CONTENT           => NoContent
           case BAD_REQUEST          =>
-            logger.warn("400 returned by HIP")
             InternalServerError
           case FORBIDDEN            =>
             Forbidden(
@@ -70,11 +69,11 @@ class UcLiabilityNotificationController @Inject() (
               case JsSuccess(hipResponse, _) =>
                 val maybe422Response = mappingService.map422ResponseErrors(hipResponse)
                 maybe422Response.map(response => UnprocessableEntity(Json.toJson(response))).getOrElse {
-                  logger.warn("422 with no reasons returned by HIP")
+                  logger.error("422 with no reasons returned by HIP - CorrelationID : $correlationId")
                   InternalServerError
                 }
               case _                         =>
-                logger.warn("Unreadable 422 returned by HIP")
+                logger.error("Unreadable 422 returned by HIP - CorrelationID : $correlationId")
                 InternalServerError
             }
 
@@ -91,5 +90,4 @@ class UcLiabilityNotificationController @Inject() (
         }
       }).merge
   }
-
 }
