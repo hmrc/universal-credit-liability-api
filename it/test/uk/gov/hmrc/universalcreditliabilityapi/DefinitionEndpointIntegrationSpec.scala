@@ -113,9 +113,7 @@ object Expected {
        |        "version": "1.0",
        |        "status": "$status",
        |        "endpointsEnabled": $endpointEnabled,
-       |        "access": {
-       |          "type": "PRIVATE"
-       |        }
+       |        "access": "PRIVATE"
        |      }
        |    ]
        |  }
