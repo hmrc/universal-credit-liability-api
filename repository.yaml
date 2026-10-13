@@ -5,3 +5,4 @@ tags: ['api']
 test-repositories:
   - universal-credit-liability-tests
   - universal-credit-liability-performance-tests
+serviceNowMapping: SNSVC0021021
